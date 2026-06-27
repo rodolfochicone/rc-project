@@ -30,42 +30,6 @@ type goReleaserHomebrewCask struct {
 	IDs  []string `yaml:"ids"`
 }
 
-func TestReleaseWorkflowsUseScopedReleaseNotesGenerator(t *testing.T) {
-	t.Parallel()
-
-	const fixedModule = "github.com/rc/releasepr@v0.0.21"
-	brokenModules := []string{
-		"github.com/rc/releasepr@v0.0.17",
-		"github.com/rc/releasepr@v0.0.18",
-		"github.com/rc/releasepr@v0.0.19",
-		"github.com/rc/releasepr@v0.0.20",
-	}
-	workflowPaths := []string{
-		filepath.Join(repoRoot(t), ".github", "workflows", "auto-docs.yml"),
-		filepath.Join(repoRoot(t), ".github", "workflows", "release.yml"),
-	}
-
-	for _, workflowPath := range workflowPaths {
-		workflowPath := workflowPath
-		t.Run(filepath.Base(workflowPath), func(t *testing.T) {
-			t.Parallel()
-			content, err := os.ReadFile(workflowPath)
-			if err != nil {
-				t.Fatalf("read release workflow: %v", err)
-			}
-			text := string(content)
-			if !strings.Contains(text, "PR_RELEASE_MODULE: "+fixedModule) {
-				t.Fatalf("expected workflow to use fixed releasepr module %q", fixedModule)
-			}
-			for _, brokenModule := range brokenModules {
-				if strings.Contains(text, brokenModule) {
-					t.Fatalf("expected workflow to avoid broken releasepr module %q", brokenModule)
-				}
-			}
-		})
-	}
-}
-
 func TestReleasePublicationUsesCurrentBodyAndHistoricalNotes(t *testing.T) {
 	t.Parallel()
 
@@ -297,15 +261,6 @@ func TestGoReleaserBuildsFrontendBundleBeforeBinaries(t *testing.T) {
 		t.Fatalf("read release workflow: %v", err)
 	}
 	workflow := string(workflowContent)
-
-	dryRunBlock := workflowJobBlock(t, workflow, "dry-run", "release")
-	assertWorkflowStepBefore(
-		t,
-		dryRunBlock,
-		"uses: ./.github/actions/setup-bun",
-		"uses: ./.github/actions/setup-release",
-		"expected release dry-run to install Bun before invoking GoReleaser",
-	)
 
 	releaseBlock := workflowJobBlock(t, workflow, "release", "")
 	assertWorkflowStepBefore(

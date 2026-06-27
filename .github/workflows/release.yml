@@ -1,19 +1,10 @@
 name: Release
 
 on:
-  # Trigger on push to main for Release PR creation/update
+  # A `release:` / `ci(release):` commit on main cuts a release
   push:
     branches:
       - main
-
-  # Trigger on PR events for dry-run checks
-  pull_request:
-    types:
-      - opened
-      - synchronize
-    branches:
-      - main
-      - "release/v*"
 
   # Manual trigger for emergency releases
   workflow_dispatch:
@@ -30,9 +21,7 @@ concurrency:
 
 env:
   GO_VERSION: "1.26.1"
-  INITIAL_VERSION: "v0.1.0"
   NODE_VERSION: "22"
-  PR_RELEASE_MODULE: github.com/rc/releasepr@v0.0.21
 
 permissions:
   contents: write
@@ -42,101 +31,15 @@ permissions:
   attestations: write
 
 jobs:
-  # Job 1: Create or update Release PR
-  release-pr:
-    name: Create/Update Release PR
-    if: |
-      (github.event_name == 'push' &&
-       github.ref == 'refs/heads/main' &&
-       !contains(github.event.head_commit.message, 'release:') &&
-       !startsWith(github.event.head_commit.message, 'ci(release):') &&
-       !startsWith(github.event.head_commit.message, 'Merge pull request') &&
-       github.event.head_commit.author.name != 'github-actions[bot]') ||
-      (github.event_name == 'workflow_dispatch')
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-          fetch-tags: true
-
-      - name: Prepare Go temporary directory
-        env:
-          GOTMPDIR: ${{ runner.temp }}/go-tmp
-        run: mkdir -p "$GOTMPDIR"
-
-      - uses: ./.github/actions/setup-go
-        with:
-          go-version: ${{ env.GO_VERSION }}
-          install-tools: "false"
-
-      - uses: ./.github/actions/setup-node
-      - uses: ./.github/actions/setup-git-cliff
-
-      - name: Run PR Release Orchestrator
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
-          INITIAL_VERSION: ${{ env.INITIAL_VERSION }}
-          GOTMPDIR: ${{ runner.temp }}/go-tmp
-        run: |
-          go run "${{ env.PR_RELEASE_MODULE }}" pr-release --force --enable-rollback --ci-output
-
-  # Job 2: Dry-run checks on Release PR
-  dry-run:
-    name: Dry-Run Release Check
-    if: |
-      github.event_name == 'pull_request' &&
-      (startsWith(github.event.pull_request.title, 'ci(release): Release ') ||
-       startsWith(github.event.pull_request.title, 'release: Release ') ||
-       startsWith(github.base_ref, 'release/v'))
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-          fetch-tags: true
-
-      - name: Prepare Go temporary directory
-        env:
-          GOTMPDIR: ${{ runner.temp }}/go-tmp
-        run: mkdir -p "$GOTMPDIR"
-
-      - uses: ./.github/actions/setup-go
-        with:
-          go-version: ${{ env.GO_VERSION }}
-          install-tools: false
-
-      - uses: ./.github/actions/setup-node
-
-      - uses: ./.github/actions/setup-bun
-
-      - name: Setup Release Tools
-        uses: ./.github/actions/setup-release
-        with:
-          goreleaser-distribution: goreleaser
-          setup-docker: false
-          setup-docker-login: false
-
-      - name: Run Dry-Run Orchestrator
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
-          GITHUB_HEAD_REF: ${{ github.head_ref }}
-          GITHUB_ISSUE_NUMBER: ${{ github.event.pull_request.number }}
-          GOTMPDIR: ${{ runner.temp }}/go-tmp
-        run: go run "${{ env.PR_RELEASE_MODULE }}" dry-run --ci-output
-
-  # Job 3: Production release on merge
+  # Production release: a `release:` / `ci(release):` commit on main, or manual dispatch
   release:
     name: Production Release
     if: |
-      github.event_name == 'push' &&
-      github.ref == 'refs/heads/main' &&
-      (contains(github.event.head_commit.message, 'ci(release):') ||
-       startsWith(github.event.head_commit.message, 'release:'))
+      (github.event_name == 'push' &&
+       github.ref == 'refs/heads/main' &&
+       (contains(github.event.head_commit.message, 'ci(release):') ||
+        startsWith(github.event.head_commit.message, 'release:'))) ||
+      github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 120
     env:
