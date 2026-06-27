@@ -27,16 +27,16 @@ var rcPeakRows = []string{
 	"╚══════════╝",
 }
 
-// rcWordRows is the "rc" wordmark in the figlet "ANSI Shadow" style: solid
+// rcWordRows is the "RC" wordmark in the figlet "ANSI Shadow" style: solid
 // blocks (█) traced by a line outline (╗ ╔ ═ ║ ╝ ╚) that echoes each letter's
 // silhouette toward the bottom-right.
 var rcWordRows = []string{
-	" ██╗  ██╗ ██████╗",
-	" ██║ ██╔╝ ╚════██╗",
-	" █████╔╝   █████╔╝",
-	" ██╔═██╗  ██╔═══╝ ",
-	" ██║  ██╗ ███████╗",
-	" ╚═╝  ╚═╝ ╚══════╝",
+	" ██████╗   ██████╗",
+	" ██╔══██╗ ██╔════╝",
+	" ██████╔╝ ██║     ",
+	" ██╔══██╗ ██║     ",
+	" ██║  ██║ ╚██████╗",
+	" ╚═╝  ╚═╝  ╚═════╝",
 }
 
 // rcBannerRows is the full startup wordmark: the peak logo followed by "rc",
