@@ -12,7 +12,6 @@ dist/
 web/dist/*
 !web/dist/.keep
 apps/desktop/dist-packaged/
-RELEASE_NOTES.md
 coverage.out
 coverage.html
 .codex/CONTINUITY*
