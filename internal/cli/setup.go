@@ -43,6 +43,7 @@ type setupCommandState struct {
 	installReusableAgents setupReusableAgentInstallFunc
 	previewCommands       func(setup.CommandInstallConfig) ([]setup.CommandPreviewItem, error)
 	installCommands       func(setup.CommandInstallConfig) ([]setup.CommandSuccessItem, []setup.CommandFailureItem, error)
+	installOpenCodeAssets func(setup.OpenCodeInstallConfig) ([]setup.OpenCodeAssetSuccessItem, []setup.OpenCodeAssetFailureItem, error)
 	cleanupLegacyAssets   func(setup.LegacyAssetCleanupConfig) (setup.LegacyAssetCleanupResult, error)
 	isInteractive         func() bool
 
@@ -132,6 +133,7 @@ func newSetupCommandState() *setupCommandState {
 		installReusableAgents: setup.InstallReusableAgents,
 		previewCommands:       setup.PreviewCommandInstall,
 		installCommands:       setup.InstallCommands,
+		installOpenCodeAssets: setup.InstallBundledOpenCodeAssets,
 		cleanupLegacyAssets:   setup.CleanupLegacyTransferredAssets,
 		isInteractive:         isInteractiveTerminal,
 		detectTool:            setup.DetectTool,
@@ -492,6 +494,8 @@ func (s *setupCommandState) executeInstall(cmd *cobra.Command, plan setupInstall
 		result.CommandsFailed,
 	) + len(
 		result.HooksFailed,
+	) + len(
+		result.OpenCodeFailed,
 	)
 	if failureCount > 0 {
 		return fmt.Errorf("setup completed with %d failure(s)", failureCount)
@@ -548,6 +552,25 @@ func (s *setupCommandState) installPlan(plan setupInstallPlan) (*setup.Result, e
 	}
 	result.CommandsSuccessful = successfulCommands
 	result.CommandsFailed = failedCommands
+
+	opencodeSelected := false
+	for _, name := range plan.Config.AgentNames {
+		if name == setup.OpenCodeAgentName {
+			opencodeSelected = true
+			break
+		}
+	}
+	if opencodeSelected {
+		ocSuccessful, ocFailed, err := s.installOpenCodeAssets(setup.OpenCodeInstallConfig{
+			ResolverOptions: plan.Config.ResolverOptions,
+			Global:          plan.Config.Global,
+		})
+		if err != nil {
+			return result, fmt.Errorf("install opencode assets: %w", err)
+		}
+		result.OpenCodeSuccessful = ocSuccessful
+		result.OpenCodeFailed = ocFailed
+	}
 	return result, nil
 }
 
@@ -990,6 +1013,12 @@ func printSecondaryInstallResults(
 		printSectionSeparator(w, styles)
 	}
 	printHookInstallResults(w, styles, result, cwd, homeDir)
+
+	hasOpenCodeResults := len(result.OpenCodeSuccessful) > 0 || len(result.OpenCodeFailed) > 0
+	if (hasSkillResults || hasReusableAgentResults || hasCommandResults || hasHookResults) && hasOpenCodeResults {
+		printSectionSeparator(w, styles)
+	}
+	printOpenCodeInstallResults(w, styles, result, cwd, homeDir)
 }
 
 func printSectionSeparator(w io.Writer, styles cliChromeStyles) {
@@ -1172,6 +1201,73 @@ func printCommandInstallResults(
 		lipgloss.Fprintf(w, "    %s  %s  %s\n", icon, name, path)
 		lipgloss.Fprintf(w, "       %s\n", styles.errorMessage.Render(item.Error))
 	}
+}
+
+func printOpenCodeInstallResults(
+	w io.Writer,
+	styles cliChromeStyles,
+	result *setup.Result,
+	cwd, homeDir string,
+) {
+	if result == nil {
+		return
+	}
+	if len(result.OpenCodeSuccessful) == 0 && len(result.OpenCodeFailed) == 0 {
+		return
+	}
+
+	width := openCodeColumnWidth(result.OpenCodeSuccessful, result.OpenCodeFailed)
+
+	if len(result.OpenCodeSuccessful) > 0 {
+		lipgloss.Fprintln(w, styles.successHeader.Render(
+			fmt.Sprintf("  ✓ Installed OpenCode assets (%d)", len(result.OpenCodeSuccessful)),
+		))
+		fmt.Fprintln(w)
+
+		for i := range result.OpenCodeSuccessful {
+			item := &result.OpenCodeSuccessful[i]
+			icon := styles.successIcon.Render("✓")
+			name := styles.agent.Render(padRight(item.Kind+" "+item.Name, width))
+			path := styles.path.Render(shortenPath(item.Path, cwd, homeDir))
+			lipgloss.Fprintf(w, "    %s  %s  %s\n", icon, name, path)
+		}
+	}
+
+	if len(result.OpenCodeFailed) == 0 {
+		return
+	}
+	if len(result.OpenCodeSuccessful) > 0 {
+		fmt.Fprintln(w)
+	}
+
+	lipgloss.Fprintln(w, styles.failureHeader.Render(
+		fmt.Sprintf("  ✗ Failed OpenCode assets (%d)", len(result.OpenCodeFailed)),
+	))
+	fmt.Fprintln(w)
+
+	for i := range result.OpenCodeFailed {
+		item := &result.OpenCodeFailed[i]
+		icon := styles.failureIcon.Render("✗")
+		name := styles.agent.Render(padRight(item.Kind+" "+item.Name, width))
+		path := styles.path.Render(shortenPath(item.Path, cwd, homeDir))
+		lipgloss.Fprintf(w, "    %s  %s  %s\n", icon, name, path)
+		lipgloss.Fprintf(w, "       %s\n", styles.errorMessage.Render(item.Error))
+	}
+}
+
+func openCodeColumnWidth(successful []setup.OpenCodeAssetSuccessItem, failed []setup.OpenCodeAssetFailureItem) int {
+	width := 0
+	for i := range successful {
+		if length := len(successful[i].Kind + " " + successful[i].Name); length > width {
+			width = length
+		}
+	}
+	for i := range failed {
+		if length := len(failed[i].Kind + " " + failed[i].Name); length > width {
+			width = length
+		}
+	}
+	return width
 }
 
 func commandColumnWidth(successful []setup.CommandSuccessItem, failed []setup.CommandFailureItem) int {

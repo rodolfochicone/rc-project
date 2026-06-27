@@ -272,6 +272,9 @@ type Result struct {
 
 	HooksSuccessful []HookSuccessItem
 	HooksFailed     []HookFailureItem
+
+	OpenCodeSuccessful []OpenCodeAssetSuccessItem
+	OpenCodeFailed     []OpenCodeAssetFailureItem
 }
 
 // VerifiedReusableAgent captures the verification result for one reusable agent.
