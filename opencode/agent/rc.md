@@ -1,7 +1,7 @@
 ---
 description: rc pipeline orchestrator — delegates each phase to its specialized rc subagent
 mode: primary
-model: opencode-go/minimax-m2.7
+model: opencode-go/deepseek-v4-pro
 reasoningEffort: medium
 temperature: 0.2
 ---
