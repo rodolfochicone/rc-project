@@ -1,0 +1,16 @@
+@import "tailwindcss";
+@import "@rodolfochicone/ui/tokens.css";
+
+@source "../../packages/ui/src";
+
+@layer base {
+  body {
+    background:
+      radial-gradient(circle at top left, rgba(242, 107, 33, 0.045), transparent 24%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.012), transparent 18%), var(--background);
+  }
+}
+
+@utility eyebrow {
+  @apply font-eyebrow text-[10px] leading-4 font-medium tracking-[0.14em] uppercase;
+}

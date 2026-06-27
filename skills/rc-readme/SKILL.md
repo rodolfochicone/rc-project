@@ -1,0 +1,73 @@
+---
+name: rc-readme
+description: Creates or updates a project README by analyzing the real codebase, then rewriting README.md with accurate, evidence-based content. Use when generating a README from scratch, refreshing an outdated one, or syncing docs after features land. Do not use for API reference files (use rc-openapi or rc-postman), changelog generation, or editing source code.
+model: sonnet
+effort: medium
+---
+
+# README
+
+Produce a `README.md` that reflects what the code actually does — never invented or aspirational content. Every claim must trace back to a file you read. This skill is standalone and stack-agnostic; it detects the project's technology before writing.
+
+## Required Inputs
+
+- None. Operates on the current repository root.
+- Optional: a target path other than `README.md`, or specific sections to scope the update to.
+
+## Workflow
+
+1. Gather documentation context.
+   - Read, when present: the existing `README.md`, `CLAUDE.md`, `AGENTS.md`, `CONTRIBUTING.md`, any `docs/` overview, and architecture notes or ADRs under `docs/`, `.techdocs/`, or `.rc/tasks/*/adrs/` (in monorepos there may be more than one `.rc` directory — scan each one, skipping `node_modules`, `.git`, `vendor`, and `_archived/`).
+   - The existing README defines the structure and tone to preserve. Keep valid sections; only rewrite what is stale.
+
+2. Detect the stack and analyze the codebase. Read real sources — do not guess.
+   - **Manifest and stack**: inspect `go.mod`, `package.json`, `pyproject.toml`, `Cargo.toml`, `pom.xml`, `*.csproj`, `Gemfile`, etc. Record real dependency versions, the language, frameworks, and the package/registry.
+   - **Entry points and public API**: the binary `main`, exported packages, library entry, or CLI commands.
+   - **HTTP / RPC surface**: route definitions, handlers, controllers, or service files. Capture method, path, and the request/response contract from the validation layer (schemas, DTOs, structs).
+   - **Configuration**: environment variables and config files — which are required vs optional, and defaults.
+   - **Scripts and tasks**: real commands from `package.json` scripts, `Makefile`, `Taskfile`, `justfile`, etc.
+   - **Persistence**: migrations or schema files — tables/collections and their shape.
+   - **CI/CD**: workflows under `.github/workflows/` or equivalent — triggers and deploy targets.
+   - **Project structure**: map the real directory tree (Glob), describing each significant directory's purpose.
+   - For an unfamiliar framework, spawn an Agent to map the relevant files rather than guessing conventions.
+
+3. Compare and find gaps. Cross-check the existing README against the data from step 2: outdated versions, missing or removed endpoints, stale env vars, wrong commands, undocumented new features, and incorrect structure. List what must change.
+
+4. Rewrite `README.md` using only verified data. Adapt the section set to the project type (library, service, CLI, monorepo); include the sections that apply, in this order:
+   - **Title** — matches the package/repo name.
+   - **Short description** — one line, under ~120 characters, says what it does.
+   - **Badges** — 2–4 key badges (build, coverage, version, license) via shields.io; preserve existing ones and update values. Skip if the project has none and none are warranted.
+   - **Table of Contents** — when the README exceeds ~100 lines.
+   - **Overview / Background** — what it is and why it exists.
+   - **Architecture** — layers and data flow; keep/refresh existing diagrams.
+   - **Install / Quick Start** — prerequisites and setup, with copy-pasteable commands.
+   - **Usage** — the primary way to run it, with a real example.
+   - **API / Endpoints** — when a service: method, path, and request/response shape. Link to `openapi.yaml` or the Postman collection if present instead of duplicating exhaustively.
+   - **Configuration** — env var table: variable, description, required, default.
+   - **Project structure** — the real tree with per-directory purpose.
+   - **Scripts / Commands** — the real task list.
+   - **Testing** — runner, conventions, command.
+   - **Deploy** — environments and pipelines, when applicable.
+   - **Contributing** — link to `CONTRIBUTING.md` / `CLAUDE.md` rules when present.
+   - **License** — always last.
+
+5. Validate before finishing. Confirm: every documented endpoint, command, env var, and version traces to a file you read; no section was invented; links and commands are real; the structure matches the actual tree. Mark genuinely undeterminable details as `[TODO]` rather than fabricating them.
+
+6. Verify and report.
+   - Use installed `rc-final-verify` before claiming completion.
+   - Present a summary: sections updated, the most relevant changes (new endpoints, version bumps, added env vars), and sections left unchanged.
+
+## Critical Rules
+
+- Never invent information. Every fact comes from a file you read; when unknown, omit it or mark `[TODO]`.
+- Match the language and tone of the existing README. If the repo writes docs in another language, follow it.
+- Preserve still-valid content and existing badges — this is a surgical refresh, not a from-scratch rewrite unless none exists.
+- Use real dependency versions from the manifest; never hardcode versions.
+- Code examples must match the project's actual usage and conventions.
+- Do not modify any source code. This skill only writes the README (and only the target file).
+
+## Error Handling
+
+- If no manifest or recognizable stack can be found, report what was inspected and ask the user to confirm the project type before writing.
+- If the codebase is too large to analyze fully, document the core surfaces, note what was not covered, and do not imply full coverage.
+- If the target file cannot be written, stop and report the filesystem error.

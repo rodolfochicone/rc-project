@@ -1,0 +1,199 @@
+# Changelog
+
+## [Unreleased]
+
+## [0.13.0] - 2026-06-22
+
+### Added
+
+- **`rc install --headroom` e listagem de recursos.** O comando `rc install`
+  agora instala mais de um recurso: além do `rtk`, suporta `--headroom`
+  (instala o pacote Python `headroom-ai[all]` via pipx, pip3 ou pip; imprime
+  instruções manuais quando não há instalador Python disponível). Rodar
+  `rc install` sem flag lista os recursos instaláveis. A orquestração de
+  detecção/instalação foi generalizada e é compartilhada por todos os recursos
+  e pelo passo de RTK do `rc setup` (sem duplicação).
+- **Tutorial de primeiros passos por recurso.** Após instalar (ou quando o
+  recurso já está presente), `rc install` imprime um bloco "Getting started"
+  com os comandos principais e o link da documentação oficial. A flag
+  `--guide` (ex.: `rc install --rtk --guide`) mostra esse tutorial sob demanda,
+  sem detectar nem instalar nada.
+
+## [0.12.0] - 2026-06-22
+
+### Added
+
+- **Comando `rc install --rtk`.** Instala o `rtk` (runtime toolkit) diretamente,
+  sem precisar passar pelo fluxo completo de `rc setup`. Detecta o `rtk` no
+  `PATH` e reporta a versão quando já presente; quando ausente, roda o instalador
+  apropriado para o SO (Homebrew, script oficial ou cargo) ou imprime instruções
+  manuais quando nenhum instalador pode rodar. Com `--yes` instala de forma
+  desassistida; sem ele, em terminal interativo, confirma antes de instalar. A
+  lógica de RTK é compartilhada com `rc setup` (sem duplicação).
+
+## [0.11.1] - 2026-06-21
+
+### Changed
+
+- **Docs e help do `rc init`.** O comando passa a aparecer na lista de
+  subcomandos em `rc --help`, e o README ganhou um destaque e a seção
+  "Start a new project" documentando `rc init` e a skill `rc-new-project`.
+
+## [0.11.0] - 2026-06-21
+
+### Added
+
+- **Scaffold de projeto novo a partir do template TypeScript da rodolfochicone.** Duas
+  frentes para começar um projeto do zero:
+
+  **Comando `rc init [nome]`:** cria um repositório **privado** na organização
+  **rodolfochicone** a partir do template `rodolfochicone/typescript-template` e o clona em
+  `./<nome>/` no diretório atual (`gh repo create … --template … --private --clone`).
+  - Fluxo **híbrido** do nome: com argumento usa direto; sem argumento e em
+    terminal interativo, pergunta o nome (com validação); sem TTY e sem nome,
+    retorna erro acionável em vez de travar.
+  - Pré-valida o GitHub CLI e, em erro de configuração, **orienta como
+    configurar**: `gh` não instalado, não autenticado ou sem acesso à org
+    rodolfochicone — cada caso com comandos copiáveis, sem stacktrace.
+
+  **Skill `rc-new-project`:** versão agêntica (Claude/Codex) do mesmo fluxo, com
+  fases em ordem, confirmação no passo externo, comandos `gh` explícitos,
+  orientação de configuração do GitHub e verificação real do clone antes de
+  declarar sucesso.
+
+## [0.10.0] - 2026-06-21
+
+### Added
+
+- **Suporte a monorepos com múltiplas pastas `.rc`.** O rc agora descobre a pasta
+  `.rc` ativa em projetos que têm mais de uma (ex.: `packages/*/.rc`, `apps/*/.rc`),
+  tanto nas skills quanto no binário.
+
+  **Binário (`internal/core/workspace`):**
+  - A descoberta continua caminhando **para cima** do diretório atual até o `.rc`
+    mais próximo (então `cd <subprojeto> && rc ...` já escolhe o `.rc` certo).
+  - Quando **nenhum** `.rc` existe acima, agora busca **para baixo** (ignorando
+    `node_modules`, `.git`, `vendor`, `_archived`, limitada à profundidade 6):
+    - **1 encontrado** → usa automaticamente.
+    - **2+ encontrados** → erro claro listando os candidatos, pedindo `cd` no
+      subprojeto ou `--workspace <dir>`.
+    - **0 encontrados** → mantém o comportamento atual (raiz como workspace).
+  - Nova flag global **`--workspace <dir>`** em todos os comandos para apontar o
+    `.rc`/subprojeto explicitamente, sem precisar dar `cd`.
+
+  **Skills:** `rc-create-prd` e `rc-idea-factory` perguntam em qual `.rc` salvar
+  quando há mais de uma; `rc-create-techspec`, `rc-create-tasks`, `rc-review-round`
+  e `rc-code-review` localizam o `.rc` que contém a tarefa (`<NN>-<slug>`) e só
+  perguntam em caso de ambiguidade; `rc-readme` varre todos os `.rc` por ADRs.
+  Projetos de pasta única (com ou sem `.rc`) seguem idênticos — sem perguntas novas.
+
+#### Como atualizar o rc
+
+```bash
+rc upgrade
+```
+
+> ⚠️ O repositório é privado, então o `rc upgrade` precisa de um token. Garanta no
+> shell (`~/.zshrc`):
+>
+> ```bash
+> export GH_TOKEN="$(gh auth token)"
+> ```
+
+Confirme a versão depois:
+
+```bash
+rc --version   # deve mostrar v0.10.0
+```
+
+## [0.9.0] - 2026-06-21
+
+### Added
+
+- **`rc setup --sync`** — novo modo de sincronização de skills. Rodando dentro de
+  um projeto, ele reconcilia as skills bundled do rc com a versão do binário:
+  - ✅ **Atualiza** as skills bundled que o projeto já tem (quando mudaram).
+  - ➕ **Adiciona** as skills bundled que estão faltando.
+  - ⏭️ **Ignora** as que já estão atualizadas (não reescreve à toa).
+  - 🔒 **Não toca** em skills de terceiros/customizadas no mesmo diretório.
+
+#### Como atualizar o rc
+
+```bash
+rc upgrade
+```
+
+> ⚠️ O repositório é privado, então o `rc upgrade` precisa de um token. Garanta no
+> shell (`~/.zshrc`):
+>
+> ```bash
+> export GH_TOKEN="$(gh auth token)"
+> ```
+>
+> Sem isso, o `upgrade` silenciosamente não faz nada.
+
+Confirme a versão depois:
+
+```bash
+rc --version   # deve mostrar v0.9.0
+```
+
+#### Como usar o comando
+
+```bash
+# Claude Code (aceita "claude" ou "claude-code")
+rc setup --sync --agent claude
+
+# Codex
+rc setup --sync --agent codex
+```
+
+Flags combináveis:
+
+| Flag              | Efeito                                                                              |
+| ----------------- | ---------------------------------------------------------------------------------- |
+| `--agent <nome>`  | Agente alvo (repetível). `claude` → `.claude/skills/`, `codex` → `.agents/skills/` |
+| `--yes` / `-y`    | Não-interativo (útil em scripts/CI)                                                |
+| `--global` / `-g` | Sincroniza no diretório do usuário em vez do projeto                               |
+| `--copy`          | Copia arquivos em vez de symlink                                                   |
+
+Exemplos:
+
+```bash
+# Projeto, Claude, sem prompts
+rc setup --sync --agent claude --yes
+
+# Vários agentes de uma vez
+rc setup --sync --agent claude --agent codex --yes
+
+# Escopo global (na máquina, não no projeto)
+rc setup --sync --agent claude --global --yes
+```
+
+> ❌ `--sync` não combina com `--all` nem `--skill` (eles selecionam catálogos
+> explícitos e contrariam a ideia de sincronizar). O comando avisa se for usado junto.
+
+#### Exemplo de saída
+
+```
+Sync Claude Code (project scope)
+
+  ✓ Added (3)
+    ✓  rc-readme        ./.claude/skills/rc-readme
+    ✓  rc-postman       ./.claude/skills/rc-postman
+    ✓  rc-openapi       ./.claude/skills/rc-openapi
+  ✓ Updated (1)
+    ✓  rc-create-prd    ./.claude/skills/rc-create-prd
+  Unchanged  11 already current
+```
+
+#### Fluxo recomendado para o time
+
+1. `rc upgrade` (atualiza o binário para v0.9.0).
+2. Dentro de cada projeto: `rc setup --sync --agent claude --yes` (ou `codex`).
+3. Repetir o passo 2 sempre que sair uma nova versão do rc — só o que mudou é atualizado.
+
+## [0.2.4] - 2026-06-13
+
+### Added
+- Initial rc release

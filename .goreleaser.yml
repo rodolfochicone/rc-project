@@ -1,0 +1,222 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema-pro.json
+# vim: set ts=2 sw=2 tw=0 fo=jcroql
+version: 2
+pro: true
+
+project_name: rc
+
+metadata:
+  mod_timestamp: "{{ .CommitTimestamp }}"
+  license: "BSL-1.1"
+  homepage: "https://github.com/rodolfochicone/rc-project"
+  description: "rc CLI"
+  maintainers:
+    - "rc Team <support@rc.tech>"
+
+env:
+  - GO111MODULE=on
+  - CGO_ENABLED=0
+
+git:
+  tag_sort: -version:refname
+
+before:
+  hooks:
+    - make frontend-build
+
+builds:
+  - id: rc
+    main: ./cmd/rc
+    binary: rc
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ignore:
+      - goos: windows
+        goarch: arm64
+    ldflags:
+      - -s -w
+      - -X github.com/rodolfochicone/rc-project/internal/version.Version={{ .Version }}
+      - -X github.com/rodolfochicone/rc-project/internal/version.Commit={{ .ShortCommit }}
+      - -X github.com/rodolfochicone/rc-project/internal/version.Date={{ .Date }}
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    mod_timestamp: "{{ .CommitTimestamp }}"
+
+archives:
+  - id: rc-archive
+    ids:
+      - rc
+    name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_{{ .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- with .Arm }}v{{ . }}{{ end }}
+    format_overrides:
+      - goos: windows
+        formats:
+          - zip
+    files:
+      - README.md
+      - LICENSE*
+    # Keep the binary at the archive root so Homebrew casks can link it directly.
+
+checksum:
+  name_template: "checksums.txt"
+  algorithm: sha256
+
+signs:
+  - cmd: cosign
+    certificate: "${artifact}.pem"
+    args:
+      - sign-blob
+      - "--output-certificate=${certificate}"
+      - "--output-signature=${signature}"
+      - "${artifact}"
+      - "--yes"
+    artifacts: checksum
+    output: true
+
+snapshot:
+  version_template: "0.0.0-{{ .Timestamp }}"
+
+source:
+  enabled: true
+
+changelog:
+  # Use git history so the first release works before a previous tag exists on GitHub.
+  use: git
+  sort: asc
+  abbrev: 7
+  groups:
+    - title: "🎉 Features"
+      regexp: "^.*feat[\\(\\w)]*:+.*$"
+      order: 0
+    - title: "🐛 Bug Fixes"
+      regexp: "^.*fix[\\(\\w)]*:+.*$"
+      order: 1
+    - title: "⚡ Performance Improvements"
+      regexp: "^.*perf[\\(\\w)]*:+.*$"
+      order: 2
+    - title: "🔒 Security"
+      regexp: "^.*security[\\(\\w)]*:+.*$"
+      order: 3
+    - title: "📚 Documentation"
+      regexp: "^.*docs[\\(\\w)]*:+.*$"
+      order: 4
+    - title: "♻️ Refactoring"
+      regexp: "^.*refactor[\\(\\w)]*:+.*$"
+      order: 5
+    - title: "📦 Dependencies"
+      regexp: "^.*deps[\\(\\w)]*:+.*$"
+      order: 6
+    - title: "🧪 Testing"
+      regexp: "^.*test[\\(\\w)]*:+.*$"
+      order: 7
+    - title: "Other Changes"
+      order: 999
+  filters:
+    exclude:
+      - "^(build|ci): "
+      - "^ci\\(release\\): "
+      - "^release: "
+      - "^chore\\(release\\): "
+      - "^chore: auto-update generated files$"
+      - "^chore: docs$"
+      - "^chore: schema update$"
+      - "^chore: typo$"
+      - "^chore\\(legal\\): "
+      - "^chore\\(deps\\): "
+      - "^docs: update$"
+      - "^test:"
+      - "^test\\("
+      - "merge conflict"
+      - Merge branch
+      - Merge pull request
+      - Merge remote-tracking branch
+      - go mod tidy
+      - "^wip "
+      - "^wip:"
+
+release:
+  github:
+    owner: rodolfochicone
+    name: rc-project
+  name_template: "Release {{ .Version }}"
+  mode: replace
+  draft: false
+  prerelease: auto
+
+sboms:
+  - artifacts: archive
+  - id: source
+    artifacts: source
+
+# Homebrew cask configuration
+homebrew_casks:
+  - name: rc
+    repository:
+      owner: rodolfochicone
+      name: homebrew-rc
+      branch: main
+      token: "{{ .Env.RELEASE_TOKEN }}"
+
+    commit_author:
+      name: goreleaserbot
+      email: bot@goreleaser.com
+
+    commit_msg_template: "Brew cask update for {{ .ProjectName }} version {{ .Tag }}"
+    directory: Casks
+    caveats: |
+      To get started with rc, see https://github.com/rodolfochicone/rc-project
+    homepage: "https://github.com/rodolfochicone/rc-project"
+    description: "rc CLI"
+    skip_upload: auto
+
+# NPM package configuration
+npms:
+  - name: "@rodolfochicone/cli"
+    description: "rc CLI"
+    repository: "git+https://github.com/rodolfochicone/rc-project.git"
+    bugs: https://github.com/rodolfochicone/rc-project/issues
+    access: public
+    license: BSL-1.1
+    homepage: "https://rc.tech"
+
+# Arch User Repository (AUR) configuration
+# Temporarily disabled until the AUR package exists and `AUR_KEY` is configured.
+# Uncomment this block to re-enable AUR publishing.
+# aurs:
+#   - name: rc-bin
+#     homepage: "https://github.com/rodolfochicone/rc-project"
+#     description: "rc CLI"
+#     maintainers:
+#       - "rc Team <support@rc.tech>"
+#     license: "MIT"
+#     private_key: '{{ .Env.AUR_KEY }}'
+#     git_url: 'ssh://aur@aur.archlinux.org/rc-bin.git'
+#     provides:
+#       - rc
+#     conflicts:
+#       - rc
+#       - rc-git
+#     package: |-
+#       # Binaries
+#       install -Dm755 "${srcdir}/${pkgname%-bin}" "${pkgdir}/usr/bin/${pkgname%-bin}"
+#
+#       # License
+#       install -Dm644 "${srcdir}/LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+#
+#       # README
+#       install -Dm644 "${srcdir}/README.md" "${pkgdir}/usr/share/doc/${pkgname}/README.md"
+#     commit_author:
+#       name: goreleaserbot
+#       email: bot@goreleaser.com
+#     commit_msg_template: "AUR package update for {{ .ProjectName }} version {{ .Tag }}"

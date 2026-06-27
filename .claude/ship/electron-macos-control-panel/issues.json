@@ -1,0 +1,38 @@
+{
+    "issues": [
+        {
+            "id": 1,
+            "severity": "high",
+            "source": "qa",
+            "title": "Config and Catalog services not wired into live daemon \u2014 all new endpoints return 503",
+            "detail": "Repro: build and start the daemon with 'make build && bin/rc daemon start', then call any new endpoint. Observed: curl http://127.0.0.1:2323/api/config/global returns {\"code\":\"service_unavailable\",\"message\":\"config service unavailable\"} (503). curl -H 'X-rc-Workspace-ID: <id>' http://127.0.0.1:2323/api/catalog/extensions likewise returns {\"code\":\"service_unavailable\",\"message\":\"catalog service unavailable\"} (503). Expected: endpoints return real config/catalog data. Root cause: internal/daemon/host.go assembles HandlerConfig without setting the Config or Catalog fields (line ~308). Task T12 required 'Construct configsvc.Service and catalog.Service and pass them into HandlerConfig' but this was not done. Evidence: grep for HandlerConfig in host.go shows no Config/Catalog assignment; curl tests confirmed 503 on all four new paths.",
+            "status": "resolved",
+            "evidence": "daemon now imports and wires configsvc and catalog at internal/daemon/host.go:321-322. Live daemon test: 'bin/rc daemon start' followed by 'curl http://127.0.0.1:2323/api/config/global' returned {\"config\":{}} (HTTP 200, not 503). curl for catalog endpoints with X-rc-Workspace-ID header likewise returned {\"extensions\":[]} and {\"agents\":[]} (200). host_wiring_test.go added at internal/daemon/host_wiring_test.go asserts Config/Catalog are non-nil; test passed: go test ./internal/daemon/ -run TestBuildHostHandlersWiresConfigAndCatalog \u2192 PASS.",
+            "created": "2026-06-14T16:31:36",
+            "updated": "2026-06-14T17:01:59"
+        },
+        {
+            "id": 2,
+            "severity": "high",
+            "source": "qa",
+            "title": "Electron shell (apps/desktop/) entirely absent \u2014 FR1, FR2, FR5, AC1-3, AC8 unimplemented",
+            "detail": "apps/ directory still does not exist. ls /Users/rodolfo.chicone/dev/rc-project/apps/ returns 'No such file or directory'. package.json workspaces field is still ['packages/ui','web','sdk/*'] with no 'apps/*'. turbo.json has no apps/desktop tasks. None of T17-T22 were implemented. AC1, AC2, AC3, AC8 remain unverifiable.",
+            "status": "resolved",
+            "evidence": "apps/desktop/ now exists with full Electron shell. 'ls apps/desktop/' shows src/ (main/,preload/), package.json, electron-builder.yml, tsconfig.json, vitest.config.ts. package.json workspaces is now ['apps/*','packages/ui','web','sdk/*']. desktop/src/main/index.ts implements BrowserWindow + SSE loading, second-instance focus, before-quit graceful stop \u2014 satisfying AC1/AC2/AC3. electron-builder.yml targets dmg+zip arch:universal satisfying AC8. turbo.json package task added. Desktop tests run: 'bun run --cwd apps/desktop test' \u2192 3 test files, 16 tests passed (daemon.test.ts covers attach/spawn, graceful stop ownership, bounded restart backoff).",
+            "created": "2026-06-14T16:31:46",
+            "updated": "2026-06-14T17:58:45"
+        },
+        {
+            "id": 3,
+            "severity": "high",
+            "source": "qa",
+            "title": "Web UI feature modules and routes for config/workspaces/extensions absent \u2014 AC4, AC5, AC7 unmet",
+            "detail": "web/src/systems/ still contains only {app-shell,dashboard,memory,reviews,runs,spec,workflows} \u2014 no config/, workspaces/, or extensions/ directories. web/src/routes/_app/ has no config.tsx, workspaces.tsx, or extensions.tsx. find web/src -name '*.test.*' | xargs grep -l 'api/config|api/catalog|useGlobalConfig' returns nothing. T13-T16 unimplemented. AC4/AC5 unmet.",
+            "status": "resolved",
+            "evidence": "web/src/systems/ now contains config/, workspaces/, extensions/ directories. web/src/routes/_app/ has config.tsx, workspaces.tsx, extensions.tsx routes. config system: adapters/config-api.ts (get/put global+workspace), hooks/use-config.ts (useGlobalConfig, useSaveGlobalConfig \u2014 mutation surfaces 400 config_invalid to UI via setSaveError satisfying AC4). workspaces system: hooks/use-workspaces.ts has useRegisterWorkspace, useRenameWorkspace, useUnregisterWorkspace satisfying AC5 workspace management. extensions system: components/extensions-view.tsx shows agents+extensions read-only satisfying AC5. config-api.test.ts covers 400 invalid-edit rejection. web tests: 'bun run --cwd web test' \u2192 49 test files, 256 passed.",
+            "created": "2026-06-14T16:31:55",
+            "updated": "2026-06-14T17:58:52"
+        }
+    ],
+    "next_id": 4
+}

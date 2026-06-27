@@ -1,0 +1,37 @@
+.DS_Store
+.vscode/
+.env
+.tmp/
+.cache/
+bin/
+dist/
+# Root-level Go build artifacts (binaries belong in bin/, or run via `go run`)
+/rc
+/rc-plugin-sync
+!web/dist/
+web/dist/*
+!web/dist/.keep
+apps/desktop/dist-packaged/
+RELEASE_NOTES.md
+coverage.out
+coverage.html
+.codex/CONTINUITY*
+.codex/plans
+.resources/
+.factory/skills
+skills/*/autoresearch-*/
+skills-lock.json
+.claude/skills
+ai-docs
+**/**/node_modules
+node_modules/
+.rc/runs
+.rc/analysis/
+.rc/memory.db
+.rc/tasks/daemon-improvs/analysis/qa/logs/live-daemon-run-id.txt
+.turbo/
+coverage/
+*.tsbuildinfo
+
+# TanStack Router generated tree — regenerated at build/dev time.
+web/src/routeTree.gen.ts

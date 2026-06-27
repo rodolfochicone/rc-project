@@ -1,0 +1,14 @@
+{
+    "name": "rc-project",
+    "owner": {
+        "name": "Escale"
+    },
+    "plugins": [
+        {
+            "name": "rc",
+            "source": ".",
+            "version": "0.27.0",
+            "description": "rc workflow skills and slash commands"
+        }
+    ]
+}
