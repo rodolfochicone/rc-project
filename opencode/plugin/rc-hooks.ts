@@ -43,6 +43,17 @@ export const RcHooks: Plugin = async ({ $ }) => {
     return { tool_input: { file_path: filePath }, session_id: input?.sessionID ?? "opencode" };
   }
 
+  // Notification sound — opt-in via RC_SOUND=1. Fire-and-forget so it never
+  // delays the turn; afplay on macOS, ignored on platforms without it.
+  function playSound(kind: "done" | "attention") {
+    if (process.env.RC_SOUND !== "1") return;
+    const sound =
+      kind === "attention"
+        ? "/System/Library/Sounds/Ping.aiff"
+        : "/System/Library/Sounds/Glass.aiff";
+    void $`afplay ${sound}`.nothrow().quiet();
+  }
+
   return {
     "tool.execute.before": async (input: any, output: any) => {
       if (input.tool === "bash") {
@@ -75,6 +86,12 @@ export const RcHooks: Plugin = async ({ $ }) => {
             : { tool_name: input.tool, tool_input: { file_path: args.filePath ?? "" } };
         await runGuard("observe.sh", payload);
       }
+    },
+    // End-of-turn / needs-attention notification sound (opt-in via RC_SOUND=1).
+    event: async ({ event }: any) => {
+      const type = event?.type;
+      if (type === "session.idle") playSound("done");
+      else if (type === "permission.asked") playSound("attention");
     },
   };
 };
