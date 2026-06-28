@@ -22,14 +22,16 @@ for the pipeline belong in the Go executor.
 
 ## Hooks
 
-| Event         | Matcher                        | Script            | Profile    | Effect                                                                                                                                                                                                        |
-| ------------- | ------------------------------ | ----------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `PreToolUse`  | `Bash`                         | `git-guard.sh`    | `minimal`  | Blocks destructive/history-rewriting git: `reset --hard`, `restore`, `clean`, change-discarding `checkout`, `rebase`, `filter-branch`, force-push.                                                            |
-| `PreToolUse`  | `Bash`                         | `commit-guard.sh` | `minimal`  | Blocks AI attribution in commit messages (`Co-Authored-By`, "Generated with Claude", 🤖).                                                                                                                     |
-| `PreToolUse`  | `Edit\|Write\|MultiEdit`       | `go-mod-guard.sh` | `standard` | Blocks hand-editing `go.mod` / `go.sum`; directs to `go get`.                                                                                                                                                 |
-| `PreToolUse`  | `Edit\|Write\|MultiEdit`       | `gateguard.sh`    | `strict`   | Fact-gate: blocks the **first** edit of each file in a session once, demanding the agent state callers, affected API, data shape, and the literal instruction. Off by default.                                |
-| `PostToolUse` | `Edit\|Write\|MultiEdit`       | `go-fmt.sh`       | `standard` | Runs `gofmt -w` on the edited `.go` file (never blocks).                                                                                                                                                      |
-| `PostToolUse` | `Edit\|Write\|MultiEdit\|Bash` | `observe.sh`      | opt-in     | Instincts capture: appends a compact `{tool, target}` observation to `.rc/instincts/observations.jsonl` for the `rc-instincts` skill. Off unless `RC_INSTINCTS=1`. Never blocks; never records file contents. |
+| Event          | Matcher                        | Script            | Profile    | Effect                                                                                                                                                                                                        |
+| -------------- | ------------------------------ | ----------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PreToolUse`   | `Bash`                         | `git-guard.sh`    | `minimal`  | Blocks destructive/history-rewriting git: `reset --hard`, `restore`, `clean`, change-discarding `checkout`, `rebase`, `filter-branch`, force-push.                                                            |
+| `PreToolUse`   | `Bash`                         | `commit-guard.sh` | `minimal`  | Blocks AI attribution in commit messages (`Co-Authored-By`, "Generated with Claude", 🤖).                                                                                                                     |
+| `PreToolUse`   | `Edit\|Write\|MultiEdit`       | `go-mod-guard.sh` | `standard` | Blocks hand-editing `go.mod` / `go.sum`; directs to `go get`.                                                                                                                                                 |
+| `PreToolUse`   | `Edit\|Write\|MultiEdit`       | `gateguard.sh`    | `strict`   | Fact-gate: blocks the **first** edit of each file in a session once, demanding the agent state callers, affected API, data shape, and the literal instruction. Off by default.                                |
+| `PostToolUse`  | `Edit\|Write\|MultiEdit`       | `go-fmt.sh`       | `standard` | Runs `gofmt -w` on the edited `.go` file (never blocks).                                                                                                                                                      |
+| `PostToolUse`  | `Edit\|Write\|MultiEdit\|Bash` | `observe.sh`      | opt-in     | Instincts capture: appends a compact `{tool, target}` observation to `.rc/instincts/observations.jsonl` for the `rc-instincts` skill. Off unless `RC_INSTINCTS=1`. Never blocks; never records file contents. |
+| `Stop`         | —                              | `notify.sh`       | opt-in     | Plays a short "done" sound at end of turn. Off unless `RC_SOUND=1`. Never blocks.                                                                                                                             |
+| `Notification` | —                              | `notify.sh`       | opt-in     | Plays an "attention" sound when the agent needs you (e.g. a permission prompt). Off unless `RC_SOUND=1`. Never blocks.                                                                                        |
 
 Blocking hooks exit `2` and return the message on stderr to the agent. Allowed
 calls exit `0`.
@@ -46,10 +48,16 @@ and lets you disable any hook without editing config:
 | `RC_DRY_RUN`        | `1`                                 | A hook that _would_ block instead logs `(dry-run, would block)` and allows.                                                                                                                       |
 
 Hook names for the kill-switch are `git-guard`, `commit-guard`, `go-mod-guard`,
-`gateguard`, `go-fmt`, `observe`.
+`gateguard`, `go-fmt`, `observe`, `notify`.
 
-`observe.sh` has a separate opt-in: it does nothing unless `RC_INSTINCTS=1`, so the
-instincts capture adds zero overhead by default even at the `standard` profile.
+Two hooks have a separate opt-in and add zero overhead by default:
+
+- `observe.sh` — does nothing unless `RC_INSTINCTS=1` (instincts capture).
+- `notify.sh` — does nothing unless `RC_SOUND=1` (end-of-turn / attention sound). On
+  macOS it uses `afplay` with system sounds (Glass = done, Ping = attention); on
+  Linux it tries `paplay`/`aplay`; otherwise it is silent. The same `RC_SOUND=1`
+  toggle drives the equivalent OpenCode plugin events (`session.idle`,
+  `permission.asked`).
 
 ## Requirements
 

@@ -31,6 +31,8 @@ var rcHookGroups = []hookGroupSpec{
 	{event: "PreToolUse", matcher: "Edit|Write|MultiEdit", scripts: []string{"go-mod-guard.sh", "gateguard.sh"}},
 	{event: "PostToolUse", matcher: "Edit|Write|MultiEdit", scripts: []string{"go-fmt.sh"}},
 	{event: "PostToolUse", matcher: "Edit|Write|MultiEdit|Bash", scripts: []string{"observe.sh"}},
+	{event: "Stop", matcher: "", scripts: []string{"notify.sh"}},
+	{event: "Notification", matcher: "", scripts: []string{"notify.sh"}},
 }
 
 // rcHookSupportScripts are shared library files sourced by the hook scripts at

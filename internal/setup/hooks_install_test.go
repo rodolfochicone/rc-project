@@ -147,8 +147,21 @@ func TestInstallBundledHooksPreservesExistingSettings(t *testing.T) {
 		t.Error("permissions key was dropped during merge")
 	}
 	stop := hookCommandsForEvent(t, settings, "Stop")
-	if len(stop) != 1 || stop[0] != "echo done" {
-		t.Errorf("Stop hook not preserved: %v", stop)
+	foundUserStop := false
+	rcStopCount := 0
+	for _, command := range stop {
+		switch {
+		case command == "echo done":
+			foundUserStop = true
+		case strings.Contains(command, rcHookMarker):
+			rcStopCount++
+		}
+	}
+	if !foundUserStop {
+		t.Errorf("user Stop hook was dropped: %v", stop)
+	}
+	if rcStopCount != 1 {
+		t.Errorf("expected 1 rc Stop hook, got %d (%v)", rcStopCount, stop)
 	}
 	pre := hookCommandsForEvent(t, settings, "PreToolUse")
 	foundUser := false
