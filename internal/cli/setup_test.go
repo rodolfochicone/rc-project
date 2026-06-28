@@ -73,6 +73,65 @@ func TestSetupRunYesFailsWithoutDetectedAgents(t *testing.T) {
 	}
 }
 
+func TestInstallPlanInstallsHooksOnlyWhenClaudeSelected(t *testing.T) {
+	t.Parallel()
+
+	makeState := func(calls *int) *setupCommandState {
+		return &setupCommandState{
+			installSkills: func(setup.ResolverOptions, []setup.Skill, []string, bool, setup.InstallMode) ([]setup.SuccessItem, []setup.FailureItem, error) {
+				return nil, nil, nil
+			},
+			installReusableAgents: func(setup.ReusableAgentInstallConfig) ([]setup.ReusableAgentSuccessItem, []setup.ReusableAgentFailureItem, error) {
+				return nil, nil, nil
+			},
+			installCommands: func(setup.CommandInstallConfig) ([]setup.CommandSuccessItem, []setup.CommandFailureItem, error) {
+				return nil, nil, nil
+			},
+			installOpenCodeAssets: func(setup.OpenCodeInstallConfig) ([]setup.OpenCodeAssetSuccessItem, []setup.OpenCodeAssetFailureItem, error) {
+				return nil, nil, nil
+			},
+			installHooks: func(setup.HookInstallConfig) ([]setup.HookSuccessItem, []setup.HookFailureItem, error) {
+				*calls++
+				return []setup.HookSuccessItem{{Name: "notify.sh"}}, nil, nil
+			},
+		}
+	}
+
+	plan := func(agents ...string) setupInstallPlan {
+		return setupInstallPlan{Config: setup.InstallConfig{AgentNames: agents}}
+	}
+
+	t.Run("claude selected installs hooks", func(t *testing.T) {
+		t.Parallel()
+		calls := 0
+		result, err := makeState(&calls).installPlan(plan("claude-code", "cursor"))
+		if err != nil {
+			t.Fatalf("installPlan: %v", err)
+		}
+		if calls != 1 {
+			t.Fatalf("installHooks calls = %d, want 1", calls)
+		}
+		if len(result.HooksSuccessful) != 1 {
+			t.Fatalf("HooksSuccessful = %d, want 1", len(result.HooksSuccessful))
+		}
+	})
+
+	t.Run("non-claude selection skips hooks", func(t *testing.T) {
+		t.Parallel()
+		calls := 0
+		result, err := makeState(&calls).installPlan(plan("cursor", "codex"))
+		if err != nil {
+			t.Fatalf("installPlan: %v", err)
+		}
+		if calls != 0 {
+			t.Fatalf("installHooks calls = %d, want 0 when claude is not selected", calls)
+		}
+		if len(result.HooksSuccessful) != 0 {
+			t.Fatalf("HooksSuccessful = %d, want 0", len(result.HooksSuccessful))
+		}
+	})
+}
+
 func TestSetupListIncludesExtensionSourcesAndConflictWarnings(t *testing.T) {
 	t.Parallel()
 
