@@ -620,7 +620,7 @@ Repeat steps 7–8. Each cycle creates a new review round (`reviews-002/`, `revi
 
 ## 🧩 Skills
 
-rc bundles 9 core skills that its workflows depend on. They run inside your AI agent — no context switching to external tools.
+rc bundles 10 core skills that its workflows depend on. They run inside your AI agent — no context switching to external tools.
 
 > **Recommended companion: [Serena MCP](https://github.com/oraios/serena).** When Serena is connected, the code-touching skills (analyze, create-tasks/techspec/prd, execute-task, fix-analysis, fix-reviews, review-round, code-review) prefer its LSP-backed symbolic tools — `get_symbols_overview`, `find_symbol`, `find_referencing_symbols`, and `replace_symbol_body` / `insert_after_symbol` / `insert_before_symbol` — for more accurate, token-efficient code navigation and editing, falling back to Grep/Glob when it isn't available. Install it with `uv` per Serena's docs (its maintainers warn against installing via a plugin marketplace).
 
@@ -636,6 +636,16 @@ rc bundles 9 core skills that its workflows depend on. They run inside your AI a
 | `rc-final-verify`    | Enforces verification evidence before any completion claim                 |
 | `rc-git`             | Branch, push, and open a PR with a confirmation at each outward step       |
 | `rc-jira`            | Create, read, comment on, and transition Jira issues via the Atlassian MCP |
+
+Optional bundled skills — opt-in helpers for quality, security, context, and learning:
+
+| Skill               | Purpose                                                                                                                                                                               |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `rc-audit`          | Audit the agent config surface (settings, MCP, hooks, agents) for secrets, broad permissions, unpinned MCP servers, and prompt-injection vectors; graded report + SARIF-like findings |
+| `rc-context-budget` | Audit what consumes the context window (agents, skills, MCP tool schemas, CLAUDE.md) and recommend the highest-impact trims                                                           |
+| `rc-compact`        | Compact the conversation deliberately at logical task boundaries, driven by the session's real token usage                                                                            |
+| `rc-gan`            | Adversarial generator↔evaluator loop that drives subjective quality (UI/UX, CLI ergonomics, copy) up to a target score by exercising the running artifact                             |
+| `rc-instincts`      | Distill recurring corrections and workflows into atomic, confidence-scored "instincts" (project-scoped continuous learning)                                                           |
 
 Optional first-party extension skills:
 
