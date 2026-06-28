@@ -10,6 +10,8 @@ First, once, before the loop:
 
 0. **Simplify (one-shot)** — invoke the `rc-simplify-review` skill for the slug. It writes a ranked delete-list (over-engineering only) to `.rc/tasks/<slug>/simplify-review-NNN.md`. Apply the cuts you can prove safe — dead code and single-caller abstractions confirmed via Serena; the skill never flags validation, error handling, security, or concurrency — then re-run the project's verification gate. Leave judgment calls (`shrink:`/`yagni:`) for the user. Running this first means the rounds below review already-lean code.
 
+0.5. **Quality (conditional)** — if the change has a subjective-quality surface (UI/UX, CLI ergonomics, user-facing copy), invoke the `rc-gan` skill on that surface with a sensible threshold before the rounds, so they review already-polished work. **Skip this step and say so** for backend/library-only changes that `make verify` already covers — do not run a quality loop where it adds nothing.
+
 Then repeat up to 3 times:
 
 1. **Review (fresh eyes)** — invoke the `rc-review-round` skill for the slug. Review each round from scratch — re-derive findings against the current code; do not merely re-check the previous round's issues (that anchors you to the last framing and misses what the fix introduced). The skill already excludes issues tracked in prior rounds, so a round surfaces only _new_ problems.
