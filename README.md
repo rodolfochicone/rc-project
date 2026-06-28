@@ -620,7 +620,7 @@ Repeat steps 7–8. Each cycle creates a new review round (`reviews-002/`, `revi
 
 ## 🧩 Skills
 
-rc bundles 9 core skills that its workflows depend on. They run inside your AI agent — no context switching to external tools.
+rc bundles 10 core skills that its workflows depend on. They run inside your AI agent — no context switching to external tools.
 
 > **Recommended companion: [Serena MCP](https://github.com/oraios/serena).** When Serena is connected, the code-touching skills (analyze, create-tasks/techspec/prd, execute-task, fix-analysis, fix-reviews, review-round, code-review) prefer its LSP-backed symbolic tools — `get_symbols_overview`, `find_symbol`, `find_referencing_symbols`, and `replace_symbol_body` / `insert_after_symbol` / `insert_before_symbol` — for more accurate, token-efficient code navigation and editing, falling back to Grep/Glob when it isn't available. Install it with `uv` per Serena's docs (its maintainers warn against installing via a plugin marketplace).
 
