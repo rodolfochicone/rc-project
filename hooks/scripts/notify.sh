@@ -18,8 +18,8 @@ if command -v jq >/dev/null 2>&1; then
 fi
 
 case "$event" in
-Notification) mac_sound="/System/Library/Sounds/Ping.aiff" ;;
-*) mac_sound="/System/Library/Sounds/Glass.aiff" ;;
+Notification) mac_sound="/System/Library/Sounds/Funk.aiff" ;;
+*) mac_sound="/System/Library/Sounds/Hero.aiff" ;;
 esac
 
 # Play in the background so the hook returns immediately. Pick the first player

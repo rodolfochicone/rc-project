@@ -54,7 +54,7 @@ Two hooks have a separate opt-in and add zero overhead by default:
 
 - `observe.sh` — does nothing unless `RC_INSTINCTS=1` (instincts capture).
 - `notify.sh` — does nothing unless `RC_SOUND=1` (end-of-turn / attention sound). On
-  macOS it uses `afplay` with system sounds (Glass = done, Ping = attention); on
+  macOS it uses `afplay` with system sounds (Hero = done, Funk = attention); on
   Linux it tries `paplay`/`aplay`; otherwise it is silent. The same `RC_SOUND=1`
   toggle drives the equivalent OpenCode plugin events (`session.idle`,
   `permission.asked`).

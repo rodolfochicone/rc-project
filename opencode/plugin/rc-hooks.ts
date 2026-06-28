@@ -49,8 +49,8 @@ export const RcHooks: Plugin = async ({ $ }) => {
     if (process.env.RC_SOUND !== "1") return;
     const sound =
       kind === "attention"
-        ? "/System/Library/Sounds/Ping.aiff"
-        : "/System/Library/Sounds/Glass.aiff";
+        ? "/System/Library/Sounds/Funk.aiff"
+        : "/System/Library/Sounds/Hero.aiff";
     void $`afplay ${sound}`.nothrow().quiet();
   }
 
