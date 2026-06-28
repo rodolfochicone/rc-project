@@ -637,6 +637,16 @@ rc bundles 9 core skills that its workflows depend on. They run inside your AI a
 | `rc-git`             | Branch, push, and open a PR with a confirmation at each outward step       |
 | `rc-jira`            | Create, read, comment on, and transition Jira issues via the Atlassian MCP |
 
+Optional bundled skills — opt-in helpers for quality, security, context, and learning:
+
+| Skill               | Purpose                                                                                                                                                                               |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `rc-audit`          | Audit the agent config surface (settings, MCP, hooks, agents) for secrets, broad permissions, unpinned MCP servers, and prompt-injection vectors; graded report + SARIF-like findings |
+| `rc-context-budget` | Audit what consumes the context window (agents, skills, MCP tool schemas, CLAUDE.md) and recommend the highest-impact trims                                                           |
+| `rc-compact`        | Compact the conversation deliberately at logical task boundaries, driven by the session's real token usage                                                                            |
+| `rc-gan`            | Adversarial generator↔evaluator loop that drives subjective quality (UI/UX, CLI ergonomics, copy) up to a target score by exercising the running artifact                             |
+| `rc-instincts`      | Distill recurring corrections and workflows into atomic, confidence-scored "instincts" (project-scoped continuous learning)                                                           |
+
 Optional first-party extension skills:
 
 | Skill             | Purpose                                                                                     |
