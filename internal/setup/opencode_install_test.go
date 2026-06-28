@@ -46,12 +46,15 @@ func TestInstallBundledOpenCodeAssetsProjectScope(t *testing.T) {
 		t.Fatalf("expected both agents and commands installed, got agents=%d commands=%d", agents, commands)
 	}
 
-	pluginData, err := os.ReadFile(filepath.Join(cwd, ".opencode", "plugin", "rc-hooks.ts"))
-	if err != nil {
-		t.Fatalf("read installed opencode plugin: %v", err)
-	}
-	if !strings.Contains(string(pluginData), "tool.execute.before") {
-		t.Fatal("rc-hooks plugin must register the tool.execute.before hook")
+	// The plugin ships to both plugin/ and plugins/ for opencode version compatibility.
+	for _, pluginDir := range []string{"plugin", "plugins"} {
+		pluginData, err := os.ReadFile(filepath.Join(cwd, ".opencode", pluginDir, "rc-hooks.ts"))
+		if err != nil {
+			t.Fatalf("read installed opencode plugin from %s: %v", pluginDir, err)
+		}
+		if !strings.Contains(string(pluginData), "tool.execute.before") {
+			t.Fatalf("rc-hooks plugin in %s must register the tool.execute.before hook", pluginDir)
+		}
 	}
 
 	// The plugin shells out to the shared hook scripts, so they must ship alongside it.

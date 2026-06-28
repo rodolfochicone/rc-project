@@ -16,6 +16,14 @@ import { join } from "node:path";
 const SCRIPTS_DIR = join(import.meta.dir, "..", "rc", "hooks", "scripts");
 
 export const RcHooks: Plugin = async ({ $ }) => {
+  // `rc setup` installs this plugin into BOTH .opencode/plugin/ and
+  // .opencode/plugins/ for cross-version compatibility (opencode has used both
+  // names). If a version loads both copies in the same process, register the
+  // hooks only once so guards don't run twice.
+  const g = globalThis as Record<string, unknown>;
+  if (g.__rcHooksActive) return {};
+  g.__rcHooksActive = true;
+
   // Run one guard script with a synthesized payload. Exit 2 → throw (block).
   // Any other failure (missing bash/jq, exit 0/1) is non-blocking, matching the
   // scripts' fail-open contract so a broken environment never wedges a session.
