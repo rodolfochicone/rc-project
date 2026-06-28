@@ -44,6 +44,7 @@ type setupCommandState struct {
 	previewCommands       func(setup.CommandInstallConfig) ([]setup.CommandPreviewItem, error)
 	installCommands       func(setup.CommandInstallConfig) ([]setup.CommandSuccessItem, []setup.CommandFailureItem, error)
 	installOpenCodeAssets setupOpenCodeInstallFunc
+	installHooks          setupHookInstallFunc
 	cleanupLegacyAssets   func(setup.LegacyAssetCleanupConfig) (setup.LegacyAssetCleanupResult, error)
 	isInteractive         func() bool
 
@@ -79,6 +80,10 @@ type setupSkillSyncFunc func(setup.SyncConfig) (setup.SyncResult, error)
 type setupOpenCodeInstallFunc func(
 	setup.OpenCodeInstallConfig,
 ) ([]setup.OpenCodeAssetSuccessItem, []setup.OpenCodeAssetFailureItem, error)
+
+type setupHookInstallFunc func(
+	setup.HookInstallConfig,
+) ([]setup.HookSuccessItem, []setup.HookFailureItem, error)
 
 type setupInstallPlan struct {
 	Config               setup.InstallConfig
@@ -138,6 +143,7 @@ func newSetupCommandState() *setupCommandState {
 		previewCommands:       setup.PreviewCommandInstall,
 		installCommands:       setup.InstallCommands,
 		installOpenCodeAssets: setup.InstallBundledOpenCodeAssets,
+		installHooks:          setup.InstallBundledHooks,
 		cleanupLegacyAssets:   setup.CleanupLegacyTransferredAssets,
 		isInteractive:         isInteractiveTerminal,
 		detectTool:            setup.DetectTool,
@@ -557,14 +563,20 @@ func (s *setupCommandState) installPlan(plan setupInstallPlan) (*setup.Result, e
 	result.CommandsSuccessful = successfulCommands
 	result.CommandsFailed = failedCommands
 
-	opencodeSelected := false
-	for _, name := range plan.Config.AgentNames {
-		if name == setup.OpenCodeAgentName {
-			opencodeSelected = true
-			break
+	// Hooks are Claude-channel only; install them only when Claude is a target.
+	if s.installHooks != nil && agentSelected(plan.Config.AgentNames, "claude", "claude-code") {
+		hookSuccessful, hookFailed, err := s.installHooks(setup.HookInstallConfig{
+			ResolverOptions: plan.Config.ResolverOptions,
+			Global:          plan.Config.Global,
+		})
+		if err != nil {
+			return result, fmt.Errorf("install hooks: %w", err)
 		}
+		result.HooksSuccessful = hookSuccessful
+		result.HooksFailed = hookFailed
 	}
-	if opencodeSelected {
+
+	if agentSelected(plan.Config.AgentNames, setup.OpenCodeAgentName) {
 		ocSuccessful, ocFailed, err := s.installOpenCodeAssets(setup.OpenCodeInstallConfig{
 			ResolverOptions: plan.Config.ResolverOptions,
 			Global:          plan.Config.Global,
@@ -576,6 +588,18 @@ func (s *setupCommandState) installPlan(plan setupInstallPlan) (*setup.Result, e
 		result.OpenCodeFailed = ocFailed
 	}
 	return result, nil
+}
+
+// agentSelected reports whether any of the target agent names is in names.
+func agentSelected(names []string, targets ...string) bool {
+	for _, name := range names {
+		for _, target := range targets {
+			if name == target {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func (s *setupCommandState) buildCommandPlan(
