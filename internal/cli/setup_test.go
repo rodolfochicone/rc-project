@@ -321,6 +321,11 @@ func TestSetupRunYesUsesProjectScopeForReusableAgentsWhenGlobalFlagIsFalse(t *te
 	) ([]setup.CommandSuccessItem, []setup.CommandFailureItem, error) {
 		return nil, nil, nil
 	}
+	state.installHooks = func(
+		setup.HookInstallConfig,
+	) ([]setup.HookSuccessItem, []setup.HookFailureItem, error) {
+		return nil, nil, nil
+	}
 
 	cmd := &cobra.Command{Use: "setup"}
 	var output bytes.Buffer
@@ -435,6 +440,11 @@ func TestSetupRunYesCleansLegacyTransferredAssetsBeforeInstall(t *testing.T) {
 	state.installCommands = func(
 		setup.CommandInstallConfig,
 	) ([]setup.CommandSuccessItem, []setup.CommandFailureItem, error) {
+		return nil, nil, nil
+	}
+	state.installHooks = func(
+		setup.HookInstallConfig,
+	) ([]setup.HookSuccessItem, []setup.HookFailureItem, error) {
 		return nil, nil, nil
 	}
 
