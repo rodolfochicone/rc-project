@@ -276,6 +276,7 @@ Task and review issue files use YAML frontmatter for parseable metadata such as 
 - `rc tasks run <slug>` is the canonical workflow runner. In interactive terminals it attaches to the TUI by default; in non-interactive environments it falls back to streaming. Use `--ui`, `--stream`, `--detach`, or `--attach` to override that behavior.
 - `rc runs attach <run-id>` restores the interactive TUI for an existing daemon-managed run, while `rc runs watch <run-id>` streams textual observation from the same snapshot-plus-stream transport.
 - `rc reviews fetch|list|show|fix` is the canonical review command family.
+- The daemon's HTTP API — consumed by the web UI, desktop app, and watch/attach clients — is described by [`openapi/rc-daemon.json`](openapi/rc-daemon.json).
 
 ### Desktop App (macOS)
 
@@ -998,42 +999,73 @@ _ = root.Execute()
 <summary><strong>Project Layout</strong></summary>
 
 ```
-cmd/rc/             CLI entry point
-rc.go               Public Go API + reusable Cobra command helpers
+cmd/rc/                  CLI entry point
+cmd/rc-plugin-sync/      Release tool that pins the Claude Code plugin manifests to a version
+rc.go                    Public Go API + reusable Cobra command helpers
+agents/                  Bundled council agent definitions (embedded)
 internal/cli/            Cobra flags, interactive form, CLI glue
 internal/core/           Internal facade for preparation and execution
   agent/                 IDE command validation and process construction
   agents/                Reusable agent discovery, validation, MCP merge, nested execution
   extension/             Extension manifest, discovery, hooks, Host API, lifecycle
-  memory/                Workflow memory bootstrapping, inspection, and compaction detection
+  kernel/                Typed command dispatcher, handler registry, legacy adapters
+  memory/ projectmemory/ Workflow-scoped and project-scoped memory
   model/                 Shared runtime data structures
+  modelprovider/         Model provider alias discovery and resolution
   plan/                  Input discovery, filtering, grouping, batch prep
   prompt/                Prompt builders emitting runtime context + skill names
+  provider/ reviews/     Review provider abstraction and review remediation
   run/                   Execution pipeline, logging, shutdown, Bubble Tea UI
+  tasks/ sync/ migration/ Task workflow, daemon sync, and legacy artifact migration
+internal/api/            Daemon HTTP API handlers
+internal/daemon/         Home-scoped daemon runtime and lifecycle
+internal/store/          Daemon SQLite catalog and run state
+internal/update/         In-place self-update
 internal/setup/          Bundled skill and council-agent installer (agent detection, symlink/copy)
 internal/version/        Build metadata
+pkg/rc/events/           Public event envelope, kind constants, documented payload API
+pkg/rc/runs/             Public run reader library (list/open/replay/tail/watch)
 sdk/extension/           Public Go SDK for extension authors
 sdk/extension-sdk-ts/    Public TypeScript SDK for extension authors
 sdk/create-extension/    CLI scaffolder for new extension projects
+web/                     Daemon frontend (rc-web), embedded via embed.go and served by the daemon
+packages/ui/             Shared frontend UI package (@rodolfochicone/ui)
+apps/desktop/            Electron macOS control panel wrapping the daemon-served UI
+openapi/rc-daemon.json   OpenAPI spec for the daemon HTTP API
 skills/                  Bundled installable skills
-.rc/config.toml     Optional workspace defaults for CLI execution
-.rc/agents/         Optional reusable agents (`AGENT.md` + optional `mcp.json`)
-.rc/extensions/     Workspace-scoped extensions (starts disabled)
-~/.rc/runs/         Home-scoped runtime artifacts for daemon-managed and persisted exec runs
-.rc/tasks/          Default workflow artifact root (PRDs, TechSpecs, tasks, ADRs, reviews)
+.claude-plugin/          Claude Code plugin + marketplace manifests (additive Claude-only channel)
+.rc/config.toml          Optional workspace defaults for CLI execution
+.rc/agents/              Optional reusable agents (`AGENT.md` + optional `mcp.json`)
+.rc/extensions/          Workspace-scoped extensions (starts disabled)
+~/.rc/runs/              Home-scoped runtime artifacts for daemon-managed and persisted exec runs
+.rc/tasks/               Default workflow artifact root (PRDs, TechSpecs, tasks, ADRs, reviews)
 ```
 
 </details>
 
 ## 🛠️ Development
 
+rc is a Go CLI plus an embedded daemon frontend (`web/`, built with [bun](https://bun.sh) `1.3.11`). The default gate runs both the Go and the frontend pipelines, so a clean checkout needs bun on `PATH`.
+
 ```bash
-make verify    # Full pipeline: fmt → lint → test → build
-make fmt       # Format code
-make lint      # Lint (zero tolerance)
-make test      # Tests with race detector
-make build     # Compile binary
-make deps      # Tidy and verify modules
+make verify        # Full gate: frontend-verify → fmt → lint → test → go-build → frontend-e2e
+make fmt           # Format Go code with gofmt
+make lint          # Strict golangci-lint (zero tolerance)
+make test          # Go tests with the race detector
+make test-coverage # Go tests with a coverage profile
+make build         # Build the frontend bundle and the rc binary (frontend-build + go-build)
+make deps          # Tidy and verify Go modules
+```
+
+Frontend-only targets (require bun):
+
+```bash
+make frontend-verify     # frontend lint + typecheck + test + build
+make frontend-lint       # lint the web app
+make frontend-typecheck  # TypeScript typecheck
+make frontend-test       # vitest unit tests
+make frontend-build      # build the daemon UI bundle into web/dist
+make frontend-e2e        # Playwright end-to-end tests (builds the binary first)
 ```
 
 ## 🤝 Contributing
