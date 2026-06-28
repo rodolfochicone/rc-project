@@ -94,15 +94,20 @@ func InstallBundledOpenCodeAssets(
 		}
 	}
 
-	// Install the rc-hooks plugin and the shared hook scripts it shells out to.
-	pluginS, pluginF, err := installOpenCodeFromDir(
-		opencode.FS, "plugin", filepath.Join(root, "plugin"), ".ts", "plugin",
-	)
-	if err != nil {
-		return nil, nil, err
+	// Install the rc-hooks plugin into BOTH .opencode/plugin/ and
+	// .opencode/plugins/ — opencode has used both directory names across
+	// versions, so shipping to both makes the hooks load regardless. The plugin
+	// guards against double-registration if a version loads both copies.
+	for _, pluginDirName := range []string{"plugin", "plugins"} {
+		pluginS, pluginF, err := installOpenCodeFromDir(
+			opencode.FS, "plugin", filepath.Join(root, pluginDirName), ".ts", "plugin",
+		)
+		if err != nil {
+			return nil, nil, err
+		}
+		successes = append(successes, pluginS...)
+		failures = append(failures, pluginF...)
 	}
-	successes = append(successes, pluginS...)
-	failures = append(failures, pluginF...)
 
 	// The hook scripts are the SAME ones the Claude channel uses, so the guard
 	// logic has a single source of truth. The plugin invokes them via

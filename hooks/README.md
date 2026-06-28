@@ -9,11 +9,13 @@ These hooks load automatically when the rc plugin is enabled (convention-based
 `hooks/hooks.json`). They apply to the **Claude Code plugin channel** — i.e. when
 you run `claude` directly in a repo with the plugin installed.
 
-**OpenCode parity:** `rc setup` also installs an OpenCode plugin
-(`.opencode/plugin/rc-hooks.ts`) that shells out to these _same_ scripts via
-OpenCode's `tool.execute.before` / `tool.execute.after` hooks, so the guards and
-the instincts capture behave identically there. The scripts are the single source
-of truth; each harness only adapts how they are invoked.
+**OpenCode parity:** `rc setup` also installs an OpenCode plugin (`rc-hooks.ts`,
+into both `.opencode/plugin/` and `.opencode/plugins/` for version compatibility)
+that shells out to these _same_ scripts via OpenCode's `tool.execute.before` /
+`tool.execute.after` hooks, so the guards and the instincts capture behave
+identically there. The plugin registers its hooks only once per process even if
+both copies load. The scripts are the single source of truth; each harness only
+adapts how they are invoked.
 
 They do **not** apply to rc's ACP execution pipeline today; deterministic gates
 for the pipeline belong in the Go executor.
