@@ -17,7 +17,7 @@ func TestListBundledCommands(t *testing.T) {
 	for i := range commands {
 		got = append(got, commands[i].Name)
 	}
-	want := []string{"rc-docs", "rc-exec", "rc-pipe", "rc-plan", "rc-review"}
+	want := []string{"rc-docs", "rc-exec", "rc-gan", "rc-pipe", "rc-plan", "rc-review"}
 	if strings.Join(got, ",") != strings.Join(want, ",") {
 		t.Fatalf("bundled commands = %v, want %v", got, want)
 	}

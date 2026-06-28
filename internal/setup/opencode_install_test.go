@@ -45,6 +45,21 @@ func TestInstallBundledOpenCodeAssetsProjectScope(t *testing.T) {
 	if agents == 0 || commands == 0 {
 		t.Fatalf("expected both agents and commands installed, got agents=%d commands=%d", agents, commands)
 	}
+
+	pluginData, err := os.ReadFile(filepath.Join(cwd, ".opencode", "plugin", "rc-hooks.ts"))
+	if err != nil {
+		t.Fatalf("read installed opencode plugin: %v", err)
+	}
+	if !strings.Contains(string(pluginData), "tool.execute.before") {
+		t.Fatal("rc-hooks plugin must register the tool.execute.before hook")
+	}
+
+	// The plugin shells out to the shared hook scripts, so they must ship alongside it.
+	for _, script := range []string{"gateguard.sh", "git-guard.sh", "_lib.sh"} {
+		if _, err := os.Stat(filepath.Join(cwd, ".opencode", "rc", "hooks", "scripts", script)); err != nil {
+			t.Fatalf("hook script %s not installed for opencode: %v", script, err)
+		}
+	}
 }
 
 func TestInstallBundledOpenCodeAssetsGlobalScope(t *testing.T) {

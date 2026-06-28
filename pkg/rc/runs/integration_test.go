@@ -9,12 +9,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	apiclient "github.com/rodolfochicone/rc-project/internal/api/client"
 	apicore "github.com/rodolfochicone/rc-project/internal/api/core"
 	rcconfig "github.com/rodolfochicone/rc-project/internal/config"
 	"github.com/rodolfochicone/rc-project/internal/daemon"
 	"github.com/rodolfochicone/rc-project/pkg/rc/events"
-	"github.com/gin-gonic/gin"
 )
 
 func TestOpenAndListUseDaemonBackedHTTPTransport(t *testing.T) {

@@ -2,6 +2,9 @@
 # PostToolUse(Edit|Write|MultiEdit): gofmt the edited Go file.
 # PostToolUse cannot block; this only normalizes formatting deterministically.
 set -u
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+. "$SCRIPT_DIR/_lib.sh"
+rc_hook_active "go-fmt" "standard" || exit 0
 
 input=$(cat)
 command -v jq >/dev/null 2>&1 || exit 0

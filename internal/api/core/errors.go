@@ -8,9 +8,9 @@ import (
 	"os"
 	"strings"
 
+	"github.com/gin-gonic/gin"
 	"github.com/rodolfochicone/rc-project/internal/core/reviews"
 	"github.com/rodolfochicone/rc-project/internal/core/tasks"
-	"github.com/gin-gonic/gin"
 
 	"github.com/rodolfochicone/rc-project/internal/api/contract"
 	"github.com/rodolfochicone/rc-project/internal/store/globaldb"

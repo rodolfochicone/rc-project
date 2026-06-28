@@ -47,6 +47,13 @@ Reference the TechSpec implementation section for code patterns and interface de
 ### Dependent Files
 - `path/to/dependency` — [brief reason this file is affected]
 
+### Patterns to Mirror
+Real code already in this repo to imitate (≤10 lines each, tagged with its source). Omit only if the task introduces a pattern with no precedent.
+```
+// SOURCE: path/to/example.go:120-128
+[actual snippet copied from the codebase showing the convention to follow]
+```
+
 ### Related ADRs
 - [ADR-NNN: Title](../adrs/adr-NNN.md) — Relevance to this task
 

@@ -9,11 +9,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	apicore "github.com/rodolfochicone/rc-project/internal/api/core"
 	"github.com/rodolfochicone/rc-project/internal/core/model"
 	"github.com/rodolfochicone/rc-project/internal/store/globaldb"
 	eventspkg "github.com/rodolfochicone/rc-project/pkg/rc/events"
-	"github.com/gin-gonic/gin"
 )
 
 func TestStopDaemonHTTPReturnsConflictThenForceCancelsActiveRun(t *testing.T) {

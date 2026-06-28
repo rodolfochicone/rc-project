@@ -12,9 +12,9 @@ import (
 	"strings"
 	"sync"
 
+	toml "github.com/pelletier/go-toml/v2"
 	rcconfig "github.com/rodolfochicone/rc-project/internal/config"
 	"github.com/rodolfochicone/rc-project/internal/core/model"
-	toml "github.com/pelletier/go-toml/v2"
 )
 
 var osUserHomeDir = os.UserHomeDir

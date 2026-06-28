@@ -28,9 +28,15 @@ type hookGroupSpec struct {
 
 var rcHookGroups = []hookGroupSpec{
 	{event: "PreToolUse", matcher: "Bash", scripts: []string{"git-guard.sh", "commit-guard.sh"}},
-	{event: "PreToolUse", matcher: "Edit|Write|MultiEdit", scripts: []string{"go-mod-guard.sh"}},
+	{event: "PreToolUse", matcher: "Edit|Write|MultiEdit", scripts: []string{"go-mod-guard.sh", "gateguard.sh"}},
 	{event: "PostToolUse", matcher: "Edit|Write|MultiEdit", scripts: []string{"go-fmt.sh"}},
+	{event: "PostToolUse", matcher: "Edit|Write|MultiEdit|Bash", scripts: []string{"observe.sh"}},
 }
+
+// rcHookSupportScripts are shared library files sourced by the hook scripts at
+// runtime. They are copied alongside the hooks into the same scripts directory
+// but are never referenced from settings.json (they are not hooks themselves).
+var rcHookSupportScripts = []string{"_lib.sh"}
 
 // HookInstallConfig selects the scope for a hooks install. ScriptsFS defaults to
 // the embedded bundle when nil (overridable in tests).
@@ -80,6 +86,23 @@ func InstallBundledHooks(cfg HookInstallConfig) ([]HookSuccessItem, []HookFailur
 	}
 
 	for _, script := range uniqueHookScripts() {
+		target := filepath.Join(scriptsDir, script)
+		if !isPathSafe(scriptsDir, target) {
+			failures = append(failures, HookFailureItem{
+				Name:  script,
+				Path:  target,
+				Error: fmt.Sprintf("resolved target escapes %s", scriptsDir),
+			})
+			continue
+		}
+		if err := copyHookScript(bundle, script, target); err != nil {
+			failures = append(failures, HookFailureItem{Name: script, Path: target, Error: err.Error()})
+			continue
+		}
+		successes = append(successes, HookSuccessItem{Name: script, Path: target})
+	}
+
+	for _, script := range rcHookSupportScripts {
 		target := filepath.Join(scriptsDir, script)
 		if !isPathSafe(scriptsDir, target) {
 			failures = append(failures, HookFailureItem{

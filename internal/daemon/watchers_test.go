@@ -12,9 +12,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/fsnotify/fsnotify"
 	rcconfig "github.com/rodolfochicone/rc-project/internal/config"
 	corepkg "github.com/rodolfochicone/rc-project/internal/core"
-	"github.com/fsnotify/fsnotify"
 )
 
 func TestWorkflowWatcherDebouncesBurstyWritesAndPersistsCheckpoint(t *testing.T) {

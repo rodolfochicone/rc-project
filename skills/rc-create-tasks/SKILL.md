@@ -104,11 +104,13 @@ rc supports monorepos, where more than one `.rc` directory can exist. Before rea
      - `## Implementation Details`: file paths to create or modify, integration points. Reference TechSpec for patterns.
      - `### Relevant Files`: discovered paths from codebase exploration with brief reasons.
      - `### Dependent Files`: files that will be affected by this task with brief reasons.
+     - `### Patterns to Mirror`: 1-3 short snippets of **real code already in this repo** that the implementation should imitate — the existing error-wrap style, the table-test shape, the handler/constructor pattern. Copy the actual lines (≤10 each) and tag each with `// SOURCE: <path>:<start>-<end>` so the executor mirrors what exists instead of inventing a parallel style. Capture this now (you already explored the codebase) — if the executor would have to grep the repo to find "how we do X here", that knowledge belongs in the task. Omit only when the task genuinely introduces a pattern with no precedent.
      - `### Related ADRs`: links to relevant ADRs if any exist, or omit subsection if no ADRs apply.
      - `## Deliverables`: concrete outputs with mandatory test items and at least 80% coverage target.
      - `## Tests`: specific test cases as checklists, split into unit tests and integration tests categories.
      - `## Success Criteria`: measurable outcomes including "All tests passing" and "Test coverage >=80%".
    - Reassess complexity based on exploration findings and update if changed.
+   - **No Prior Knowledge Test.** Before finalizing each task file, apply this check: *could a competent developer (or executor agent) with no prior context implement this task correctly using only the task file plus the referenced TechSpec sections, without having to grep the repo to discover how things are done here?* If not, the gap is missing context — add the concrete file paths, the Patterns to Mirror snippet, or the specific TechSpec/ADR reference that closes it. A task that only an author-who-already-knows could implement is under-enriched.
    - Update the task file in place with enriched content.
    - If enrichment fails for one task, continue to the next and report all failures at the end.
 

@@ -28,6 +28,7 @@ Maintain the workflow memory files provided by the caller.
    - Update the current task memory whenever the objective changes, a non-obvious decision is made, an important learning appears, or an error changes the plan.
    - Promote only durable cross-task context into the shared workflow memory.
    - Keep task-local execution details in the current task memory file.
+   - If the `rc-instincts` skill has promoted high-confidence instincts (recurring trigger→action patterns for this project), treat them as a source of durable cross-task context worth carrying in shared memory.
 
 3. Close out the run cleanly.
    - Update memory before any completion claim, handoff, or commit.

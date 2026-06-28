@@ -2,6 +2,7 @@
 description: rc full pipeline — plan → exec → review → fix, each phase on its own model
 agent: rc
 ---
+
 Run the full rc delivery pipeline for: $ARGUMENTS
 
 Delegate each phase to its specialized subagent via the task tool, in order, confirming success before the next:

@@ -13,12 +13,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/modelcontextprotocol/go-sdk/mcp"
 	core "github.com/rodolfochicone/rc-project/internal/core"
 	reusableagents "github.com/rodolfochicone/rc-project/internal/core/agents"
 	"github.com/rodolfochicone/rc-project/internal/core/agents/mcpserver"
 	"github.com/rodolfochicone/rc-project/internal/core/model"
 	coreRun "github.com/rodolfochicone/rc-project/internal/core/run"
-	"github.com/modelcontextprotocol/go-sdk/mcp"
 	"github.com/spf13/cobra"
 )
 

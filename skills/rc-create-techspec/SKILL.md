@@ -105,6 +105,7 @@ You MUST create a task for each phase and complete them in order:
    - Reference PRD sections by name but do not duplicate business context.
    - Include code examples only for core interfaces, limited to 20 lines each. The Core Interfaces section must contain at least one Go interface or struct definition as a code block, even for simple features — show the primary type that other components will depend on.
    - The Development Sequencing section MUST include a numbered Build Order where every step after the first explicitly states which previous steps it depends on.
+   - **MANDATORY — Behavioral Contract section:** end the technical body (before the ADR section) with a "Behavioral Contract" of machine-parseable assertions, so requirements are verifiable and grep-able rather than buried in prose. Use the format in "Behavioral contract format" below. Derive the assertions from the PRD's acceptance criteria and the design decisions; each gets a stable `id` that later artifacts (tasks, reviews) reference. This is the durable, checkable core of the spec — write it for every TechSpec, even simple ones.
    - Prefer active voice, omit needless words, use definite and specific language over vague generalities. Every sentence should earn its place.
    - Language: **English**. Tone: clear, technical, consistent with existing project artifacts.
    - Present the complete draft to the user for review.
@@ -123,6 +124,35 @@ You MUST create a task for each phase and complete them in order:
    - Write the completed document to `.rc/tasks/<name>/_techspec.md`.
    - Confirm the file path to the user.
    - Remind the user that the next step is to create tasks using `rc-create-tasks` from this TechSpec.
+
+## Behavioral contract format
+
+The Behavioral Contract is a flat list of atomic assertions — each one independently checkable — with stable identifiers in HTML comments so they survive edits and can be grepped by reviewers and task files. Two kinds:
+
+- **Requirement** — a behavior that must hold *when triggered* (an action/endpoint/flow does X under conditions Y).
+- **Invariant** — a property that must hold *at all times* (a constraint the system never violates).
+
+```
+### Requirement: reject expired tokens
+When a request presents an expired auth token, the API responds 401 and does not touch the session store.
+<!-- id: auth.reject-expired -->
+<!-- enforced: TestAuth_RejectsExpired (internal/auth) -->
+<!-- depends_on: auth.session-shape -->
+
+### Invariant: session store is append-only
+Session records are never mutated in place; updates write a new revision.
+<!-- id: auth.session-append-only -->
+<!-- enforced: pending -->
+```
+
+Rules for the contract:
+
+- `id` is `<area>.<short-kebab>`, **stable** — never renumber on edit; deletions are explicit. It is the anchor other artifacts cite.
+- `enforced` names the test/check that proves the assertion, or `pending` if not yet covered (a reviewer can grep `enforced: pending` to find unverified requirements).
+- `depends_on` (optional) lists other assertion ids this one builds on.
+- Keep each assertion to one sentence, observable and testable. Vague assertions ("should be fast") are not allowed — quantify or drop them.
+
+`rc-create-tasks` references these ids per task; `rc-code-review`/`rc-review-round` can grep `enforced:` to detect requirements that drifted out of coverage.
 
 ## Project memory
 

@@ -20,6 +20,10 @@
                     {
                         "type": "command",
                         "command": "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/go-mod-guard.sh"
+                    },
+                    {
+                        "type": "command",
+                        "command": "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/gateguard.sh"
                     }
                 ]
             }
@@ -31,6 +35,15 @@
                     {
                         "type": "command",
                         "command": "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/go-fmt.sh"
+                    }
+                ]
+            },
+            {
+                "matcher": "Edit|Write|MultiEdit|Bash",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/observe.sh"
                     }
                 ]
             }

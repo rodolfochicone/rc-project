@@ -15,6 +15,9 @@ func testHookScriptsFS() fstest.MapFS {
 	for _, script := range uniqueHookScripts() {
 		fsys["scripts/"+script] = &fstest.MapFile{Data: []byte("#!/usr/bin/env bash\nexit 0\n")}
 	}
+	for _, script := range rcHookSupportScripts {
+		fsys["scripts/"+script] = &fstest.MapFile{Data: []byte("#!/usr/bin/env bash\n# support lib\n")}
+	}
 	return fsys
 }
 
@@ -79,13 +82,13 @@ func TestInstallBundledHooksFreshProject(t *testing.T) {
 	if len(failures) != 0 {
 		t.Fatalf("unexpected failures: %+v", failures)
 	}
-	// Every script plus settings.json should be reported as installed.
-	if want := len(uniqueHookScripts()) + 1; len(successes) != want {
+	// Every hook script, every support file, plus settings.json should be reported as installed.
+	if want := len(uniqueHookScripts()) + len(rcHookSupportScripts) + 1; len(successes) != want {
 		t.Fatalf("success count = %d, want %d (%+v)", len(successes), want, successes)
 	}
 
 	scriptsDir := filepath.Join(cwd, ".claude", "rc", "hooks", "scripts")
-	for _, script := range uniqueHookScripts() {
+	for _, script := range append(append([]string{}, uniqueHookScripts()...), rcHookSupportScripts...) {
 		info, err := os.Stat(filepath.Join(scriptsDir, script))
 		if err != nil {
 			t.Fatalf("stat installed script %s: %v", script, err)
@@ -98,11 +101,11 @@ func TestInstallBundledHooksFreshProject(t *testing.T) {
 	settings := readSettings(t, filepath.Join(cwd, ".claude", "settings.json"))
 	pre := hookCommandsForEvent(t, settings, "PreToolUse")
 	post := hookCommandsForEvent(t, settings, "PostToolUse")
-	if len(pre) != 3 {
-		t.Errorf("PreToolUse command count = %d, want 3 (%v)", len(pre), pre)
+	if len(pre) != 4 {
+		t.Errorf("PreToolUse command count = %d, want 4 (%v)", len(pre), pre)
 	}
-	if len(post) != 1 {
-		t.Errorf("PostToolUse command count = %d, want 1 (%v)", len(post), post)
+	if len(post) != 2 {
+		t.Errorf("PostToolUse command count = %d, want 2 (%v)", len(post), post)
 	}
 	for _, command := range append(append([]string{}, pre...), post...) {
 		if !strings.HasPrefix(command, "${CLAUDE_PROJECT_DIR}/.claude/rc/hooks/scripts/") {
@@ -161,8 +164,8 @@ func TestInstallBundledHooksPreservesExistingSettings(t *testing.T) {
 	if !foundUser {
 		t.Error("user PreToolUse hook was dropped")
 	}
-	if rcCount != 3 {
-		t.Errorf("expected 3 rc PreToolUse hooks, got %d (%v)", rcCount, pre)
+	if rcCount != 4 {
+		t.Errorf("expected 4 rc PreToolUse hooks, got %d (%v)", rcCount, pre)
 	}
 }
 

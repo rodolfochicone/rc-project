@@ -117,7 +117,7 @@ rc update     # alias of: rc upgrade
 | Direct binary  | Downloads the latest release and self-updates **in place** (checksum-verified) |
 | Homebrew       | Prints `brew upgrade --cask rc`                                                |
 | NPM            | Prints `npm install -g @rc/cli@latest`                                         |
-| Go install     | Prints `go install github.com/rodolfochicone/rc-project/cmd/rc@latest`             |
+| Go install     | Prints `go install github.com/rodolfochicone/rc-project/cmd/rc@latest`         |
 
 If you are already on the newest version, it prints `rc is already up to date`.
 
@@ -440,10 +440,10 @@ rc extensions are executable subprocess plugins that intercept and modify pipeli
 
 ### SDK support
 
-| Language   | Package                                              | Install                                                 |
-| ---------- | ---------------------------------------------------- | ------------------------------------------------------- |
+| Language   | Package                                                  | Install                                                     |
+| ---------- | -------------------------------------------------------- | ----------------------------------------------------------- |
 | TypeScript | [`@rodolfochicone/extension-sdk`](sdk/extension-sdk-ts/) | `npm install @rodolfochicone/extension-sdk`                 |
-| Go         | [`sdk/extension`](sdk/extension/)                    | `go get github.com/rodolfochicone/rc-project/sdk/extension` |
+| Go         | [`sdk/extension`](sdk/extension/)                        | `go get github.com/rodolfochicone/rc-project/sdk/extension` |
 
 Scaffold a new extension project with starter templates:
 

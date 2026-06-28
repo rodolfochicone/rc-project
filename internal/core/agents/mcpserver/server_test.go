@@ -10,10 +10,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/modelcontextprotocol/go-sdk/mcp"
 	reusableagents "github.com/rodolfochicone/rc-project/internal/core/agents"
 	"github.com/rodolfochicone/rc-project/internal/core/model"
 	"github.com/rodolfochicone/rc-project/pkg/rc/events/kinds"
-	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
 var stdioSwapMu sync.Mutex

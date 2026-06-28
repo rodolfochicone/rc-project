@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/rodolfochicone/rc-project/hooks"
 	"github.com/rodolfochicone/rc-project/opencode"
 )
 
@@ -51,7 +52,9 @@ func openCodeRoot(env resolvedEnvironment, global bool) string {
 
 // InstallBundledOpenCodeAssets installs the bundled OpenCode agents and commands
 // into the selected scope so opencode runs rc skills on the intended models.
-func InstallBundledOpenCodeAssets(cfg OpenCodeInstallConfig) ([]OpenCodeAssetSuccessItem, []OpenCodeAssetFailureItem, error) {
+func InstallBundledOpenCodeAssets(
+	cfg OpenCodeInstallConfig,
+) ([]OpenCodeAssetSuccessItem, []OpenCodeAssetFailureItem, error) {
 	env, err := resolveEnvironment(cfg.ResolverOptions)
 	if err != nil {
 		return nil, nil, err
@@ -76,7 +79,14 @@ func InstallBundledOpenCodeAssets(cfg OpenCodeInstallConfig) ([]OpenCodeAssetSuc
 
 			target := filepath.Join(destDir, name)
 			assetName := strings.TrimSuffix(name, ".md")
-			if failure := installOpenCodeAsset(opencode.FS, path.Join(group.dir, name), destDir, target, group.kind, assetName); failure != nil {
+			if failure := installOpenCodeAsset(
+				opencode.FS,
+				path.Join(group.dir, name),
+				destDir,
+				target,
+				group.kind,
+				assetName,
+			); failure != nil {
 				failures = append(failures, *failure)
 				continue
 			}
@@ -84,6 +94,63 @@ func InstallBundledOpenCodeAssets(cfg OpenCodeInstallConfig) ([]OpenCodeAssetSuc
 		}
 	}
 
+	// Install the rc-hooks plugin and the shared hook scripts it shells out to.
+	pluginS, pluginF, err := installOpenCodeFromDir(
+		opencode.FS, "plugin", filepath.Join(root, "plugin"), ".ts", "plugin",
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+	successes = append(successes, pluginS...)
+	failures = append(failures, pluginF...)
+
+	// The hook scripts are the SAME ones the Claude channel uses, so the guard
+	// logic has a single source of truth. The plugin invokes them via
+	// `bash <script>`, so the executable bit is not required.
+	scriptS, scriptF, err := installOpenCodeFromDir(
+		hooks.ScriptsFS, "scripts", filepath.Join(root, "rc", "hooks", "scripts"), ".sh", "hook-script",
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+	successes = append(successes, scriptS...)
+	failures = append(failures, scriptF...)
+
+	return successes, failures, nil
+}
+
+// installOpenCodeFromDir copies every file with the given suffix from sourceDir
+// in the bundle into destDir, reporting each as the given kind. The asset name is
+// the file name with the suffix trimmed.
+func installOpenCodeFromDir(
+	bundle fs.FS, sourceDir, destDir, suffix, kind string,
+) ([]OpenCodeAssetSuccessItem, []OpenCodeAssetFailureItem, error) {
+	entries, err := fs.ReadDir(bundle, sourceDir)
+	if err != nil {
+		return nil, nil, fmt.Errorf("list bundled opencode %ss: %w", kind, err)
+	}
+	successes := make([]OpenCodeAssetSuccessItem, 0)
+	failures := make([]OpenCodeAssetFailureItem, 0)
+	for _, entry := range entries {
+		name := entry.Name()
+		if entry.IsDir() || !strings.HasSuffix(name, suffix) {
+			continue
+		}
+		target := filepath.Join(destDir, name)
+		assetName := strings.TrimSuffix(name, suffix)
+		if failure := installOpenCodeAsset(
+			bundle,
+			path.Join(sourceDir, name),
+			destDir,
+			target,
+			kind,
+			assetName,
+		); failure != nil {
+			failures = append(failures, *failure)
+			continue
+		}
+		successes = append(successes, OpenCodeAssetSuccessItem{Kind: kind, Name: assetName, Path: target})
+	}
 	return successes, failures, nil
 }
 
@@ -98,7 +165,7 @@ func installOpenCodeAsset(bundle fs.FS, source, destDir, target, kind, name stri
 	if err != nil {
 		return openCodeFailure(kind, name, target, err)
 	}
-	if err := os.WriteFile(target, data, 0o644); err != nil {
+	if err := os.WriteFile(target, data, 0o600); err != nil {
 		return openCodeFailure(kind, name, target, err)
 	}
 	return nil

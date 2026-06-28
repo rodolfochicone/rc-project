@@ -2,6 +2,7 @@
 description: rc planning pipeline — PRD → TechSpec → Tasks, each on its own model
 agent: rc
 ---
+
 Run the rc planning pipeline for: $ARGUMENTS
 
 Delegate each phase to its specialized subagent via the task tool, in order, confirming the artifact exists before the next:

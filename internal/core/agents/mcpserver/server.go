@@ -7,9 +7,9 @@ import (
 	"os"
 	"strings"
 
+	"github.com/modelcontextprotocol/go-sdk/mcp"
 	reusableagents "github.com/rodolfochicone/rc-project/internal/core/agents"
 	"github.com/rodolfochicone/rc-project/internal/version"
-	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
 const (

@@ -47,7 +47,7 @@ rc supports monorepos, where more than one `.rc` directory can exist. Before rea
    - hand-rolled code that duplicates the stdlib or an already-installed dependency;
    - layers and indirection added "for later" that nothing uses yet.
 
-3. Confirm before flagging. For every candidate cut, prove it with `find_referencing_symbols` (truly dead / single caller) or by reading the replacement (the stdlib function exists and is edge-case-correct). A cut you cannot prove is a hypothesis — label it as such, do not assert it.
+3. Confirm before flagging. For every candidate cut, prove it with `find_referencing_symbols` (truly dead / single caller) or by reading the replacement (the stdlib function exists and is edge-case-correct). A cut you cannot prove is a hypothesis — label it as such, do not assert it. Only assert a cut you are **>80% sure is safe and real** here; proposing zero cuts (`Lean already. Ship.`) is a valid, expected outcome — never invent cuts to look thorough.
 
 4. Write the report and print it.
    - Write to `.rc/tasks/<slug>/simplify-review-NNN.md`, where `NNN` is zero-padded and increments past any existing `simplify-review-*.md`. If no feature slug applies, write to `.rc/analysis/simplify-review-NNN.md`. Print the same content.

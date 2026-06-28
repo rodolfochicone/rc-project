@@ -110,6 +110,20 @@ Technical challenges and mitigation strategies:
 - Mitigation approach
 - Areas requiring further research or prototyping
 
+## Behavioral Contract
+
+Machine-parseable assertions derived from the PRD acceptance criteria and the design above. Each is atomic, observable, and carries a stable `id` (HTML comment) that tasks and reviews reference. `Requirement` = behavior that must hold when triggered; `Invariant` = property that must always hold. `enforced` names the test/check that proves it, or `pending`.
+
+### Requirement: <short name>
+<one-sentence behavior, with its trigger/condition>
+<!-- id: <area>.<short-kebab> -->
+<!-- enforced: <test name / location, or pending> -->
+
+### Invariant: <short name>
+<one-sentence always-true property>
+<!-- id: <area>.<short-kebab> -->
+<!-- enforced: <test name / location, or pending> -->
+
 ## Architecture Decision Records
 
 ADRs documenting key decisions made during PRD brainstorming and technical design:

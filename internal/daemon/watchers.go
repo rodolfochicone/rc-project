@@ -15,9 +15,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/fsnotify/fsnotify"
 	"github.com/rodolfochicone/rc-project/internal/core/reviews"
 	"github.com/rodolfochicone/rc-project/internal/core/tasks"
-	"github.com/fsnotify/fsnotify"
 )
 
 const defaultWatcherDebounce = 500 * time.Millisecond

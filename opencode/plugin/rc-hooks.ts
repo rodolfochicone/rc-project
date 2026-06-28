@@ -1,0 +1,72 @@
+import type { Plugin } from "@opencode-ai/plugin";
+import { join } from "node:path";
+
+// rc hook parity for OpenCode. OpenCode has no settings.json hooks like Claude
+// Code; it exposes a plugin API instead. Rather than reimplement the guard logic
+// in TypeScript, this plugin shells out to the SAME bundled shell scripts the
+// Claude channel uses (git-guard, commit-guard, go-mod-guard, gateguard, go-fmt),
+// so there is one source of truth. `rc setup` installs those scripts next to this
+// plugin under <opencode-root>/rc/hooks/scripts/.
+//
+// The scripts read a Claude-style JSON payload on stdin and exit 2 to block; this
+// plugin maps OpenCode's tool events to that payload and turns an exit-2 into a
+// thrown error (which OpenCode treats as a denied tool call). The same env
+// knobs apply: RC_HOOK_PROFILE, RC_DISABLED_HOOKS, RC_DRY_RUN.
+
+const SCRIPTS_DIR = join(import.meta.dir, "..", "rc", "hooks", "scripts");
+
+export const RcHooks: Plugin = async ({ $ }) => {
+  // Run one guard script with a synthesized payload. Exit 2 → throw (block).
+  // Any other failure (missing bash/jq, exit 0/1) is non-blocking, matching the
+  // scripts' fail-open contract so a broken environment never wedges a session.
+  async function runGuard(script: string, payload: unknown): Promise<void> {
+    const scriptPath = join(SCRIPTS_DIR, script);
+    const res = await $`printf '%s' ${JSON.stringify(payload)} | bash ${scriptPath}`
+      .nothrow()
+      .quiet();
+    if (res.exitCode === 2) {
+      const msg = res.stderr.toString().trim() || `blocked by rc ${script}`;
+      throw new Error(msg);
+    }
+  }
+
+  function fileArgs(input: any, output: any) {
+    const filePath = output?.args?.filePath ?? input?.args?.filePath ?? "";
+    return { tool_input: { file_path: filePath }, session_id: input?.sessionID ?? "opencode" };
+  }
+
+  return {
+    "tool.execute.before": async (input: any, output: any) => {
+      if (input.tool === "bash") {
+        const payload = {
+          tool_input: { command: output?.args?.command ?? input?.args?.command ?? "" },
+        };
+        await runGuard("git-guard.sh", payload);
+        await runGuard("commit-guard.sh", payload);
+        return;
+      }
+      if (input.tool === "edit" || input.tool === "write" || input.tool === "patch") {
+        const payload = fileArgs(input, output);
+        await runGuard("go-mod-guard.sh", payload);
+        await runGuard("gateguard.sh", payload);
+      }
+    },
+    "tool.execute.after": async (input: any, output: any) => {
+      const isEdit = input.tool === "edit" || input.tool === "write" || input.tool === "patch";
+      if (isEdit) {
+        // go-fmt never blocks (exit 0); it normalizes the edited Go file.
+        await runGuard("go-fmt.sh", fileArgs(input, output));
+      }
+      // Instincts capture — opt-in, only when RC_INSTINCTS=1 (observe.sh self-gates
+      // too, but skip spawning bash entirely when disabled).
+      if (process.env.RC_INSTINCTS === "1" && (isEdit || input.tool === "bash")) {
+        const args = output?.args ?? input?.args ?? {};
+        const payload =
+          input.tool === "bash"
+            ? { tool_name: "bash", tool_input: { command: args.command ?? "" } }
+            : { tool_name: input.tool, tool_input: { file_path: args.filePath ?? "" } };
+        await runGuard("observe.sh", payload);
+      }
+    },
+  };
+};

@@ -43,7 +43,7 @@ type setupCommandState struct {
 	installReusableAgents setupReusableAgentInstallFunc
 	previewCommands       func(setup.CommandInstallConfig) ([]setup.CommandPreviewItem, error)
 	installCommands       func(setup.CommandInstallConfig) ([]setup.CommandSuccessItem, []setup.CommandFailureItem, error)
-	installOpenCodeAssets func(setup.OpenCodeInstallConfig) ([]setup.OpenCodeAssetSuccessItem, []setup.OpenCodeAssetFailureItem, error)
+	installOpenCodeAssets setupOpenCodeInstallFunc
 	cleanupLegacyAssets   func(setup.LegacyAssetCleanupConfig) (setup.LegacyAssetCleanupResult, error)
 	isInteractive         func() bool
 
@@ -75,6 +75,10 @@ type setupReusableAgentInstallFunc func(
 ) ([]setup.ReusableAgentSuccessItem, []setup.ReusableAgentFailureItem, error)
 
 type setupSkillSyncFunc func(setup.SyncConfig) (setup.SyncResult, error)
+
+type setupOpenCodeInstallFunc func(
+	setup.OpenCodeInstallConfig,
+) ([]setup.OpenCodeAssetSuccessItem, []setup.OpenCodeAssetFailureItem, error)
 
 type setupInstallPlan struct {
 	Config               setup.InstallConfig
@@ -994,31 +998,38 @@ func printSecondaryInstallResults(
 	result *setup.Result,
 	cwd, homeDir string,
 ) {
-	hasSkillResults := len(result.Successful) > 0 || len(result.Failed) > 0
-	hasReusableAgentResults := len(result.ReusableAgentsSuccessful) > 0 || len(result.ReusableAgentsFailed) > 0
-	hasCommandResults := len(result.CommandsSuccessful) > 0 || len(result.CommandsFailed) > 0
-	hasHookResults := len(result.HooksSuccessful) > 0 || len(result.HooksFailed) > 0
-
-	if hasSkillResults && hasReusableAgentResults {
-		printSectionSeparator(w, styles)
+	// Each section prints unconditionally (the printers no-op when empty); a
+	// separator precedes a non-empty section only when an earlier section was
+	// also non-empty. Tracking that with a running flag keeps the compound
+	// boolean conditions out of one function.
+	sections := []struct {
+		has   bool
+		print func()
+	}{
+		{len(result.ReusableAgentsSuccessful) > 0 || len(result.ReusableAgentsFailed) > 0, func() {
+			printReusableAgentInstallResults(w, styles, result, cwd, homeDir)
+		}},
+		{len(result.CommandsSuccessful) > 0 || len(result.CommandsFailed) > 0, func() {
+			printCommandInstallResults(w, styles, result, cwd, homeDir)
+		}},
+		{len(result.HooksSuccessful) > 0 || len(result.HooksFailed) > 0, func() {
+			printHookInstallResults(w, styles, result, cwd, homeDir)
+		}},
+		{len(result.OpenCodeSuccessful) > 0 || len(result.OpenCodeFailed) > 0, func() {
+			printOpenCodeInstallResults(w, styles, result, cwd, homeDir)
+		}},
 	}
-	printReusableAgentInstallResults(w, styles, result, cwd, homeDir)
 
-	if (hasSkillResults || hasReusableAgentResults) && hasCommandResults {
-		printSectionSeparator(w, styles)
+	printedAny := len(result.Successful) > 0 || len(result.Failed) > 0
+	for _, section := range sections {
+		if section.has && printedAny {
+			printSectionSeparator(w, styles)
+		}
+		section.print()
+		if section.has {
+			printedAny = true
+		}
 	}
-	printCommandInstallResults(w, styles, result, cwd, homeDir)
-
-	if (hasSkillResults || hasReusableAgentResults || hasCommandResults) && hasHookResults {
-		printSectionSeparator(w, styles)
-	}
-	printHookInstallResults(w, styles, result, cwd, homeDir)
-
-	hasOpenCodeResults := len(result.OpenCodeSuccessful) > 0 || len(result.OpenCodeFailed) > 0
-	if (hasSkillResults || hasReusableAgentResults || hasCommandResults || hasHookResults) && hasOpenCodeResults {
-		printSectionSeparator(w, styles)
-	}
-	printOpenCodeInstallResults(w, styles, result, cwd, homeDir)
 }
 
 func printSectionSeparator(w io.Writer, styles cliChromeStyles) {
