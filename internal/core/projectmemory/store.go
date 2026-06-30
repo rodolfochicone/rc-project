@@ -3,7 +3,9 @@
 // read and write through the `rc memory` command. It is local-first and lives in the
 // project's resolved .rc base directory. Retrieval is keyword-ranked via SQLite
 // FTS5/BM25, which keeps exact symbol and identifier matches that pure vector search
-// would lose. The database is the single source of truth; there is no markdown mirror.
+// would lose. A committed text mirror under .rc/memory/ — one markdown file per fact,
+// synced with `rc memory export`/`import` — is the shareable source of truth across
+// machines; the SQLite database is a local cache and query index rebuilt from it.
 package projectmemory
 
 import (
