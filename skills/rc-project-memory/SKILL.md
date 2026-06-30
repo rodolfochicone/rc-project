@@ -26,6 +26,8 @@ exact symbol and identifier matches are preserved.
 - `rc memory update <id> [--title ...] [--body ...] [--tags ...]` — change fields.
 - `rc memory delete <id>` — remove one record.
 - `rc memory reindex` — regenerate semantic embeddings (only with embeddings enabled).
+- `rc memory export` — write every memory to the committed text mirror under `.rc/memory/` (one markdown file per fact).
+- `rc memory import` — load the mirror files back into the database (most-recent-wins by `updated_at`).
 
 Use `--format json` whenever another step must parse the result. Hits and records expose
 `id`, `scope`, `key`, `title`, `body`, `tags`, `source`, timestamps, and a `score` on search.
@@ -91,6 +93,20 @@ down the write still succeeds, just without a vector), and `search` fuses lexica
 semantic rankings. If embedding the query fails, search falls back to lexical results.
 This keeps data on your machine (no API key, no external network) at the cost of running
 the Ollama daemon — it is opt-in and off by default.
+
+## Sharing across machines
+
+The SQLite database (`.rc/memory.db`) is gitignored and local to one machine. To share
+memory across machines and teammates, use the committed text mirror under `.rc/memory/`:
+
+1. After recording memories, run `rc memory export` to write the mirror files.
+2. Commit `.rc/memory/` to git and push.
+3. On another machine, after pulling, run `rc memory import` to load them into the local
+   database. Import is most-recent-wins by `updated_at`, so it is safe to run repeatedly.
+
+Keyed facts (`--key`) map to a stable file name (`<scope>__<key>.md`), so the same fact edited
+on two machines merges in place through git. Deletions do not propagate automatically: to
+remove a shared fact, delete its `.md` file (and run `rc memory delete` locally).
 
 ## Error Handling
 

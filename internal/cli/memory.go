@@ -37,6 +37,8 @@ via SQLite FTS5, so exact symbol and identifier matches are preserved.`,
 		newMemoryUpdateCommand(),
 		newMemoryDeleteCommand(),
 		newMemoryReindexCommand(),
+		newMemoryExportCommand(),
+		newMemoryImportCommand(),
 	)
 	return cmd
 }
