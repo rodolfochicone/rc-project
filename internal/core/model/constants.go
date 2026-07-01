@@ -18,7 +18,7 @@ const (
 	DefaultOpenCodeModel     = "anthropic/claude-opus-4-6"
 	DefaultPiModel           = "anthropic/claude-opus-4-6"
 	DefaultGeminiModel       = "gemini-2.5-pro"
-	DefaultCopilotModel      = "claude-sonnet-4.6"
+	DefaultCopilotModel      = "claude-sonnet-5"
 	DefaultActivityTimeout   = 10 * time.Minute
 	WorkflowRootDirName      = ".rc"
 	WorkflowConfigFileName   = "config.toml"
