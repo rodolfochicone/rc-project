@@ -8,6 +8,7 @@ This file provides project guidance for coding agents working in this repository
 - **YOU CAN ONLY** finish a task if `make verify` passes at 100% (runs `fmt + lint + test + build`). No exceptions — failing any of these commands means the task is **NOT COMPLETE**
 - **`make lint` has zero tolerance**. **Zero issues allowed** — any golangci-lint issue is a blocking failure
 - **ALWAYS** check dependent package APIs before writing integration code or tests to avoid writing wrong code
+- **BEFORE hand-rolling non-trivial logic** — check the standard library and established modules (via pkg.go.dev / `go get`) for a proven solution, and prefer adopting it over writing net-new code
 - **NEVER** use workarounds — always use the `no-workarounds` skill for any fix/debug task + `testing-anti-patterns` for tests
 - **ALWAYS** use the `no-workarounds` and `systematic-debugging` skills when fixing bugs or complex issues
 - **NEVER** use web search tools to search local project code — for local code, use Grep/Glob instead

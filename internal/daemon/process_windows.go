@@ -2,11 +2,16 @@
 
 package daemon
 
-import "golang.org/x/sys/windows"
+import (
+	"log/slog"
+	"math"
+
+	"golang.org/x/sys/windows"
+)
 
 // ProcessAlive reports whether a process with pid is currently alive.
 func ProcessAlive(pid int) bool {
-	if pid <= 0 {
+	if pid <= 0 || uint64(pid) > math.MaxUint32 {
 		return false
 	}
 
@@ -14,7 +19,11 @@ func ProcessAlive(pid int) bool {
 	if err != nil {
 		return false
 	}
-	defer windows.CloseHandle(handle)
+	defer func() {
+		if cerr := windows.CloseHandle(handle); cerr != nil {
+			slog.Warn("close process handle", "pid", pid, "error", cerr)
+		}
+	}()
 
 	event, err := windows.WaitForSingleObject(handle, 0)
 	if err != nil {
