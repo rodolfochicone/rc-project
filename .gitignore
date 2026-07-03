@@ -35,3 +35,7 @@ coverage/
 
 # TanStack Router generated tree — regenerated at build/dev time.
 web/src/routeTree.gen.ts
+
+# graphify generated output and cache — recreated by running the graphify skill.
+graphify-out/
+**/graphify-out/
