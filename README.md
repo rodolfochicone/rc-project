@@ -1,4 +1,6 @@
 <div align="center">
+  <img src="imgs/rc-hero.jpeg" alt="rc — orchestrate AI coding agents from idea to shipped code" width="100%">
+
   <h1>rc</h1>
   <p><strong>Orchestrate AI coding agents from idea to shipped code — in a single pipeline.</strong></p>
   <p>
