@@ -32,6 +32,8 @@ for the pipeline belong in the Go executor.
 | `PostToolUse`  | `Edit\|Write\|MultiEdit\|Bash` | `observe.sh`      | opt-in     | Instincts capture: appends a compact `{tool, target}` observation to `.rc/instincts/observations.jsonl` for the `rc-instincts` skill. Off unless `RC_INSTINCTS=1`. Never blocks; never records file contents. |
 | `Stop`         | —                              | `notify.sh`       | opt-in     | Plays a short "done" sound at end of turn. Off unless `RC_SOUND=1`. Never blocks.                                                                                                                             |
 | `Notification` | —                              | `notify.sh`       | opt-in     | Plays an "attention" sound when the agent needs you (e.g. a permission prompt). Off unless `RC_SOUND=1`. Never blocks.                                                                                        |
+| `SessionStart` | —                              | `session-recall.sh` | opt-in   | Recall: injects a bounded pointer to the project's curated memory and highest-confidence instincts at session start — a pointer, never a dump of bodies. Off unless `RC_RECALL=1`. Never blocks. |
+| `PreCompact`   | —                              | `precompact-capture.sh` | opt-in | Capture: before the conversation compacts, reminds the agent to persist durable learnings (`rc memory add`, instincts) so they survive summarization. Off unless `RC_RECALL=1`. Never blocks. |
 
 Blocking hooks exit `2` and return the message on stderr to the agent. Allowed
 calls exit `0`.
@@ -48,11 +50,15 @@ and lets you disable any hook without editing config:
 | `RC_DRY_RUN`        | `1`                                 | A hook that _would_ block instead logs `(dry-run, would block)` and allows.                                                                                                                       |
 
 Hook names for the kill-switch are `git-guard`, `commit-guard`, `go-mod-guard`,
-`gateguard`, `go-fmt`, `observe`, `notify`.
+`gateguard`, `go-fmt`, `observe`, `notify`, `session-recall`, `precompact-capture`.
 
-Two hooks have a separate opt-in and add zero overhead by default:
+Several hooks have a separate opt-in and add zero overhead by default:
 
 - `observe.sh` — does nothing unless `RC_INSTINCTS=1` (instincts capture).
+- `session-recall.sh` / `precompact-capture.sh` — do nothing unless `RC_RECALL=1` (the
+  learning loop: recall durable memory at `SessionStart`, remind to persist it at
+  `PreCompact`). `RC_RECALL_MAX_CHARS` (default 1500) bounds the injected recall context.
+  They read only local `.rc` files — no rc binary or network needed — and never block.
 - `notify.sh` — does nothing unless `RC_SOUND=1` (end-of-turn / attention sound). On
   macOS it uses `afplay` with system sounds (Hero = done, Funk = attention); on
   Linux it tries `paplay`/`aplay`; otherwise it is silent. The same `RC_SOUND=1`

@@ -67,6 +67,26 @@
                     }
                 ]
             }
+        ],
+        "SessionStart": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/session-recall.sh"
+                    }
+                ]
+            }
+        ],
+        "PreCompact": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/precompact-capture.sh"
+                    }
+                ]
+            }
         ]
     }
 }

@@ -27,6 +27,10 @@ func projectMemoryMirrorDir(ctx context.Context) (string, error) {
 }
 
 func newMemoryExportCommand() *cobra.Command {
+	var (
+		native bool
+		dir    string
+	)
 	cmd := &cobra.Command{
 		Use:          "export",
 		Short:        "Write every memory to the committed text mirror (.rc/memory/)",
@@ -41,6 +45,10 @@ Export overwrites mirror files but never deletes them. Commit the mirror, then t
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			ctx, stop := signalCommandContext(cmd)
 			defer stop()
+
+			if native {
+				return runNativeExport(ctx, cmd, dir)
+			}
 
 			mirrorDir, err := projectMemoryMirrorDir(ctx)
 			if err != nil {
@@ -86,6 +94,9 @@ Export overwrites mirror files but never deletes them. Commit the mirror, then t
 			return writeMemoryText(cmd, fmt.Sprintf("Exported %d memories to %s\n", len(memories), mirrorDir))
 		},
 	}
+	cmd.Flags().
+		BoolVar(&native, "native", false, "Export in Claude-native format (MEMORY.md index + one file per fact)")
+	cmd.Flags().StringVar(&dir, "dir", "", "Target directory for --native (default: <.rc base>/memory-native)")
 	return cmd
 }
 

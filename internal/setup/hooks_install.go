@@ -33,6 +33,8 @@ var rcHookGroups = []hookGroupSpec{
 	{event: "PostToolUse", matcher: "Edit|Write|MultiEdit|Bash", scripts: []string{"observe.sh"}},
 	{event: "Stop", matcher: "", scripts: []string{"notify.sh"}},
 	{event: "Notification", matcher: "", scripts: []string{"notify.sh"}},
+	{event: "SessionStart", matcher: "", scripts: []string{"session-recall.sh"}},
+	{event: "PreCompact", matcher: "", scripts: []string{"precompact-capture.sh"}},
 }
 
 // rcHookSupportScripts are shared library files sourced by the hook scripts at

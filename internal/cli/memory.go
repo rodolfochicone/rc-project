@@ -39,7 +39,10 @@ via SQLite FTS5, so exact symbol and identifier matches are preserved.`,
 		newMemoryReindexCommand(),
 		newMemoryExportCommand(),
 		newMemoryImportCommand(),
+		newMemoryPromoteCommand(),
 	)
+	cmd.PersistentFlags().
+		Bool("global", false, "Target the home-scoped memory shared across all workspaces (~/.rc/memory.db)")
 	return cmd
 }
 
@@ -52,8 +55,13 @@ func openProjectMemory(ctx context.Context) (*projectmemory.Store, projectmemory
 	if err != nil {
 		return nil, nil, err
 	}
-	dbPath := filepath.Join(model.RcDir(root), projectmemory.DBFileName)
+	return openMemoryAt(ctx, filepath.Join(model.RcDir(root), projectmemory.DBFileName))
+}
 
+// openMemoryAt opens the memory store at dbPath, wiring the env-configured embedder and the
+// matching retriever (hybrid when embeddings are enabled, lexical otherwise). It is shared by
+// the workspace and global scopes.
+func openMemoryAt(ctx context.Context, dbPath string) (*projectmemory.Store, projectmemory.Retriever, error) {
 	embedder, err := projectMemoryEmbedderFromEnv()
 	if err != nil {
 		return nil, nil, err
@@ -266,7 +274,7 @@ func (s *memoryAddState) run(cmd *cobra.Command, _ []string) error {
 		return withExitCode(1, err)
 	}
 
-	st, _, err := openProjectMemory(ctx)
+	st, _, err := openMemoryScope(ctx, memoryGlobalFlag(cmd))
 	if err != nil {
 		return withExitCode(2, err)
 	}
@@ -320,13 +328,7 @@ func (s *memorySearchState) run(cmd *cobra.Command, args []string) error {
 		return withExitCode(1, err)
 	}
 
-	st, retriever, err := openProjectMemory(ctx)
-	if err != nil {
-		return withExitCode(2, err)
-	}
-	defer closeProjectMemory(ctx, st)
-
-	hits, err := retriever.Search(ctx, projectmemory.SearchQuery{
+	hits, err := searchMemories(ctx, cmd, projectmemory.SearchQuery{
 		Text:  strings.Join(args, " "),
 		Scope: s.scope,
 		Limit: s.limit,
@@ -371,7 +373,7 @@ func (s *memoryGetState) run(cmd *cobra.Command, args []string) error {
 		return withExitCode(1, err)
 	}
 
-	st, _, err := openProjectMemory(ctx)
+	st, _, err := openMemoryScope(ctx, memoryGlobalFlag(cmd))
 	if err != nil {
 		return withExitCode(2, err)
 	}
@@ -428,7 +430,7 @@ func (s *memoryListState) run(cmd *cobra.Command, _ []string) error {
 		return withExitCode(1, err)
 	}
 
-	st, _, err := openProjectMemory(ctx)
+	st, _, err := openMemoryScope(ctx, memoryGlobalFlag(cmd))
 	if err != nil {
 		return withExitCode(2, err)
 	}
@@ -498,7 +500,7 @@ func (s *memoryUpdateState) run(cmd *cobra.Command, args []string) error {
 		input.Tags = &tags
 	}
 
-	st, _, err := openProjectMemory(ctx)
+	st, _, err := openMemoryScope(ctx, memoryGlobalFlag(cmd))
 	if err != nil {
 		return withExitCode(2, err)
 	}
@@ -524,7 +526,7 @@ func newMemoryDeleteCommand() *cobra.Command {
 			ctx, stop := signalCommandContext(cmd)
 			defer stop()
 
-			st, _, err := openProjectMemory(ctx)
+			st, _, err := openMemoryScope(ctx, memoryGlobalFlag(cmd))
 			if err != nil {
 				return withExitCode(2, err)
 			}
@@ -557,7 +559,7 @@ so existing memories become searchable semantically.`,
 			ctx, stop := signalCommandContext(cmd)
 			defer stop()
 
-			st, _, err := openProjectMemory(ctx)
+			st, _, err := openMemoryScope(ctx, memoryGlobalFlag(cmd))
 			if err != nil {
 				return withExitCode(2, err)
 			}
