@@ -1,6 +1,6 @@
 ---
 name: rc-simplify-review
-description: Reviews the current change set through a single lens — over-engineering and complexity only — and writes a ranked delete-list to .rc/tasks/<slug>/ (what to delete, replace with stdlib, fold into a native feature, or shrink), ending with the net lines/dependencies a cleanup could remove. Use as an opt-in pre-PR pass to catch bloat that a severity-ranked review buries, or to audit legacy code that never went through the rc ladder. Do not use for correctness, security, or performance defects (use rc-code-review), to generate a remediation round (use rc-review-round), to fix existing review issues (use rc-fix-reviews), or to edit source code.
+description: Reviews the current change set through a single lens — over-engineering and complexity only — and writes a ranked delete-list to .rc/tasks/{slug}/ (what to delete, replace with stdlib, fold into a native feature, or shrink), ending with the net lines/dependencies a cleanup could remove. Use as an opt-in pre-PR pass to catch bloat that a severity-ranked review buries, or to audit legacy code that never went through the rc ladder. Do not use for correctness, security, or performance defects (use rc-code-review), to generate a remediation round (use rc-review-round), to fix existing review issues (use rc-fix-reviews), or to edit source code.
 model: opus
 effort: high
 ---

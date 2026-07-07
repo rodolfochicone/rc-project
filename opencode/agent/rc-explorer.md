@@ -4,6 +4,9 @@ mode: subagent
 model: opencode-go/deepseek-v4-flash
 reasoningEffort: low
 temperature: 0.1
+tools:
+  write: false
+  edit: false
 ---
 
 You are the rc explorer — a fast codebase navigation specialist.

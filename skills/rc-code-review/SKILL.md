@@ -1,6 +1,6 @@
 ---
 name: rc-code-review
-description: Performs a rigorous, standards-driven review of the current change set, writing a categorized, severity-ranked report to .rc/tasks/<slug>/ covering correctness, security, performance, and project-convention conformance. Use for an on-demand quality gate of a diff or branch before merge. Do not use to generate a review-round directory for remediation (use rc-review-round), to fix existing review issues (use rc-fix-reviews), or to edit source code.
+description: Performs a rigorous, standards-driven review of the current change set, writing a categorized, severity-ranked report to .rc/tasks/{slug}/ covering correctness, security, performance, and project-convention conformance. Use for an on-demand quality gate of a diff or branch before merge. Do not use to generate a review-round directory for remediation (use rc-review-round), to fix existing review issues (use rc-fix-reviews), or to edit source code.
 model: opus
 effort: xhigh
 ---

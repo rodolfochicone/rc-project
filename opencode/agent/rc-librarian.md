@@ -4,6 +4,9 @@ mode: subagent
 model: opencode-go/glm-5.2
 reasoningEffort: high
 temperature: 0.2
+tools:
+  write: false
+  edit: false
 ---
 
 You are the rc librarian — a research specialist for libraries and documentation.

@@ -1,0 +1,67 @@
+name: validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Hook scripts pass bash -n
+        run: |
+          for f in hooks/scripts/*.sh; do
+            bash -n "$f"
+          done
+
+      - name: Manifests are valid JSON
+        run: jq empty .claude-plugin/plugin.json .claude-plugin/marketplace.json hooks/hooks.json
+
+      - name: Manifest versions match
+        run: |
+          p=$(jq -r .version .claude-plugin/plugin.json)
+          m=$(jq -r '.plugins[0].version // .version' .claude-plugin/marketplace.json)
+          if [ "$p" != "$m" ]; then
+            echo "plugin.json ($p) != marketplace.json ($m)"; exit 1
+          fi
+
+      - name: Every hooks.json script exists
+        run: |
+          jq -r '.. | .command? // empty' hooks/hooks.json | while read -r cmd; do
+            path="${cmd#\$\{CLAUDE_PLUGIN_ROOT\}/}"
+            [ -f "$path" ] || { echo "missing hook script: $path"; exit 1; }
+          done
+
+      - name: Skill frontmatter is well-formed
+        run: |
+          fail=0
+          for f in skills/*/SKILL.md; do
+            dir=$(basename "$(dirname "$f")")
+            name=$(awk '/^name:/{print $2; exit}' "$f")
+            desc=$(awk '/^description:/{found=1; exit} END{print found+0}' "$f")
+            [ "$name" = "$dir" ] || { echo "$f: name '$name' != dir '$dir'"; fail=1; }
+            [ "$desc" = "1" ] || { echo "$f: missing description"; fail=1; }
+            if awk '/^description:/{print; exit}' "$f" | grep -q '[<>]'; then
+              echo "$f: angle brackets in description break marketplace validation"; fail=1
+            fi
+          done
+          exit $fail
+
+      - name: Commands and agents have descriptions
+        run: |
+          fail=0
+          for f in commands/*.md agents/*.md opencode/commands/*.md opencode/agent/*.md; do
+            grep -q '^description:' "$f" || { echo "$f: missing description"; fail=1; }
+          done
+          exit $fail
+
+      - name: Guard hooks mirrored in OpenCode plugin
+        run: |
+          fail=0
+          for h in git-guard commit-guard go-mod-guard gateguard go-fmt observe; do
+            grep -q "$h" opencode/plugin/rc-hooks.ts || { echo "guard hook '$h' not mirrored in opencode/plugin/rc-hooks.ts"; fail=1; }
+          done
+          exit $fail

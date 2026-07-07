@@ -2,6 +2,47 @@
 
 ## [Unreleased]
 
+### Added
+
+- **`rc-doctor`** — nova skill de health-check da própria instalação do rc:
+  hooks presentes/válidos/wired, manifestos JSON com versões consistentes,
+  frontmatter de skills/commands/agents bem-formado, paridade dos guard hooks
+  Claude↔OpenCode e ferramentas exigidas (jq, gh) no PATH. Read-only: prescreve
+  o fix, não aplica.
+- **CI de validação** (`.github/workflows/validate.yml`): `bash -n` em todos os
+  hook scripts, `jq empty` + consistência de versão nos manifestos, checagem de
+  frontmatter (incluindo a regra de angle brackets do marketplace) e paridade
+  dos guard hooks no `rc-hooks.ts` — a cada push/PR.
+- **Mapa de uso** no README (pipeline mermaid, tabela "I want to…" por intenção
+  Claude/OpenCode, dia típico) e versão HTML interativa em
+  `docs/usage-map.html`.
+
+### Removed
+
+- **~450 arquivos não-produto destrackeados** e adicionados ao `.gitignore`:
+  `.agents/` (skills de terceiros + cópia pré-1.0.0 obsoleta das skills rc e as
+  antigas `cy-*`), os symlinks `.junie/`/`.kilocode/`/`.pi/`/`.qwen/` (lixo do
+  rename cy→rc) e `.claude/ship/` + `.claude/workflows/` (artefatos de outros
+  projetos). O marketplace clona o repo inteiro, então isso tudo era
+  distribuído a cada instalação do plugin. Os arquivos permanecem no disco,
+  apenas fora do versionamento. `.rc/tasks/` foi mantido versionado de
+  propósito — dogfooding coerente com o design do rc (artefatos versionados
+  junto ao código).
+
+### Fixed
+
+- **Descriptions com `<slug>`** em `rc-code-review` e `rc-simplify-review`
+  trocadas para `{slug}` — angle brackets em `description` quebram a validação
+  do marketplace de plugins do Claude Code.
+- **README** dizia "10 agents" na tabela de layout; são 12 (10 de fase + 2
+  read-only de apoio).
+
+### Changed
+
+- **`rc-explorer` e `rc-librarian` (OpenCode)** agora desligam `write`/`edit`
+  no frontmatter, espelhando a restrição de tools que o lado Claude já impunha
+  aos agents read-only.
+
 ## [1.0.1] - 2026-07-07
 
 ### Fixed
