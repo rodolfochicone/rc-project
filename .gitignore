@@ -21,6 +21,15 @@ coverage.html
 skills/*/autoresearch-*/
 skills-lock.json
 .claude/skills
+.claude/ship/
+.claude/workflows/
+
+# Local agent-tool config and third-party skills — not part of the rc plugin.
+.agents/
+.junie/
+.kilocode/
+.pi/
+.qwen/
 ai-docs
 **/**/node_modules
 node_modules/
