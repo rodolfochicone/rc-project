@@ -29,6 +29,7 @@ Run every check even after a failure; collect results.
 4. **Skill frontmatter** — every `skills/*/SKILL.md` has `name` (matching its directory) and `description`; no description contains `<` or `>` (they break marketplace validation); every `references/` path a skill mentions exists.
 5. **Commands and agents** — every file in `commands/`, `agents/`, `opencode/commands/`, and `opencode/agent/` has valid frontmatter with a `description`; every skill or agent a command routes to exists.
 6. **Environment** — `jq` and `git` on PATH; `gh` on PATH (warn, not fail — only `rc-git` and `rc-new-project` need it); `.rc/` writable in the current project if one exists.
+7. **Installed copy freshness** — if a plugin cache exists (`~/.claude/plugins/cache/*/rc/`), compare each cached copy's `plugin.json` version against the source of truth: the source repo's version when checking the repo, otherwise the latest marketplace version. Warn when the installed copy is behind (fix: `/plugin marketplace update`) and when stale extra versions linger in the cache (fix: remove the old version directory).
 
 ## Output
 
