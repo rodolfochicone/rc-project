@@ -25,7 +25,7 @@ Everything here is **plain markdown and shell**. There is no binary to install a
 
 Plugin skills are namespaced under the plugin, so slash commands surface as `/rc:rc-create-prd`, `/rc:rc-create-techspec`, `/rc:rc-create-tasks`, `/rc:rc-review-round`, and so on. Update with `/plugin marketplace update`.
 
-The plugin ships from this repo's layout (`skills/`, `commands/`, `hooks/hooks.json`) — Claude Code discovers them by convention. See [`docs/claude-code-plugin.md`](docs/claude-code-plugin.md) for the full runbook.
+The plugin ships from this repo's layout (`skills/`, `commands/`, `agents/`, `hooks/hooks.json`) — Claude Code discovers them by convention. See [`docs/claude-code-plugin.md`](docs/claude-code-plugin.md) for the full runbook.
 
 > **Repo is private.** `/plugin marketplace add` clones this repository, so the Claude Code environment needs GitHub read access — sign in with `gh auth login` or export `GH_TOKEN` / `GITHUB_TOKEN` before adding the marketplace.
 
@@ -53,6 +53,7 @@ The `opencode/plugin/rc-hooks.ts` plugin gives OpenCode Claude-parity hook enfor
 | ---------------- | ------------------------------------------------------------------------------------ |
 | `skills/`        | 25 skills (`SKILL.md` + references) — the workflow logic                             |
 | `commands/`      | Claude Code slash commands that route to the skills                                  |
+| `agents/`        | 10 Claude Code plugin agents — one per pipeline phase                                |
 | `hooks/`         | `hooks.json` + shell scripts run at agent lifecycle events                           |
 | `opencode/`      | OpenCode agents, commands, and the `rc-hooks` plugin                                 |
 | `rules/`         | Coding rules injected into agent context (`common.md`, `go.md`)                      |
@@ -110,6 +111,23 @@ Docs, APIs, and integrations:
 Claude Code commands (`commands/`) and OpenCode commands (`opencode/commands/`) route to the skills:
 
 `/rc-plan` · `/rc-exec` · `/rc-pipe` · `/rc-review` · `/rc-git` · `/rc-gan` · `/rc-docs` (Claude) · `/rc-prd` · `/rc-techspec` · `/rc-tasks` · `/rc-fix` (OpenCode)
+
+## 🤖 Agents
+
+One agent per pipeline phase, each pinning a model to the phase's needs. In Claude Code they live under `agents/` (invoke via the Task tool or `@rc-*`); in OpenCode under `opencode/agent/`. The `rc` agent orchestrates the rest.
+
+| Agent          | Phase                                   | Model  |
+| -------------- | --------------------------------------- | ------ |
+| `rc`           | Orchestrates the full pipeline          | sonnet |
+| `rc-prd`       | Idea → PRD                              | opus   |
+| `rc-techspec`  | PRD → TechSpec                          | opus   |
+| `rc-tasks`     | PRD + TechSpec → task files             | sonnet |
+| `rc-exec`      | Implement one hard task end to end      | opus   |
+| `rc-exec-bulk` | Implement many simple tasks in parallel | sonnet |
+| `rc-review`    | Independent, critical code review       | opus   |
+| `rc-fix`       | Resolve review/QA issues at root cause  | opus   |
+| `rc-gan`       | Adversarial quality loop (UI/CLI/copy)  | opus   |
+| `rc-git`       | Branch, commit messages, PR             | haiku  |
 
 ## 🪝 Hooks
 
