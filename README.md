@@ -114,20 +114,20 @@ Claude Code commands (`commands/`) and OpenCode commands (`opencode/commands/`) 
 
 ## 🤖 Agents
 
-One focused agent per pipeline phase, each inheriting your session model. In Claude Code they live under `agents/` (invoke via the Task tool or `@rc-*`); in OpenCode under `opencode/agent/`. The `rc` agent orchestrates the rest.
+One agent per pipeline phase, each pinning a model to the phase's needs. In Claude Code they live under `agents/` (invoke via the Task tool or `@rc-*`); in OpenCode under `opencode/agent/`. The `rc` agent orchestrates the rest.
 
-| Agent          | Phase                                   |
-| -------------- | --------------------------------------- |
-| `rc`           | Orchestrates the full pipeline          |
-| `rc-prd`       | Idea → PRD                              |
-| `rc-techspec`  | PRD → TechSpec                          |
-| `rc-tasks`     | PRD + TechSpec → task files             |
-| `rc-exec`      | Implement one hard task end to end      |
-| `rc-exec-bulk` | Implement many simple tasks in parallel |
-| `rc-review`    | Independent, critical code review       |
-| `rc-fix`       | Resolve review/QA issues at root cause  |
-| `rc-gan`       | Adversarial quality loop (UI/CLI/copy)  |
-| `rc-git`       | Branch, commit messages, PR             |
+| Agent          | Phase                                   | Model  |
+| -------------- | --------------------------------------- | ------ |
+| `rc`           | Orchestrates the full pipeline          | sonnet |
+| `rc-prd`       | Idea → PRD                              | opus   |
+| `rc-techspec`  | PRD → TechSpec                          | opus   |
+| `rc-tasks`     | PRD + TechSpec → task files             | sonnet |
+| `rc-exec`      | Implement one hard task end to end      | opus   |
+| `rc-exec-bulk` | Implement many simple tasks in parallel | sonnet |
+| `rc-review`    | Independent, critical code review       | opus   |
+| `rc-fix`       | Resolve review/QA issues at root cause  | opus   |
+| `rc-gan`       | Adversarial quality loop (UI/CLI/copy)  | opus   |
+| `rc-git`       | Branch, commit messages, PR             | haiku  |
 
 ## 🪝 Hooks
 

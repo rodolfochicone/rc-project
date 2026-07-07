@@ -1,7 +1,7 @@
 ---
 name: rc-techspec
 description: rc Tech spec / architecture phase. Use to translate an existing PRD into a concrete technical specification grounded in the real codebase. Do not use for PRD creation (use rc-prd), task breakdown (use rc-tasks), or code implementation.
-model: inherit
+model: opus
 color: cyan
 ---
 

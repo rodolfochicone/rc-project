@@ -1,7 +1,7 @@
 ---
 name: rc-fix
 description: rc fix phase. Use to drive open review/QA issues to closure by fixing the root cause. Do not use for producing reviews (use rc-review) or implementing new tasks (use rc-exec).
-model: inherit
+model: opus
 color: red
 ---
 

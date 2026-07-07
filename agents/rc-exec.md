@@ -1,7 +1,7 @@
 ---
 name: rc-exec
 description: rc execution phase for hard tasks. Use to implement a single rc task end to end with verification. Do not use for bulk/parallel simple tasks (use rc-exec-bulk), review, or fixing review issues (use rc-fix).
-model: inherit
+model: opus
 color: orange
 ---
 

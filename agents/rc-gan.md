@@ -1,7 +1,7 @@
 ---
 name: rc-gan
 description: rc GAN harness. Use to drive the subjective quality of a running artifact (UI/UX, CLI ergonomics, copy) up to a target score via an adversarial generator↔evaluator loop. Do not use for correctness/security review (use rc-review).
-model: inherit
+model: opus
 color: purple
 ---
 

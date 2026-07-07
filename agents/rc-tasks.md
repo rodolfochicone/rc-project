@@ -1,7 +1,7 @@
 ---
 name: rc-tasks
 description: rc task-breakdown phase. Use to decompose an approved PRD + TechSpec into independently implementable task files. Do not use for PRD/techspec creation or task execution (use rc-exec / rc-exec-bulk).
-model: inherit
+model: sonnet
 color: green
 ---
 
