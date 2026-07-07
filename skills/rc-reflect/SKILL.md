@@ -1,6 +1,6 @@
 ---
 name: rc-reflect
-description: Reviews recent work to find repeated friction and recommends the smallest durable improvement — a new skill, agent, slash command, hook, project-memory fact, or instinct — grounded in evidence of what actually kept happening. Use when asked to learn from recent sessions, to turn a manually-repeated workflow into a reusable asset, or to improve the rc setup based on real usage. Do not use for ordinary implementation, one-off debugging, or speculative asset creation without evidence (for atomic trigger→action corrections use rc-instincts; for durable facts use rc-project-memory).
+description: Reviews recent work to find repeated friction and recommends the smallest durable improvement — a new skill, agent, slash command, hook, project-memory fact, or instinct — grounded in evidence of what actually kept happening. Use when asked to learn from recent sessions, to turn a manually-repeated workflow into a reusable asset, or to improve your rc configuration based on real usage. Do not use for ordinary implementation, one-off debugging, or speculative asset creation without evidence (for atomic trigger→action corrections use rc-instincts; for durable facts use rc-project-memory).
 model: sonnet
 effort: high
 user-invocable: true

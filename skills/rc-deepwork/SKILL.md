@@ -1,6 +1,6 @@
 ---
 name: rc-deepwork
-description: A discipline for heavy, multi-phase, or risky coding sessions where the driver acts as a scheduler — drafting a plan, getting it reviewed before implementing, tracking progress in a durable file, and advancing phase by phase with verification gates — instead of diving straight into edits. Use for broad, multi-file, or risky work that spans several phases. Do not use for trivial edits, quick docs changes, or simple one-file bug fixes.
+description: A discipline for heavy, multi-phase, or risky coding sessions where the driver acts as a scheduler — drafting a plan, getting it reviewed before implementing, tracking progress in a durable file, and advancing phase by phase with verification gates — instead of diving straight into edits. Use for broad, multi-file, or risky work that spans several phases but does not warrant the full PRD ceremony. Do not use for trivial edits, quick docs, or simple one-file bug fixes; for formal feature work with requirements and specs, use the rc pipeline (rc-create-prd → rc-create-techspec → rc-create-tasks → rc-execute-task) instead.
 model: opus
 effort: high
 user-invocable: true

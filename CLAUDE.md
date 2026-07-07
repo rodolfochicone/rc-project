@@ -25,6 +25,7 @@ rc is a bundle of **AI-assisted development workflows** distributed as **skills,
 - **Commands** are markdown with frontmatter under `commands/` (Claude) and `opencode/commands/` (OpenCode). Keep the two in sync when a command exists on both sides.
 - **Hooks** are POSIX/bash shell scripts under `hooks/scripts/`, wired in `hooks/hooks.json`. Paths use `${CLAUDE_PLUGIN_ROOT}`. When adding or renaming a hook, update `hooks.json` **and** `opencode/plugin/rc-hooks.ts` so both runtimes stay at parity.
 - **Keep Claude Code and OpenCode in parity.** A workflow change usually touches both `commands/` + `opencode/commands/` and, if it affects enforcement, `hooks/` + `opencode/plugin/rc-hooks.ts`.
+- **The command sets differ by design, and that is intentional — do not "fix" it by forcing a 1:1 match.** OpenCode has per-phase commands (`rc-prd`, `rc-techspec`, `rc-tasks`, `rc-fix`) because its commands route to phase *agents*; on Claude those phases are reached by invoking the skills directly (`/rc:rc-create-prd`, …) plus the `rc-plan`/`rc-pipe` aggregate commands, so separate per-phase commands are redundant. `rc-docs` is Claude-only. Session hooks (`session-recall`, `phase-reminder`, `precompact-capture`) and `notify` are Claude-only; OpenCode gets equivalent behavior through the plugin's own event API, so they are not mirrored in `rc-hooks.ts` — only the guard hooks are.
 - **Match existing style** in each file. Skills follow a consistent SKILL.md shape — read a neighbor before writing a new one.
 
 ## Do not

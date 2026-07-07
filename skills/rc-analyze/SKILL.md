@@ -20,7 +20,7 @@ Fall back to Grep/Glob + Read when Serena is unavailable or for plain-text (non-
 
 ## Required Inputs
 
-- The analytical prompt: the question or topic to investigate (e.g. "how does run shutdown work", "why does the daemon exit before flushing the journal", "is the locking around the run registry consistent or is there a race", "what is the impact of changing the event journal format", "where does config validation happen and is it consistent").
+- The analytical prompt: the question or topic to investigate (e.g. "how does session auth work", "why does the cache return stale data under load", "is the locking around the shared registry consistent or is there a race", "what is the impact of changing the config file format", "where does input validation happen and is it consistent").
 - Optional: a slug or scope (specific files/directories/packages) to focus the analysis.
 
 ## Resolving the `.rc` base directory
