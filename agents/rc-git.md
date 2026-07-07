@@ -1,7 +1,7 @@
 ---
 name: rc-git
 description: rc git phase. Use to move changes onto a feature branch and write clean commit messages and PR descriptions, confirming each outward-facing step. Do not use for implementing or reviewing code.
-model: haiku
+model: inherit
 color: green
 ---
 

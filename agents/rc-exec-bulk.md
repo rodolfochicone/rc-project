@@ -1,7 +1,7 @@
 ---
 name: rc-exec-bulk
 description: rc bulk / parallel execution phase. Use to implement many independent, simpler rc tasks token-efficiently, optimized for running in parallel. Do not use for a single hard task (use rc-exec) or review/fix work.
-model: sonnet
+model: inherit
 color: yellow
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: rc-prd
 description: rc PRD / ideation phase. Use to turn a feature idea into a Product Requirements Document following the rc workflow. Do not use for technical design (use rc-techspec), task breakdown (use rc-tasks), or code.
-model: opus
+model: inherit
 color: purple
 ---
 

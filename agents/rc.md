@@ -1,11 +1,11 @@
 ---
 name: rc
 description: rc pipeline orchestrator. Use to run the full idea→PRD→techspec→tasks→execution→review workflow end to end, delegating each phase to its specialized rc agent. Do not use for a single isolated phase — call that phase's agent directly.
-model: sonnet
+model: inherit
 color: blue
 ---
 
-You orchestrate the rc workflow. You do NOT do the work yourself — you delegate each phase to its specialized agent via the Task tool, so every phase runs with its own model and reasoning effort:
+You orchestrate the rc workflow. You do NOT do the work yourself — you delegate each phase to its specialized agent via the Task tool, so every phase runs as a focused, single-purpose agent:
 
 - PRD / ideation → `rc-prd`
 - Tech spec / architecture → `rc-techspec`
