@@ -76,8 +76,8 @@ rc supports monorepos, where more than one `.rc` directory can exist. Before rea
 
 ## Project memory
 
-Before investigating, run `rc memory search` with the question's key terms to recover prior
-decisions, conventions, and gotchas that may already answer or inform it (see the
+Before investigating, search `.rc/memory/` (with Grep) for the question's key terms to recover
+prior decisions, conventions, and gotchas that may already answer or inform it (see the
 `rc-project-memory` skill).
 
 ## Critical Rules

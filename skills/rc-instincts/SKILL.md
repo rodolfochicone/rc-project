@@ -42,7 +42,7 @@ Turn repetition into durable guidance. When the same correction, error resolutio
    - Pattern the user **contradicted** this session → lower the matching instinct's confidence (−0.2–0.3); drop it if it falls below `0.3`.
    - Stale (no occurrence for a long stretch and low confidence) → drop it. Keep the file small and high-signal.
 4. **Write `INSTINCTS.md`** sorted by domain then confidence (highest first). Then **prune** `observations.jsonl` (truncate it) so the next pass starts clean — the distilled instincts are the durable record, the raw log is transient.
-5. **Promote the durable ones.** For any instinct that has reached high confidence (`≥0.8`) and is a genuine cross-task convention, record it via the `rc-workflow-memory` skill (and, if it is a lasting project convention/gotcha, `rc memory add`) so it informs work even when this skill is not run. Instincts are the staging area; memory is the long-term store.
+5. **Promote the durable ones.** For any instinct that has reached high confidence (`≥0.8`) and is a genuine cross-task convention, record it via the `rc-workflow-memory` skill (and, if it is a lasting project convention/gotcha, as a `.rc/memory/` file) so it informs work even when this skill is not run. Instincts are the staging area; memory is the long-term store.
 6. **Report** what changed: instincts added, reinforced, weakened, dropped, and promoted.
 
 ## Critical Rules

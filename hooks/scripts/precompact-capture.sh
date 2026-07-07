@@ -24,7 +24,7 @@ while :; do
 done
 [ -z "$rc_dir" ] && exit 0
 
-note="rc capture — context is about to compact. Before it is summarized away, persist anything durable you learned this session: record cross-cutting decisions, conventions, and non-obvious gotchas with \`rc memory add\` (see the rc-project-memory skill), and distill repeated corrections into instincts (rc-instincts). Skip secrets, transient state, and anything already obvious from the repository."
+note="rc capture — context is about to compact. Before it is summarized away, persist anything durable you learned this session: record cross-cutting decisions, conventions, and non-obvious gotchas as \`.rc/memory/\` files (see the rc-project-memory skill), and distill repeated corrections into instincts (rc-instincts). Skip secrets, transient state, and anything already obvious from the repository."
 
 if command -v jq >/dev/null 2>&1; then
     jq -nc --arg c "$note" '{hookSpecificOutput:{hookEventName:"PreCompact",additionalContext:$c}}'

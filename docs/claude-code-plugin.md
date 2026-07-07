@@ -1,21 +1,17 @@
 # Claude Code plugin — install and integration runbook
 
-rc distributes its workflow skills and slash commands as a **Claude Code plugin** in
-addition to the `rc setup` CLI installer. The plugin is an **additive, Claude-only**
-channel: it ships the same skills and commands and auto-updates through the plugin
-marketplace, pinned to each tagged release.
+rc distributes its workflow skills, slash commands, hooks, and agents as a **Claude Code
+plugin**. Claude Code serves the plugin directly from this repository's layout (`skills/`,
+`commands/`, `agents/`, `hooks/hooks.json`) and auto-updates through the plugin marketplace,
+pinned to each tagged release.
 
 - **Marketplace name:** `rc-project`
 - **Plugin name:** `rc`
 - **Source of truth:** `.claude-plugin/marketplace.json` and `.claude-plugin/plugin.json`
-  (kept in sync with the release version by `cmd/rc-plugin-sync`).
+  (the two files must carry the same version — keep them in sync by hand).
 
-## Who this is for
-
-- **End users** installing the plugin: follow [Install](#install) and [Update](#update).
-- **Maintainers** validating a release: run the full [manual integration runbook](#manual-integration-runbook)
-  before tagging, since plugin integration is validated manually by design (the automated
-  gate is the manifest-consistency test under `make verify`).
+For OpenCode, there is no marketplace; copy the `opencode/` bundle into your OpenCode config
+(see the README).
 
 ## Prerequisite — GitHub access (repo is private)
 
@@ -27,8 +23,7 @@ gh auth login                 # or:
 export GH_TOKEN="$(gh auth token)"   # token with repo read scope (GITHUB_TOKEN also works)
 ```
 
-Without it the marketplace add fails to clone. This is the same access `rc upgrade` and the
-CLI update notifier require.
+Without it the marketplace add fails to clone.
 
 ## Install
 
@@ -37,18 +32,9 @@ CLI update notifier require.
 /plugin install rc@rc-project
 ```
 
-Plugin commands are namespaced under the plugin name and surface as:
-
-- `/rc:rc-create-prd`
-- `/rc:rc-create-techspec`
-- `/rc:rc-create-tasks`
-- `/rc:rc-review-round`
-- `/rc:rc-final-verify`
-
-**Pick one channel.** Use _either_ the plugin _or_ `rc setup` for Claude Code, not both —
-installing the same skills through two channels produces duplicate commands. The plugin
-covers Claude Code only; keep `rc setup` for other agents (codex, cursor-agent, droid,
-gemini, …).
+Plugin commands are namespaced under the plugin name and surface as `/rc:rc-create-prd`,
+`/rc:rc-create-techspec`, `/rc:rc-create-tasks`, `/rc:rc-review-round`, `/rc:rc-final-verify`,
+and the rest of the `/rc:rc-*` set.
 
 ## Update
 
@@ -56,38 +42,33 @@ gemini, …).
 /plugin marketplace update
 ```
 
-The plugin `version` is pinned to each tagged release, so `/plugin marketplace update`
-moves you to the version published with that tag. Because Claude Code installs the
-plugin from the **git ref** (not from GoReleaser build artifacts), the pin must be
-**committed before the tag is created** — see [Pinning the version before a release](#pinning-the-version-before-a-release).
+The plugin `version` is pinned to each tagged release, so `/plugin marketplace update` moves
+you to the version published with that tag. Because Claude Code installs the plugin from the
+**git ref**, the pin must be **committed before the tag is created** — see
+[Pinning the version before a release](#pinning-the-version-before-a-release).
 
 ## Pinning the version before a release
 
-Claude Code serves the plugin from the repository **at the tagged ref** — the
-marketplace `source` is `"."`, and `/plugin marketplace add rodolfochicone/rc-project`
-clones the repo. The committed `.claude-plugin/*.json` at the tag is exactly what
-users install; GoReleaser build artifacts are never consulted by the plugin
-channel. The version bump must therefore be a **committed change that lands before
-the tag**, not a release-time hook (a GoReleaser `before.hook` would run after the
-tag and never commit its edits).
+Claude Code serves the plugin from the repository **at the tagged ref** — the marketplace
+`source` is `"."`, and `/plugin marketplace add rodolfochicone/rc-project` clones the repo. The
+committed `.claude-plugin/*.json` at the tag is exactly what users install. The version bump
+must therefore be a **committed change that lands before the tag**.
 
 Maintainer pre-tag step, when cutting release `vX.Y.Z`:
 
 ```bash
-go run ./cmd/rc-plugin-sync X.Y.Z   # stamps both manifests (v-prefix is normalized)
+# Set the same "version" in both manifests to X.Y.Z:
+#   .claude-plugin/plugin.json
+#   .claude-plugin/marketplace.json
 git add .claude-plugin/plugin.json .claude-plugin/marketplace.json
 git commit -m "chore(release): pin plugin manifests to vX.Y.Z"
 git tag vX.Y.Z                      # tag now carries the pinned manifests
 ```
 
-The manifest-consistency test (`internal/pluginmanifest`, run under `make verify`)
-keeps `plugin.json` and `marketplace.json` in agreement, but it does not enforce
-that the committed version matches the tag — that is this manual step's job.
-
 ## Manual integration runbook
 
-Run this end to end in a scratch Claude Code session before tagging a release. Each step
-lists its expected result.
+Run this end to end in a scratch Claude Code session before tagging a release. Each step lists
+its expected result.
 
 1. **Add the marketplace from a local path.** From a checkout of this repo:
 
@@ -96,8 +77,8 @@ lists its expected result.
    ```
 
    _Expected:_ Claude Code registers the `rc-project` marketplace from the local
-   `.claude-plugin/marketplace.json`. (The local-path form avoids the private-repo clone and
-   is the fastest way to validate uncommitted manifest changes.)
+   `.claude-plugin/marketplace.json`. (The local-path form avoids the private-repo clone and is
+   the fastest way to validate uncommitted manifest changes.)
 
 2. **Install the plugin.**
 
@@ -115,11 +96,9 @@ lists its expected result.
    /rc:rc-execute-task
    ```
 
-   _Expected:_ both resolve as plugin skills under the `rc:` namespace (alongside the rest of
-   the `/rc:rc-*` set).
+   _Expected:_ both resolve as plugin skills under the `rc:` namespace.
 
-4. **Validate the update flow.** Bump the manifest `version` (locally, or via
-   `go run ./cmd/rc-plugin-sync <new-version>`), then:
+4. **Validate the update flow.** Bump the manifest `version` in both files, commit, then:
 
    ```text
    /plugin marketplace update
@@ -139,7 +118,6 @@ Remove the scratch install when finished:
 ## Verifying manifest/doc consistency
 
 The marketplace name (`rc-project`), plugin name (`rc`), and slash commands referenced in the
-docs must match the manifests. The automated check lives in the manifest-consistency test
-(`internal/pluginmanifest`), which runs under `make verify`. If you rename the plugin or
-marketplace, update this runbook, the README "Install as a Claude Code plugin" section, and
-`skills/rc/SKILL.md` to match.
+docs must match the manifests. If you rename the plugin or marketplace, update this runbook, the
+README install section, and `skills/rc/SKILL.md` to match, and confirm `plugin.json` and
+`marketplace.json` still carry the same `version`.

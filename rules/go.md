@@ -4,8 +4,8 @@ paths: ["**/*.go", "**/go.mod", "**/go.sum"]
 
 # Go rules
 
-The WHAT for Go code in this repo. Enforced as patterns; some are also backed by
-hooks (`go-mod-guard`, `go-fmt`) and the `make verify` gate.
+The WHAT for Go code. Enforced as patterns; some are also backed by the
+`go-mod-guard` and `go-fmt` hooks and the project's verification gate.
 
 - Wrap errors with `fmt.Errorf("context: %w", err)`; match with `errors.Is` / `errors.As`. Never compare error strings.
 - Handle every error explicitly. No `_` discards without a written justification.

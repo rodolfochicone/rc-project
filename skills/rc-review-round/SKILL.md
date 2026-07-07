@@ -120,7 +120,7 @@ rc supports monorepos, where more than one `.rc` directory can exist. Before rea
      - The review round directory path.
      - The full list of generated issue file names.
      - Well-implemented aspects observed during the review.
-   - Suggest running `rc reviews fix <name>` to process the review round.
+   - Suggest running the `rc-fix-reviews` skill to process the review round.
 
 6. Verify before completion.
    - Use installed `rc-final-verify` before claiming the review round is complete.
@@ -130,10 +130,10 @@ rc supports monorepos, where more than one `.rc` directory can exist. Before rea
 
 ## Project memory
 
-Before reviewing, run `rc memory search` with the implementation's terms to recover the
-project's conventions and known gotchas, and check the change against them (see the
-`rc-project-memory` skill). When the review surfaces a durable, non-obvious gotcha, record
-it with `rc memory add --scope gotcha`.
+Before reviewing, search `.rc/memory/` (with Grep) for the implementation's terms to recover
+the project's conventions and known gotchas, and check the change against them (see the
+`rc-project-memory` skill). When the review surfaces a durable, non-obvious gotcha, record it
+as a `.rc/memory/gotcha__<key>.md` file.
 
 ## Critical Rules
 

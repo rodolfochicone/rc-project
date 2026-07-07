@@ -68,7 +68,7 @@ All three must be "yes" to promote. If any is "no," the item stays in task memor
 
 Workflow memory is scoped to this workflow under `.rc/tasks/`. When a fact is durable for
 the whole project — a convention, a cross-cutting decision, a recurring gotcha — also record
-it in the per-project memory with `rc memory add` so other workflows and skills can find it
+it in the per-project memory as a `.rc/memory/` file so other workflows and skills can find it
 (see the `rc-project-memory` skill). Keep workflow-local execution detail in workflow memory.
 
 ## Compaction Rules

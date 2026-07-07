@@ -7,7 +7,7 @@ effort: medium
 
 # New Project Scaffold
 
-Take a developer from "empty folder" to "cloned, ready-to-code project" by creating a new repository from the rodolfochicone TypeScript template and cloning it locally. This skill is the agent-driven equivalent of the `rc init` command and is standalone — it does not read or require any `.rc/` workflow artifacts.
+Take a developer from "empty folder" to "cloned, ready-to-code project" by creating a new repository from the rodolfochicone TypeScript template and cloning it locally. This skill is standalone — it does not read or require any `.rc/` workflow artifacts.
 
 The repository is **always** created in the `rodolfochicone` organization, **private**, from the `rodolfochicone/typescript-template` template, and cloned into a subdirectory named after the repo inside the current working directory.
 

@@ -64,9 +64,9 @@ rc supports monorepos, where more than one `.rc` directory can exist. Before rea
 
 ## Project memory
 
-Before applying the plan, run `rc memory search` with the target terms to recover relevant
-decisions and gotchas (see the `rc-project-memory` skill). When the change establishes a
-durable decision or reveals a non-obvious gotcha, record it with `rc memory add`.
+Before applying the plan, search `.rc/memory/` (with Grep) for the target terms to recover
+relevant decisions and gotchas (see the `rc-project-memory` skill). When the change establishes
+a durable decision or reveals a non-obvious gotcha, record it as a `.rc/memory/` file.
 
 ## Critical Rules
 

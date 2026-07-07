@@ -139,10 +139,10 @@ A review's worth is measured by precision, not by finding count. An inflated rep
 
 ## Project memory
 
-Before reviewing, run `rc memory search` with the changed files' terms to recover the
+Before reviewing, search `.rc/memory/` (with Grep) for the changed files' terms to recover the
 project's conventions and known gotchas, and flag deviations from them (see the
-`rc-project-memory` skill). When the review surfaces a durable, non-obvious gotcha, record
-it with `rc memory add --scope gotcha` so future work avoids it.
+`rc-project-memory` skill). When the review surfaces a durable, non-obvious gotcha, record it
+as a `.rc/memory/gotcha__<key>.md` file so future work avoids it.
 
 ## Critical Rules
 

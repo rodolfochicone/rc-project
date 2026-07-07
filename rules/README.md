@@ -2,9 +2,8 @@
 
 Rules are the **WHAT** layer of rc's enforcement model. They are short, declarative
 statements of the patterns and constraints code must follow, scoped to the files
-they apply to by a path glob. They are distributed by `rc setup` to the harnesses
-that support path-scoped rules and are otherwise referenced from `CLAUDE.md` /
-`AGENTS.md`.
+they apply to by a path glob. They are installed into the harnesses that support
+path-scoped rules and are otherwise referenced from `CLAUDE.md` / `AGENTS.md`.
 
 ## The three layers: WHAT / HOW / FORCE
 
@@ -48,8 +47,8 @@ skills; the FORCE lives in hooks. Do not paste procedures or long rationale here
 
 ## Distribution
 
-`rc setup` installs these rules into each harness in the form that harness
-understands (e.g. Cursor `.cursor/rules/`, opencode instruction files). Harnesses
-without a native path-scoped rules mechanism rely on `CLAUDE.md` / `AGENTS.md`,
+These rules are installed into each harness in the form that harness understands
+(e.g. Cursor `.cursor/rules/`, opencode instruction files). Harnesses without a
+native path-scoped rules mechanism rely on `CLAUDE.md` / `AGENTS.md`,
 which reference this directory as the source of truth. The source lives here once;
 only the per-harness shape is adapted at install time.

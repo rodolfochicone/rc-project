@@ -40,7 +40,7 @@ Fall back to Grep/Glob + Read/Edit when Serena is unavailable or for plain-text 
    - Read ADRs from the `adrs/` subdirectory of the PRD directory to understand the architectural decision context for this task.
    - After reading all sources, check for conflicts between the task specification, techspec, and ADRs. If any requirements contradict each other, stop and report the conflict instead of guessing — do not proceed to step 2.
    - If the caller provides workflow memory paths, use the installed `rc-workflow-memory` skill before editing code.
-   - Consult the per-project memory before implementing: run `rc memory search` with the task's key terms to recover prior decisions, conventions, and known gotchas (see the `rc-project-memory` skill).
+   - Consult the per-project memory before implementing: search `.rc/memory/` (with Grep) for the task's key terms to recover prior decisions, conventions, and known gotchas (see the `rc-project-memory` skill).
    - Reconcile the current workspace state before new edits.
 
 2. Build the execution checklist.
@@ -68,7 +68,7 @@ Fall back to Grep/Glob + Read/Edit when Serena is unavailable or for plain-text 
 
 5. Update task tracking.
    - If workflow memory paths were provided, update the memory files first — record decisions, learnings, and touched surfaces before updating tracking status.
-   - Record durable project-level facts with `rc memory add` — a cross-cutting decision, a new convention, or a non-obvious gotcha that future runs need — but only facts not already obvious from the repository, PRD, or techspec (see the `rc-project-memory` skill).
+   - Record durable project-level facts as `.rc/memory/` files — a cross-cutting decision, a new convention, or a non-obvious gotcha that future runs need — but only facts not already obvious from the repository, PRD, or techspec (see the `rc-project-memory` skill).
    - Use the caller-provided task file path and master tasks file path.
    - Mark subtasks complete only when the implementation and evidence are actually complete.
    - Change task status to completed only after clean verification and self-review.

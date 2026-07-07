@@ -156,11 +156,11 @@ Rules for the contract:
 
 ## Project memory
 
-Before designing, run `rc memory search` with the feature and component terms to recover
-prior architectural decisions, conventions, and known gotchas (see the `rc-project-memory`
-skill). After the techspec is settled, record any durable cross-cutting decision with
-`rc memory add --scope decision` — only decisions not already captured in the techspec or
-the ADRs.
+Before designing, search `.rc/memory/` (with Grep) for the feature and component terms to
+recover prior architectural decisions, conventions, and known gotchas (see the
+`rc-project-memory` skill). After the techspec is settled, record any durable cross-cutting
+decision as a `.rc/memory/decision__<key>.md` file — only decisions not already captured in
+the techspec or the ADRs.
 
 ## Error Handling
 

@@ -2,7 +2,7 @@
 # SessionStart: surface a small POINTER to this project's durable rc knowledge so it is
 # recalled without the agent having to remember to look — the highest-confidence instincts
 # plus a nudge to search curated memory. It injects a pointer, not a dump: bodies stay in
-# the store and are pulled on demand via `rc memory search`, keeping context cheap.
+# the .rc/memory/ files and are read on demand, keeping context cheap.
 #
 # Opt-in: does nothing unless RC_RECALL=1, so it adds zero overhead by default. Never blocks.
 # Reads only local .rc files; needs neither the rc binary nor network. Bounded by
@@ -36,8 +36,8 @@ if [ -f "$instincts" ]; then
 $top
 "
 fi
-if [ -d "$rc_dir/memory" ] || [ -f "$rc_dir/memory.db" ]; then
-    block="${block}Curated rc project memory is available — run \`rc memory search \"<task terms>\"\` before deciding or implementing."
+if [ -d "$rc_dir/memory" ]; then
+    block="${block}Curated rc project memory is available — search \`.rc/memory/\` for the task terms before deciding or implementing."
 fi
 [ -z "$block" ] && exit 0
 

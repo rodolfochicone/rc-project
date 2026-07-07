@@ -114,16 +114,16 @@ rc supports monorepos, where more than one `.rc` directory can exist. Before rea
    - Update the task file in place with enriched content.
    - If enrichment fails for one task, continue to the next and report all failures at the end.
 
-7. Run task validation.
-   - Run `rc tasks validate --name <feature>`.
-   - If it exits non-zero, fix the reported issues and re-run.
-   - Do not mark the skill complete until it exits 0.
+7. Validate the task files.
+   - Confirm every task file has the required frontmatter fields (`status`, `title`, `type`, `complexity`, `dependencies`) with valid values, and that `dependencies` reference existing task ids.
+   - If any file is invalid, fix the reported issues and re-check.
+   - Do not mark the skill complete until every task file validates.
 
 ## Project memory
 
-Before decomposing, run `rc memory search` with the feature and package terms to recover
-conventions and gotchas that should shape task boundaries and implementation notes (see the
-`rc-project-memory` skill).
+Before decomposing, search `.rc/memory/` (with Grep) for the feature and package terms to
+recover conventions and gotchas that should shape task boundaries and implementation notes
+(see the `rc-project-memory` skill).
 
 ## Anti-Patterns
 

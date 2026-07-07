@@ -61,13 +61,13 @@ Fall back to Grep/Glob + Read/Edit when Serena is unavailable or for plain-text 
 
 ## Project memory
 
-Before fixing, run `rc memory search` with the issue terms to recover relevant conventions
-and gotchas (see the `rc-project-memory` skill). When a fix reveals a durable, non-obvious
-gotcha, record it with `rc memory add --scope gotcha`.
+Before fixing, search `.rc/memory/` (with Grep) for the issue terms to recover relevant
+conventions and gotchas (see the `rc-project-memory` skill). When a fix reveals a durable,
+non-obvious gotcha, record it as a `.rc/memory/gotcha__<key>.md` file.
 
 ## Critical Rules
 
-- Do not fetch or export reviews inside this workflow. `rc reviews fetch` already produced the round files.
+- Do not fetch or export reviews inside this workflow. The review round files already exist under `reviews-NNN/`.
 - Do not call provider-specific scripts or `gh` mutations. rc resolves provider threads after the batch succeeds.
 - Do not modify issue files outside the scoped batch.
 - Do not mark an issue `resolved` before the underlying work and verification are actually complete.

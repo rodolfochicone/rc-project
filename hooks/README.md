@@ -9,16 +9,13 @@ These hooks load automatically when the rc plugin is enabled (convention-based
 `hooks/hooks.json`). They apply to the **Claude Code plugin channel** — i.e. when
 you run `claude` directly in a repo with the plugin installed.
 
-**OpenCode parity:** `rc setup` also installs an OpenCode plugin (`rc-hooks.ts`,
-into both `.opencode/plugin/` and `.opencode/plugins/` for version compatibility)
-that shells out to these _same_ scripts via OpenCode's `tool.execute.before` /
-`tool.execute.after` hooks, so the guards and the instincts capture behave
-identically there. The plugin registers its hooks only once per process even if
-both copies load. The scripts are the single source of truth; each harness only
+**OpenCode parity:** the `opencode/` bundle ships an OpenCode plugin (`rc-hooks.ts`,
+installed into both `.opencode/plugin/` and `.opencode/plugins/` for version
+compatibility) that shells out to these _same_ scripts via OpenCode's
+`tool.execute.before` / `tool.execute.after` hooks, so the guards and the instincts
+capture behave identically there. The plugin registers its hooks only once per process
+even if both copies load. The scripts are the single source of truth; each harness only
 adapts how they are invoked.
-
-They do **not** apply to rc's ACP execution pipeline today; deterministic gates
-for the pipeline belong in the Go executor.
 
 ## Hooks
 
@@ -33,7 +30,7 @@ for the pipeline belong in the Go executor.
 | `Stop`         | —                              | `notify.sh`       | opt-in     | Plays a short "done" sound at end of turn. Off unless `RC_SOUND=1`. Never blocks.                                                                                                                             |
 | `Notification` | —                              | `notify.sh`       | opt-in     | Plays an "attention" sound when the agent needs you (e.g. a permission prompt). Off unless `RC_SOUND=1`. Never blocks.                                                                                        |
 | `SessionStart` | —                              | `session-recall.sh` | opt-in   | Recall: injects a bounded pointer to the project's curated memory and highest-confidence instincts at session start — a pointer, never a dump of bodies. Off unless `RC_RECALL=1`. Never blocks. |
-| `PreCompact`   | —                              | `precompact-capture.sh` | opt-in | Capture: before the conversation compacts, reminds the agent to persist durable learnings (`rc memory add`, instincts) so they survive summarization. Off unless `RC_RECALL=1`. Never blocks. |
+| `PreCompact`   | —                              | `precompact-capture.sh` | opt-in | Capture: before the conversation compacts, reminds the agent to persist durable learnings (project memory files, instincts) so they survive summarization. Off unless `RC_RECALL=1`. Never blocks. |
 
 Blocking hooks exit `2` and return the message on stderr to the agent. Allowed
 calls exit `0`.
@@ -81,5 +78,5 @@ Several hooks have a separate opt-in and add zero overhead by default:
 - `gateguard.sh` records a per-session marker under `$TMPDIR/rc-gateguard/<session>/`
   so it interrupts only the first edit of each file; it skips `.git/`,
   `node_modules/`, `vendor/`, and `go.sum`. It is a focus prompt, not a sandbox.
-- `_lib.sh` is a sourced helper, not a hook; `rc setup` copies it next to the
-  scripts so the copied channel resolves it the same way the plugin channel does.
+- `_lib.sh` is a sourced helper, not a hook; keep it next to the scripts so the
+  OpenCode bundle resolves it the same way the plugin channel does.

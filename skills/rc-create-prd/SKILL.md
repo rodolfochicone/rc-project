@@ -170,10 +170,10 @@ You MUST create a task for each phase and complete them in order:
 
 ## Project memory
 
-Before brainstorming, consult the per-project memory: run `rc memory search` with the
+Before brainstorming, consult the per-project memory: search `.rc/memory/` (with Grep) for the
 feature's key terms to recover prior product decisions, conventions, and constraints that
-should inform this PRD (see the `rc-project-memory` skill). It is keyword-ranked, so search
-the concrete nouns of the feature.
+should inform this PRD (see the `rc-project-memory` skill). Search the concrete nouns of the
+feature.
 
 ## Error Handling
 
