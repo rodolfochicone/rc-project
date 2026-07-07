@@ -51,7 +51,7 @@ The `opencode/plugin/rc-hooks.ts` plugin gives OpenCode Claude-parity hook enfor
 
 | Directory        | Contents                                                                             |
 | ---------------- | ------------------------------------------------------------------------------------ |
-| `skills/`        | 25 skills (`SKILL.md` + references) — the workflow logic                             |
+| `skills/`        | 30 skills (`SKILL.md` + references) — the workflow logic                             |
 | `commands/`      | Claude Code slash commands that route to the skills                                  |
 | `agents/`        | 10 Claude Code plugin agents — one per pipeline phase                                |
 | `hooks/`         | `hooks.json` + shell scripts run at agent lifecycle events                           |
@@ -86,6 +86,15 @@ Quality, analysis, and review:
 | `rc-audit`           | Audit the agent config surface (settings, MCP, hooks) for secrets and risks   |
 | `rc-gan`             | Adversarial generator↔evaluator loop that drives subjective quality up        |
 
+Deep work, execution, and navigation:
+
+| Skill          | Purpose                                                                          |
+| -------------- | -------------------------------------------------------------------------------- |
+| `rc-deepwork`  | Scheduler discipline for heavy sessions: plan → review → phased, gated execution |
+| `rc-loop`      | Generate → verify → retry against an explicit pass/fail success gate             |
+| `rc-worktrees` | Git worktrees as isolated lanes for parallel or risky work                       |
+| `rc-codemap`   | Hierarchical per-directory `codemap.md` for token-efficient navigation           |
+
 Memory, context, and learning:
 
 | Skill                 | Purpose                                                                    |
@@ -93,6 +102,7 @@ Memory, context, and learning:
 | `rc-workflow-memory`  | Cross-task context so agents pick up where the last run left off           |
 | `rc-project-memory`   | Durable project facts that persist across sessions                         |
 | `rc-instincts`        | Distill recurring corrections into atomic, confidence-scored instincts     |
+| `rc-reflect`          | Review recent work and recommend the smallest reusable asset to add        |
 | `rc-context-budget`   | Audit what consumes the context window and recommend the highest-impact trims |
 | `rc-compact`          | Compact the conversation deliberately at logical task boundaries           |
 
@@ -142,6 +152,7 @@ Shell hooks under `hooks/scripts/`, wired in `hooks/hooks.json` (Claude Code) an
 | `go-fmt.sh`              | PostToolUse   | Formats Go after edits                                    |
 | `observe.sh`             | PostToolUse   | Records tool observations for `rc-instincts`             |
 | `session-recall.sh`      | SessionStart  | Recalls project memory into the session                   |
+| `phase-reminder.sh`      | SessionStart  | Reminds the active workflow's pipeline phase and next step |
 | `precompact-capture.sh`  | PreCompact    | Captures context before compaction                        |
 | `notify.sh`              | Stop / notify | Desktop notifications on terminal state                   |
 

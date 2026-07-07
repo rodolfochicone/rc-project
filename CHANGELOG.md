@@ -2,6 +2,24 @@
 
 ## [Unreleased]
 
+### Added
+
+- **Cinco skills novas** inspiradas em padrões do `oh-my-opencode-slim`, escritas
+  no nosso formato markdown:
+  - `rc-codemap` — mapa hierárquico por diretório (`codemap.md`) para navegação
+    token-efficient.
+  - `rc-worktrees` — git worktrees como lanes isoladas para trabalho paralelo/
+    arriscado, com manifest em `.rc/worktrees.json`.
+  - `rc-deepwork` — disciplina de scheduler para sessões pesadas: plano → review
+    → execução faseada com gates de verificação.
+  - `rc-loop` — loop generate→verify→retry contra um gate de sucesso explícito
+    (test/build/lint/command/fileExists/review).
+  - `rc-reflect` — revisa o trabalho recente e recomenda o menor asset reutilizável
+    a criar (skill/agent/command/hook/memória/instinct).
+- **Hook `phase-reminder`** (SessionStart, opt-in via `RC_PHASE_REMINDER=1`):
+  infere a fase do pipeline a partir dos artefatos em `.rc/tasks/<slug>` e injeta
+  um lembrete de uma linha com a fase atual e o próximo passo.
+
 ## [1.0.0] - 2026-07-07
 
 ### Changed

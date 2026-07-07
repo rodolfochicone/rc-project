@@ -30,6 +30,7 @@ adapts how they are invoked.
 | `Stop`         | —                              | `notify.sh`       | opt-in     | Plays a short "done" sound at end of turn. Off unless `RC_SOUND=1`. Never blocks.                                                                                                                             |
 | `Notification` | —                              | `notify.sh`       | opt-in     | Plays an "attention" sound when the agent needs you (e.g. a permission prompt). Off unless `RC_SOUND=1`. Never blocks.                                                                                        |
 | `SessionStart` | —                              | `session-recall.sh` | opt-in   | Recall: injects a bounded pointer to the project's curated memory and highest-confidence instincts at session start — a pointer, never a dump of bodies. Off unless `RC_RECALL=1`. Never blocks. |
+| `SessionStart` | —                              | `phase-reminder.sh` | opt-in   | Injects a one-line reminder of the active workflow's pipeline phase and next step (inferred from `.rc/tasks/<slug>` artifacts). Off unless `RC_PHASE_REMINDER=1`. Never blocks. |
 | `PreCompact`   | —                              | `precompact-capture.sh` | opt-in | Capture: before the conversation compacts, reminds the agent to persist durable learnings (project memory files, instincts) so they survive summarization. Off unless `RC_RECALL=1`. Never blocks. |
 
 Blocking hooks exit `2` and return the message on stderr to the agent. Allowed
@@ -47,7 +48,8 @@ and lets you disable any hook without editing config:
 | `RC_DRY_RUN`        | `1`                                 | A hook that _would_ block instead logs `(dry-run, would block)` and allows.                                                                                                                       |
 
 Hook names for the kill-switch are `git-guard`, `commit-guard`, `go-mod-guard`,
-`gateguard`, `go-fmt`, `observe`, `notify`, `session-recall`, `precompact-capture`.
+`gateguard`, `go-fmt`, `observe`, `notify`, `session-recall`, `precompact-capture`,
+`phase-reminder`.
 
 Several hooks have a separate opt-in and add zero overhead by default:
 
@@ -56,6 +58,9 @@ Several hooks have a separate opt-in and add zero overhead by default:
   learning loop: recall durable memory at `SessionStart`, remind to persist it at
   `PreCompact`). `RC_RECALL_MAX_CHARS` (default 1500) bounds the injected recall context.
   They read only local `.rc` files — no rc binary or network needed — and never block.
+- `phase-reminder.sh` — does nothing unless `RC_PHASE_REMINDER=1`. At `SessionStart` it
+  infers the active workflow's pipeline phase from `.rc/tasks/<slug>` artifacts and injects a
+  one-line reminder of the phase and next step. Reads only local `.rc` files; never blocks.
 - `notify.sh` — does nothing unless `RC_SOUND=1` (end-of-turn / attention sound). On
   macOS it uses `afplay` with system sounds (Hero = done, Funk = attention); on
   Linux it tries `paplay`/`aplay`; otherwise it is silent. The same `RC_SOUND=1`
