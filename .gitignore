@@ -26,7 +26,7 @@ ai-docs
 node_modules/
 .rc/runs
 .rc/analysis/
-.rc/memory.db
+.rc/memory.db*
 .rc/instincts/observations.jsonl
 .rc/tasks/daemon-improvs/analysis/qa/logs/live-daemon-run-id.txt
 .turbo/
