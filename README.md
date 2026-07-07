@@ -25,7 +25,7 @@ Everything here is **plain markdown and shell**. There is no binary to install a
 
 Plugin skills are namespaced under the plugin, so slash commands surface as `/rc:rc-create-prd`, `/rc:rc-create-techspec`, `/rc:rc-create-tasks`, `/rc:rc-review-round`, and so on. Update with `/plugin marketplace update`.
 
-The plugin ships from this repo's layout (`skills/`, `commands/`, `agents/`, `hooks/hooks.json`) — Claude Code discovers them by convention. See [`docs/claude-code-plugin.md`](docs/claude-code-plugin.md) for the full runbook.
+The plugin ships from this repo's layout (`skills/`, `commands/`, `hooks/hooks.json`) — Claude Code discovers them by convention. See [`docs/claude-code-plugin.md`](docs/claude-code-plugin.md) for the full runbook.
 
 > **Repo is private.** `/plugin marketplace add` clones this repository, so the Claude Code environment needs GitHub read access — sign in with `gh auth login` or export `GH_TOKEN` / `GITHUB_TOKEN` before adding the marketplace.
 
@@ -51,9 +51,8 @@ The `opencode/plugin/rc-hooks.ts` plugin gives OpenCode Claude-parity hook enfor
 
 | Directory        | Contents                                                                             |
 | ---------------- | ------------------------------------------------------------------------------------ |
-| `skills/`        | 24 skills (`SKILL.md` + references) — the workflow logic                             |
+| `skills/`        | 25 skills (`SKILL.md` + references) — the workflow logic                             |
 | `commands/`      | Claude Code slash commands that route to the skills                                  |
-| `agents/`        | Claude Code plugin agents                                                            |
 | `hooks/`         | `hooks.json` + shell scripts run at agent lifecycle events                           |
 | `opencode/`      | OpenCode agents, commands, and the `rc-hooks` plugin                                 |
 | `rules/`         | Coding rules injected into agent context (`common.md`, `go.md`)                      |

@@ -1,8 +1,8 @@
 # Claude Code plugin — install and integration runbook
 
-rc distributes its workflow skills, slash commands, hooks, and agents as a **Claude Code
+rc distributes its workflow skills, slash commands, and hooks as a **Claude Code
 plugin**. Claude Code serves the plugin directly from this repository's layout (`skills/`,
-`commands/`, `agents/`, `hooks/hooks.json`) and auto-updates through the plugin marketplace,
+`commands/`, `hooks/hooks.json`) and auto-updates through the plugin marketplace,
 pinned to each tagged release.
 
 - **Marketplace name:** `rc-project`

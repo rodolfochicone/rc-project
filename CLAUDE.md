@@ -12,7 +12,6 @@ rc is a bundle of **AI-assisted development workflows** distributed as **skills,
 | ----------------- | ------------------------------------------------------------------- |
 | `skills/`         | Skills — each is a directory with `SKILL.md` (+ optional `references/`) |
 | `commands/`       | Claude Code slash commands (markdown with frontmatter)              |
-| `agents/`         | Claude Code plugin agents                                           |
 | `hooks/`          | `hooks.json` + shell scripts run at agent lifecycle events          |
 | `opencode/`       | OpenCode `agent/`, `commands/`, and the `plugin/rc-hooks.ts` plugin |
 | `rules/`          | Coding rules injected into agent context                            |
