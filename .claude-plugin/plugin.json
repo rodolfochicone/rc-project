@@ -1,7 +1,7 @@
 {
     "name": "rc",
-    "version": "0.27.0",
-    "description": "rc AI-assisted development workflow skills and commands",
+    "version": "1.0.0",
+    "description": "rc AI-assisted development workflow skills, commands, hooks and agents",
     "author": {
         "name": "Escale"
     }

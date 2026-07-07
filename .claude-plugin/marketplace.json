@@ -7,8 +7,8 @@
         {
             "name": "rc",
             "source": ".",
-            "version": "0.27.0",
-            "description": "rc workflow skills and slash commands"
+            "version": "1.0.0",
+            "description": "rc workflow skills, slash commands, hooks and agents"
         }
     ]
 }

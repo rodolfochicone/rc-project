@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-07-07
+
 ### Changed
 
 - **BREAKING: rc agora é só um plugin de skills, commands, hooks e agents** para
