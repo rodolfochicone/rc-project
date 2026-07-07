@@ -2,6 +2,17 @@
 
 ## [Unreleased]
 
+## [1.0.3] - 2026-07-07
+
+### Fixed
+
+- **`git-guard`: falso positivo de force-push.** O padrão avaliava a string do
+  comando inteira, então qualquer ` -f` após um `git push` encadeado bloqueava
+  comandos legítimos (`git push && gh run list | cut -f1`, `git push && rm -f
+  tmp`, `git push && tail -f log`). O check agora avalia por segmento do
+  comando (split em `&&`, `||`, `;`, `|`); force-push real em qualquer segmento
+  continua bloqueado. Coberto por suite de payloads (14 casos).
+
 ## [1.0.2] - 2026-07-07
 
 ### Added
