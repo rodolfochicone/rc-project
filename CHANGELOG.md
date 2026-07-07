@@ -2,6 +2,23 @@
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-07-07
+
+### Fixed
+
+- **Migração da memória legada.** O único fato preso no `.rc/memory.db` (SQLite
+  descontinuado) foi recuperado para o store file-based em `.rc/memory/`.
+- **Sidecars do SQLite não são mais versionados.** O `.gitignore` passou a cobrir
+  `.rc/memory.db*` (antes só `.rc/memory.db`), evitando commitar `-wal`/`-shm`.
+
+### Changed
+
+- **`rc-deepwork`** ganhou delimitação explícita contra o pipeline PRD formal.
+- **`rc-reflect`** e **`rc-analyze`**: ajustes de texto para remover menções
+  ambíguas ao antigo comando/daemon.
+- **`CLAUDE.md`** documenta que os conjuntos de commands Claude/OpenCode diferem
+  por design (não devem ser forçados a 1:1).
+
 ## [1.0.0] - 2026-07-07
 
 ### Changed

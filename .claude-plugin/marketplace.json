@@ -7,7 +7,7 @@
         {
             "name": "rc",
             "source": ".",
-            "version": "1.0.0",
+            "version": "1.0.1",
             "description": "rc workflow skills, slash commands, hooks and agents"
         }
     ]
