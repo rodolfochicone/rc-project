@@ -2,6 +2,40 @@
 
 ## [Unreleased]
 
+### Changed
+
+- **BREAKING: rc agora é só um plugin de skills, commands, hooks e agents** para
+  Claude Code e OpenCode — markdown e shell puro, sem binário e sem build. A
+  instalação passa a ser via marketplace de plugin (Claude Code) ou cópia do
+  bundle `opencode/` (OpenCode); não há mais `rc setup`.
+- **Skills e commands convertidos para prompt-only.** As skills que dirigiam o
+  pipeline pelo binário (`rc tasks run`, `rc reviews fix`, `rc exec`, `rc tasks
+  validate`, etc.) agora orientam o agente a executar cada fase diretamente.
+  Nenhuma invocação do binário `rc` permanece.
+- **Memória de projeto agora é file-based.** O subsistema `rc memory` (SQLite
+  `.rc/memory.db` + embeddings) foi substituído por arquivos markdown em
+  `.rc/memory/` (`<scope>__<key>.md`, um fato por arquivo), consultados por Grep
+  e versionados no git. Todas as skills consumidoras e os hooks de recall/
+  precompact foram atualizados.
+- **Docs reescritos** (README, CLAUDE.md, AGENTS.md, CONTRIBUTING.md, runbook do
+  plugin) para um repo markdown+shell sem binário.
+
+### Added
+
+- **Agents do plugin Claude Code.** Os dez agentes de fase do OpenCode foram
+  portados para `agents/` (formato de agente de plugin): `rc` (orquestrador),
+  `rc-prd`, `rc-techspec`, `rc-tasks`, `rc-exec`, `rc-exec-bulk`, `rc-review`,
+  `rc-fix`, `rc-gan`, `rc-git` — cada um fixando um modelo à fase e delegando à
+  skill correspondente.
+
+### Removed
+
+- **Todo o módulo Go e o CLI**: `internal/`, `cmd/`, `pkg/`, `sdk/`,
+  `extensions/`, `rc.go`, `go.mod`/`go.sum`, o binário e o daemon.
+- **App web e desktop**, monorepo JS (`web/`, `apps/`, `packages/`) e todo o
+  tooling de build/release (Makefile, goreleaser, golangci, turbo, bun, vitest,
+  CI de build).
+
 ## [0.13.0] - 2026-06-22
 
 ### Added
