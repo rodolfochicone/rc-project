@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-07-07
+
 ### Added
 
 - **`rc-doctor`** — nova skill de health-check da própria instalação do rc:
