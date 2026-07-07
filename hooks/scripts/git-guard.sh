@@ -23,8 +23,18 @@ case "$norm" in
 *"git filter-branch"*) rc_block "git-guard" "'git filter-branch' rewrites history. Forbidden." ;;
 esac
 
-case "$norm" in
-*"git push"*"--force"* | *"git push"*" -f"* | *"git push"*"--force-with-lease"*) rc_block "git-guard" "force-push is forbidden (rewrites shared history)." ;;
-esac
+# Evaluate force-push per command segment: a bare pattern over the whole string
+# would flag unrelated flags after a chained push (e.g. `git push && cut -f1`).
+segs=${norm//&&/$'\n'}
+segs=${segs//||/$'\n'}
+segs=${segs//;/$'\n'}
+segs=${segs//|/$'\n'}
+while IFS= read -r seg; do
+    case "$seg" in
+    *"git push"*"--force"* | *"git push"*" -f"*) rc_block "git-guard" "force-push is forbidden (rewrites shared history)." ;;
+    esac
+done <<EOF
+$segs
+EOF
 
 exit 0
