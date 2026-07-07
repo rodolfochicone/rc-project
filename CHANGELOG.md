@@ -19,6 +19,10 @@
 - **Hook `phase-reminder`** (SessionStart, opt-in via `RC_PHASE_REMINDER=1`):
   infere a fase do pipeline a partir dos artefatos em `.rc/tasks/<slug>` e injeta
   um lembrete de uma linha com a fase atual e o próximo passo.
+- **Dois agentes de apoio read-only** (Claude e OpenCode): `rc-explorer` (busca
+  rápida no codebase, "where is X?") e `rc-librarian` (pesquisa de libs/docs
+  externas via context7 + web). O orquestrador `rc` pode acioná-los em qualquer
+  fase.
 
 ## [1.0.0] - 2026-07-07
 

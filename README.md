@@ -124,9 +124,9 @@ Claude Code commands (`commands/`) and OpenCode commands (`opencode/commands/`) 
 
 ## 🤖 Agents
 
-One agent per pipeline phase, each pinning a model to the phase's needs. In Claude Code they live under `agents/` (invoke via the Task tool or `@rc-*`); in OpenCode under `opencode/agent/`. The `rc` agent orchestrates the rest.
+One agent per pipeline phase plus two read-only support agents, each pinning a model to its role. In Claude Code they live under `agents/` (invoke via the Task tool or `@rc-*`); in OpenCode under `opencode/agent/`. The `rc` agent orchestrates the rest.
 
-| Agent          | Phase                                   | Model  |
+| Agent          | Role                                    | Model  |
 | -------------- | --------------------------------------- | ------ |
 | `rc`           | Orchestrates the full pipeline          | sonnet |
 | `rc-prd`       | Idea → PRD                              | opus   |
@@ -138,6 +138,8 @@ One agent per pipeline phase, each pinning a model to the phase's needs. In Clau
 | `rc-fix`       | Resolve review/QA issues at root cause  | opus   |
 | `rc-gan`       | Adversarial quality loop (UI/CLI/copy)  | opus   |
 | `rc-git`       | Branch, commit messages, PR             | haiku  |
+| `rc-explorer`  | Fast read-only codebase navigation      | haiku  |
+| `rc-librarian` | Read-only library / docs research       | sonnet |
 
 ## 🪝 Hooks
 
