@@ -95,6 +95,8 @@ RC supports monorepos, where more than one `.rc` directory can exist. Before rea
 
      # Issue NNN: <title>
 
+     > Feature: [PRD](../_prd.md) · [TechSpec](../_techspec.md) · [Tasks](../_tasks.md)
+
      ## Review Comment
 
      <detailed review body>
@@ -105,6 +107,10 @@ RC supports monorepos, where more than one `.rc` directory can exist. Before rea
      - Notes:
      ```
 
+   - The `> Feature:` backlink line goes in the body right after the title, using the
+     fixed relative paths shown. It links each issue back to the feature it reviews;
+     the paths are identical for every issue in the round. Never move backlinks into
+     the frontmatter — those fields are parsed by strict tooling.
    - The `<author>` field must be `claude-code`.
    - The `provider_ref` field must be empty.
    - The `provider` field must be `manual`.

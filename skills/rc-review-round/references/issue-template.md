@@ -17,6 +17,8 @@ provider_ref:
 
 # Issue NNN: <concise title summarizing the problem>
 
+> Feature: [PRD](../_prd.md) · [TechSpec](../_techspec.md) · [Tasks](../_tasks.md)
+
 ## Review Comment
 
 <detailed description of the issue, why it is a problem,
@@ -51,6 +53,11 @@ and a suggested fix with a concise code snippet if helpful>
 
 ## Rules
 
+- After the title, include the `> Feature:` backlink line with the fixed relative
+  paths `../_prd.md`, `../_techspec.md`, `../_tasks.md`. These names are deterministic
+  within `.rc/tasks/<name>/`; a link may dangle if that artifact was not generated,
+  which is harmless. This goes in the body only — never add backlink fields to the
+  frontmatter, which is parsed by strict tooling.
 - One issue per file. Do not combine multiple unrelated problems.
 - The Review Comment must be actionable: state the problem clearly and
   provide a concrete suggestion for how to fix it.
