@@ -1,6 +1,6 @@
 ---
 name: rc-linear
-description: Acts as a Product Manager to shape task ideas and drive Linear work — discuss an idea, create an issue, update an issue, finalize an issue, refine an issue into a PRD/TechSpec/task breakdown with native sub-issues, or execute an issue's children with test evidence — exclusively through the official Linear MCP server, always applying a mandatory issue template, discovering each team's workflow states and labels before creating, and confirming every outward-facing write. Use when the user wants to brainstorm a task or feature idea, open a Linear issue, update or comment on an issue, move or finalize an issue, refine an issue into PRD/TechSpec/sub-issues, execute the child issues of an issue and attach test evidence, or search/filter issues. Do not use when the Linear MCP is unavailable and the user declines to configure it, for other trackers (Jira, GitHub Issues), or for bulk imports.
+description: Acts as a Product Manager to shape task ideas and drive Linear work — discuss an idea, create an issue, update an issue, finalize an issue, refine an issue into a PRD/TechSpec/task breakdown with native sub-issues, or execute an issue's children with test evidence — exclusively through the official Linear MCP server, applying the project's issue-template conventions (or a sensible default), discovering each team's workflow states and labels before creating, and confirming every outward-facing write. Use when the user wants to brainstorm a task or feature idea, open a Linear issue, update or comment on an issue, move or finalize an issue, refine an issue into PRD/TechSpec/sub-issues, execute the child issues of an issue and attach test evidence, or search/filter issues. Do not use when the Linear MCP is unavailable and the user declines to configure it, for other trackers (Jira, GitHub Issues), or for bulk imports.
 model: sonnet
 effort: medium
 ---
@@ -103,8 +103,8 @@ Never assume team, project, or workflow — discover them. (Coming from *Discuss
 3. **Workflow discovery** — `list_issue_statuses` and `list_issue_labels` for the team, so the initial state and any labels come from real values.
 4. **Gather content** — ask for what you don't yet have, prioritizing:
    - **title** (required) — short and direct, stating what the task is (Linear Method); specific (what + where), not vague.
-   - **description** — structure it with the single mandatory *Issue template* below (Resumo, Contexto, Critérios de aceitação, DoR, Outras informações), used for every issue. Ask the user one topic at a time to fill each section; offer to draft each and let them adjust. Never create a bare title with no description.
-   - **DoR (blocking gate)** — required: keep asking until the *DoR* section answers how to implement, how the metrics' data is collected, how it's operated (UI/config), where the metrics are tracked, plus any issue-specific open questions. **Do not create the issue while the DoR is incomplete.**
+   - **description** — structure it with the resolved *Issue template* — the project's convention if defined, else the default (Resumo, Contexto, Critérios de aceitação, DoR, Outras informações) — used for every issue. Ask the user one topic at a time to fill each section; offer to draft each and let them adjust. Never create a bare title with no description.
+   - **DoR (blocking gate)** — required: keep asking until the *DoR* section satisfies the org's readiness checklist (from *Project conventions*, or the default: how to implement, how success is measured and where it's tracked, how it's operated via UI/config, plus any issue-specific open questions). **Do not create the issue while the DoR is incomplete.**
    - Optional fields the user wants: assignee (`save_issue` accepts a user ID, name, email, or `"me"` — use `list_users` to disambiguate), priority (0 None / 1 Urgent / 2 High / 3 Medium / 4 Low), labels, estimate, due date, project, cycle, parent.
 5. **Confirm & create** — show a compact preview (team, placement, title, description, and every field you'll set). On explicit yes, call `save_issue` (no `id`).
 6. **Report** — return the new issue identifier (e.g. `RC-123`) and its URL (`https://linear.app/<workspace>/issue/<ID>`).
@@ -180,9 +180,17 @@ A task that fails the gate is recorded as `failed` evidence and is **not** moved
 
 Build a `list_issues` filter from the user's intent — team, state, assignee, label, project, cycle, priority, `parentId`, or free-text `query` (filter `assignee: "me"` when the user means their own work). Present a concise list (ID, title, state, assignee). Use this to feed update/finalize/read.
 
-## Issue template (mandatory)
+## Project conventions (resolve before creating)
 
-Every issue you create — standalone, in a project, or a sub-issue — **must** follow this single template. Never ship a bare title. The five section headings are **fixed and written in Portuguese exactly as below** (literal `###` headings); the body content is written in the user's language. Offer to draft each section and let the user adjust. Ask the user one topic at a time, in order, so every section is filled. Keep each section lean (Linear Method): enough to execute and communicate context, linking out for depth.
+Templates and readiness rules are **organization-specific — discover them, never hardcode one company's**. Before creating an issue, resolve the conventions in this order:
+
+1. **Project convention file** — if `.rc/linear-conventions.md` exists at the project root, read it. It may define the issue description template (section headings), the DoR checklist, and the team's default labels. When present, these **override** the default below — use them verbatim.
+2. **Ask once, then persist** — if no convention file exists and this is more than a one-off, ask the few questions needed to work well here: which description sections the team requires and what their DoR checklist is. Offer to save the answers to `.rc/linear-conventions.md` so later runs start sharper. Skip the offer for a quick one-off.
+3. **Sensible default** — absent both, fall back to the default *Issue template* below. Treat it as a documented starting point, never as a rule mandated by any specific company.
+
+## Issue template (default)
+
+Every issue you create — standalone, in a project, or a sub-issue — must follow a description template; never ship a bare title. The template below is the **default** — when the project defines its own (see *Project conventions*), use that instead. The five default section headings are written in Portuguese exactly as below (literal `###` headings); the body content is written in the user's language. Offer to draft each section and let the user adjust. Ask the user one topic at a time, in order, so every section is filled. Keep each section lean (Linear Method): enough to execute and communicate context, linking out for depth.
 
 Structure the description with these five sections, in order:
 
@@ -229,10 +237,10 @@ After they add **and** authorize it, re-run Phase 0.
 - **Product Manager lens.** Lead with the problem, the user, and the outcome — not just mechanics. When discussing, challenge assumptions and push for a measurable outcome before shaping an issue.
 - **Official MCP only.** Never fall back to raw GraphQL, scripts, or another Linear integration. If the MCP is unavailable, stop and guide configuration.
 - **Confirm every write.** Create, comment, state move, and field edits execute only after an explicit yes for that specific action. Approval for one does not authorize another. Discussing an idea is never a write.
-- **Discover, don't assume.** Always resolve team, workflow states, and labels from the team's real configuration before creating or moving. Resolve ambiguous assignees via `list_users`.
+- **Discover, don't assume.** Always resolve team, workflow states, and labels from the team's real configuration before creating or moving, and the org's issue-template / DoR conventions from `.rc/linear-conventions.md` (or ask + save) — never hardcode one company's house rules. Resolve ambiguous assignees via `list_users`.
 - **Refine and execute reuse, never reinvent.** *Refine an issue* runs the RC creation skills (`rc-create-prd` → `rc-create-techspec` → `rc-create-tasks`); *Execute an issue* runs the tasks via `rc-tasks-workflow` (Claude Code) or `rc-execute-task` per task (portable). Do not hand-roll PRDs, task files, or test runs inside this skill.
 - **Local task files are the source of truth for execution.** Match Linear children to tasks via the `linear_key` frontmatter; if the local files are missing, stop — never reconstruct tasks from issue text.
 - **Never lose execution evidence.** Check Linear reachability before executing an issue, and always write results to `.rc/tasks/<slug>/_linear-sync.md` first, then push to Linear. If Linear is down, keep the rows `posted: no` and sync them when it is back — re-entering *Execute an issue* drains the pending rows without re-running the tasks.
 - **Batch writes still preview.** Creating N sub-issues, or posting N evidence comments, takes one confirmation — but always after showing the full batch.
-- **The template is mandatory.** Every created issue follows the single *Issue template* (Resumo, Contexto, Critérios de aceitação, DoR, Outras informações), and is **never created while its DoR is incomplete**. Never ship a bare title.
+- **A template is mandatory; its shape is the project's.** Every created issue follows a description template (the project convention, or the default: Resumo, Contexto, Critérios de aceitação, DoR, Outras informações) and is **never created while its DoR is incomplete**. Never ship a bare title.
 - Ask all questions in the user's language.
