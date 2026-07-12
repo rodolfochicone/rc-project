@@ -64,7 +64,7 @@ Translate every technical-sounding feature into the user experience question beh
 
 ## Resolving the `.rc` base directory
 
-rc supports monorepos, where more than one `.rc` directory can exist. Before reading or writing any `.rc/...` path, resolve which `.rc` directory this run uses; its parent is the base directory. Treat every `.rc/...` path in this skill as relative to that base.
+RC supports monorepos, where more than one `.rc` directory can exist. Before reading or writing any `.rc/...` path, resolve which `.rc` directory this run uses; its parent is the base directory. Treat every `.rc/...` path in this skill as relative to that base.
 
 1. Search the project recursively for `.rc` directories, skipping `node_modules`, `.git`, `vendor`, and any `_archived/` directory.
 2. Resolve the base from what you find:
@@ -170,10 +170,10 @@ You MUST create a task for each phase and complete them in order:
 
 ## Project memory
 
-Before brainstorming, consult the per-project memory: search `.rc/memory/` (with Grep) for the
+Before brainstorming, consult the per-project memory via the `rc-memory` skill (scanning `.rc/memory/INDEX.md`) with the
 feature's key terms to recover prior product decisions, conventions, and constraints that
-should inform this PRD (see the `rc-project-memory` skill). Search the concrete nouns of the
-feature.
+should inform this PRD (see the `rc-memory` skill). It is keyword-ranked, so search
+the concrete nouns of the feature.
 
 ## Error Handling
 

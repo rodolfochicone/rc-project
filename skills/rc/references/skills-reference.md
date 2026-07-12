@@ -1,6 +1,23 @@
 # Bundled Skills Reference
 
-Detailed catalog of all bundled rc skills, their inputs, outputs, and pipeline position.
+Detailed catalog of all bundled RC skills, their inputs, outputs, and pipeline position.
+
+---
+
+## rc-idea-factory
+
+**Trigger:** `/rc-idea-factory [feature-idea]`
+
+Bundled under `extensions/rc-idea-factory`; available once the plugin is installed.
+
+Expands a raw feature idea into a structured, research-backed specification through interactive brainstorming, web research, business analysis, and multi-advisor council debate.
+
+- **Inputs:** Feature idea or problem description. Optional existing `_idea.md` for update mode.
+- **Outputs:** `.rc/tasks/<slug>/_idea.md`, ADRs in `adrs/`.
+- **Pipeline position:** Optional first step. Feeds into `rc-create-prd`.
+- **Process:** Clarifying questions -> parallel codebase + web research -> business viability analysis -> council debate -> opportunity scan -> draft -> user approval.
+- **Use when:** The user has a raw idea and wants to explore viability before committing to a PRD.
+- **Do not use for:** PRD creation, technical specifications, task breakdown, or code implementation.
 
 ---
 
@@ -12,7 +29,7 @@ Creates a business-focused Product Requirements Document through structured brai
 
 - **Inputs:** Feature name or idea. Optional existing `_idea.md` or `_prd.md` for update mode.
 - **Outputs:** `.rc/tasks/<slug>/_prd.md`, ADRs in `adrs/`.
-- **Pipeline position:** First step. Feeds into `rc-create-techspec`.
+- **Pipeline position:** After ideation (optional). Feeds into `rc-create-techspec`.
 - **Process:** Context discovery (codebase + web) -> clarifying questions -> 2-3 product approaches -> ADR for chosen approach -> draft PRD -> user approval.
 - **Use when:** Starting a new feature or product, building or updating a PRD.
 - **Do not use for:** Technical specifications, task breakdowns, or code implementation.
@@ -42,8 +59,8 @@ Decomposes PRDs and TechSpecs into detailed, independently implementable task fi
 
 - **Inputs:** Existing `_prd.md` and `_techspec.md`.
 - **Outputs:** Individual task files (`task_01.md`, `task_02.md`, etc.), `_tasks.md` master list.
-- **Pipeline position:** After TechSpec. Feeds into task execution.
-- **Process:** Load PRD+TechSpec context -> break into granular tasks -> user approval -> generate task files -> enrich with codebase patterns -> validate task frontmatter.
+- **Pipeline position:** After TechSpec. Feeds into execution (`rc-tasks-workflow` / `rc-execute-task`).
+- **Process:** Load PRD+TechSpec context -> break into granular tasks -> user approval -> generate task files -> enrich with codebase patterns -> validate with the bundled `scripts/validate-tasks.mjs`.
 - **Task metadata:** Each task has YAML frontmatter with `status` (pending/in_progress/completed), `title`, `type`, `complexity`, and `dependencies`.
 - **Use when:** A PRD and TechSpec exist and need to be broken into executable tasks.
 - **Do not use for:** Execution, review, or code implementation.
@@ -52,13 +69,13 @@ Decomposes PRDs and TechSpecs into detailed, independently implementable task fi
 
 ## rc-execute-task
 
-**Trigger:** Invoked per task during execution.
+**Trigger:** Run per task by `rc-tasks-workflow`, or invoked directly for a single task.
 
 Executes one PRD task end-to-end using the provided task file, PRD directory, and tracking file paths.
 
 - **Inputs:** Task specification, PRD directory path, task file path, master tasks file path, auto-commit mode. Optional workflow memory paths.
 - **Outputs:** Implemented code changes, updated task tracking files, optional commit.
-- **Pipeline position:** Runs for each task in sequence during execution.
+- **Pipeline position:** Run by `rc-tasks-workflow` for each task in sequence (or directly per task).
 - **Process:** Ground in PRD/TechSpec context -> build execution checklist -> implement -> validate with `rc-final-verify` -> update tracking -> optional commit.
 - **Use when:** Invoked internally by the execution pipeline.
 - **Do not use for:** Direct invocation, PR review batches, or standalone verification.
@@ -74,20 +91,20 @@ Performs a comprehensive code review of a PRD implementation and generates revie
 - **Inputs:** Feature name identifying the workflow under `.rc/tasks/<slug>/`.
 - **Outputs:** Review round directory `reviews-NNN/` with `issue_*.md` files containing round metadata in YAML frontmatter.
 - **Pipeline position:** After execution. Outputs feed into `rc-fix-reviews`.
-- **Use when:** Reviewing implemented PRD tasks.
-- **Do not use for:** Fixing issues (use `rc-fix-reviews`).
+- **Use when:** Reviewing implemented PRD tasks without an external review provider.
+- **Do not use for:** Fixing issues (use `rc-fix-reviews`). External-provider review fetch has no plugin-native equivalent.
 
 ---
 
 ## rc-fix-reviews
 
-**Trigger:** Invoked to remediate review issues.
+**Trigger:** Run by the `rc-fix-reviews` skill.
 
 Executes provider-agnostic PR review remediation using existing review round files.
 
 - **Inputs:** Scoped issue files from the review round and their YAML frontmatter.
 - **Outputs:** Updated issue files with triage and status, code fixes, verification evidence.
-- **Pipeline position:** Operates on output from `rc-review-round`.
+- **Pipeline position:** Run by `rc-fix-reviews`. Operates on output from `rc-review-round`.
 - **Process:** Read round context -> triage issues (valid/invalid) -> fix valid issues in severity order -> verify with `rc-final-verify` -> close out issue files.
 - **Use when:** Invoked internally by the review remediation pipeline.
 - **Do not use for:** Fetching reviews, PRD task execution, or generic coding.
@@ -112,9 +129,9 @@ Enforces fresh verification evidence before any completion, fix, or passing clai
 
 ## rc-workflow-memory
 
-**Trigger:** Invoked during task execution.
+**Trigger:** Internal (called by `rc-execute-task`). Do not invoke directly.
 
-Maintains workflow-scoped task memory for rc runs using files under `.rc/tasks/<name>/memory/`.
+Maintains workflow-scoped task memory for RC runs using files under `.rc/tasks/<name>/memory/`.
 
 - **Inputs:** Workflow memory directory path, shared memory file path, current task memory file path.
 - **Outputs:** Updated `MEMORY.md` (shared) and per-task memory files.
@@ -130,10 +147,10 @@ Maintains workflow-scoped task memory for rc runs using files under `.rc/tasks/<
 
 **Trigger:** `/rc`
 
-This skill. Explains rc capabilities, the core workflow skills, slash commands, and artifact structure.
+This skill. Explains RC capabilities, CLI commands, core workflow skills, optional extension skills, configuration, artifact structure, reusable agents, and extensions.
 
 - **Inputs:** None.
 - **Outputs:** Reference information presented to the agent.
 - **Pipeline position:** Standalone reference, not part of the pipeline.
-- **Use when:** The user asks how to use rc, what commands are available, or how the workflow works.
-- **Do not use for:** Executing any workflow step. Use the specific `rc-` skills instead.
+- **Use when:** The user asks how to use RC, what commands are available, or how the workflow works.
+- **Do not use for:** Executing any workflow step. Use the specific `cy-` skills instead.

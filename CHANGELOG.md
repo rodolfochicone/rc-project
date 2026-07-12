@@ -2,124 +2,189 @@
 
 ## [Unreleased]
 
-## [1.0.3] - 2026-07-07
+## [0.42.0] - 2026-07-10
 
-### Fixed
+### Changed
 
-- **`git-guard`: falso positivo de force-push.** O padrão avaliava a string do
-  comando inteira, então qualquer ` -f` após um `git push` encadeado bloqueava
-  comandos legítimos (`git push && gh run list | cut -f1`, `git push && rm -f
-  tmp`, `git push && tail -f log`). O check agora avalia por segmento do
-  comando (split em `&&`, `||`, `;`, `|`); force-push real em qualquer segmento
-  continua bloqueado. Coberto por suite de payloads (14 casos).
+- **`/rc-card` materializa o workspace local `.rc/tasks/<slug>/`.** O comando deixa
+  de só orquestrar skills e passa a persistir os artefatos de implementação: um
+  `_techspec.md` **fino** (extrato das decisões técnicas do card + ponteiro para
+  ele — cópia local confiável, já que o ticket é untrusted), um `_tasks.md`
+  (índice master com `jira_key` em ordem de dependência) e, por tarefa, o
+  `task_NN.md` que é o **plano aprovado do `/rc-plano`** carimbado com `jira_key`.
+  **Não** gera `_prd.md` — a História refinada já é o PRD. Guardrail novo fixa os
+  papéis: **Jira = tracking; `.rc/` local = contrato de implementação**, sem fonte
+  de verdade duplicada.
 
-## [1.0.2] - 2026-07-07
+## [0.41.0] - 2026-07-10
 
 ### Added
 
-- **`rc-doctor`** — nova skill de health-check da própria instalação do rc:
-  hooks presentes/válidos/wired, manifestos JSON com versões consistentes,
-  frontmatter de skills/commands/agents bem-formado, paridade dos guard hooks
-  Claude↔OpenCode e ferramentas exigidas (jq, gh) no PATH. Read-only: prescreve
-  o fix, não aplica.
-- **CI de validação** (`.github/workflows/validate.yml`): `bash -n` em todos os
-  hook scripts, `jq empty` + consistência de versão nos manifestos, checagem de
-  frontmatter (incluindo a regra de angle brackets do marketplace) e paridade
-  dos guard hooks no `rc-hooks.ts` — a cada push/PR.
-- **Mapa de uso** no README (pipeline mermaid, tabela "I want to…" por intenção
-  Claude/OpenCode, dia típico) e versão HTML interativa em
-  `docs/usage-map.html`.
+- **`/rc-card [story-key]`** — comando que conduz uma História Jira já refinada
+  (ex.: via `rc-council`) de ponta a ponta. Descobre as Tarefas-filhas por
+  `parent = <STORY>` com fallback para as keys da seção **Decomposição** da
+  descrição, e roda um loop por Tarefa em ordem de dependência:
+  `/rc-plano` (aprovação do plano) → executa com o loop verify→fix →
+  `/rc-review` → `rc-jira` posta evidência de teste e transiciona o ticket para o
+  status correto; roll-up na História no fim. Interativo e portável (pausa para as
+  aprovações de plano/review/Jira); trata todo texto de ticket como dado não
+  confiável e nunca marca uma Tarefa concluída em gate vermelho ou com achados
+  high/critical em aberto. Um repo por execução.
 
-### Removed
+## [0.40.0] - 2026-07-10
 
-- **~450 arquivos não-produto destrackeados** e adicionados ao `.gitignore`:
-  `.agents/` (skills de terceiros + cópia pré-1.0.0 obsoleta das skills rc e as
-  antigas `cy-*`), os symlinks `.junie/`/`.kilocode/`/`.pi/`/`.qwen/` (lixo do
-  rename cy→rc) e `.claude/ship/` + `.claude/workflows/` (artefatos de outros
-  projetos). O marketplace clona o repo inteiro, então isso tudo era
-  distribuído a cada instalação do plugin. Os arquivos permanecem no disco,
-  apenas fora do versionamento. `.rc/tasks/` foi mantido versionado de
-  propósito — dogfooding coerente com o design do rc (artefatos versionados
-  junto ao código).
+### Changed
+
+- **`/rc-review` converge por severidade.** O loop-until-dry agora para quando um
+  round não traz issues novos de severidade **alta/crítica** — issues medium/low
+  ainda são corrigidos naquele round, mas não disparam um round extra (caro). O
+  teto de **3 rounds** é mantido. Atinge `commands/rc-review.md` e
+  `skills/rc-review-workflow/SKILL.md` (o schema `ROUND` ganhou `newBlocking`).
+- **`/rc-exec` executa em loop verify→fix bounded.** `rc-execute-task` deixou de
+  "consertar até resolver" (sem limite) e passou a iterar `gather → fix root cause
+  → re-verify` em gate vermelho, até **3 fix cycles** por task, escalando o
+  diagnóstico ao `rc-oracle` no último cycle. Se estourar o teto ainda vermelho,
+  reporta a task como bloqueada com a evidência — nunca marca completa em gate
+  vermelho (guarda contra *premature completion* e *over-ambition*).
+
+## [0.39.1] - 2026-07-08
 
 ### Fixed
 
-- **Descriptions com `<slug>`** em `rc-code-review` e `rc-simplify-review`
-  trocadas para `{slug}` — angle brackets em `description` quebram a validação
-  do marketplace de plugins do Claude Code.
-- **README** dizia "10 agents" na tabela de layout; são 12 (10 de fase + 2
-  read-only de apoio).
+- **Referências quebradas em `rc-brainstorming`.** A skill apontava para skills
+  inexistentes (`writing-plans`, `mcp-builder`); os handoffs agora vão para o
+  pipeline real (`rc-create-prd` → `rc-create-techspec` → `rc-create-tasks`) e
+  `frontend-design` → `rc-frontend-design`.
+- **Nomes de skill não-canônicos em prosa.** `no-workarounds` →
+  `rc-no-workarounds` (`rc-execute-task`), `tanstack` → `rc-tanstack`
+  (`rc-react`), `test-anti-patterns` → `rc-testing-anti-patterns`
+  (`rc-no-workarounds`).
 
 ### Changed
 
-- **`rc-explorer` e `rc-librarian` (OpenCode)** agora desligam `write`/`edit`
-  no frontmatter, espelhando a restrição de tools que o lado Claude já impunha
-  aos agents read-only.
+- **Leaf-workers agora alcançáveis pelas skills de execução.** As callouts de
+  delegação de `rc-execute-task` e `rc-fix-reviews` roteiam lookups de docs para
+  `rc-librarian` e apontam `rc-fixer` como upgrade path paralelo (worktree-isolado);
+  `rc-fix-reviews` ganhou sua primeira callout de delegação.
+- **Anti-triggers adicionados** a `rc-adversarial-review` e
+  `rc-fix-coderabbit-review` para desambiguar do restante do cluster de review/fix.
+- **`/rc-pipe`** ganhou um passo 0 opcional de warm-up (`rc-codemap`) para baratear
+  a exploração das fases seguintes.
 
-## [1.0.1] - 2026-07-07
-
-### Fixed
-
-- **Migração da memória legada.** O único fato preso no `.rc/memory.db` (SQLite
-  descontinuado) foi recuperado para o store file-based em `.rc/memory/`.
-- **Sidecars do SQLite não são mais versionados.** O `.gitignore` passou a cobrir
-  `.rc/memory.db*` (antes só `.rc/memory.db`), evitando commitar `-wal`/`-shm`.
-
-### Changed
-
-- **`rc-deepwork`** ganhou delimitação explícita contra o pipeline PRD formal.
-- **`rc-reflect`** e **`rc-analyze`**: ajustes de texto para remover menções
-  ambíguas ao antigo comando/daemon.
-- **`CLAUDE.md`** documenta que os conjuntos de commands Claude/OpenCode diferem
-  por design (não devem ser forçados a 1:1).
-
-## [1.0.0] - 2026-07-07
-
-### Changed
-
-- **BREAKING: rc agora é só um plugin de skills, commands, hooks e agents** para
-  Claude Code e OpenCode — markdown e shell puro, sem binário e sem build. A
-  instalação passa a ser via marketplace de plugin (Claude Code) ou cópia do
-  bundle `opencode/` (OpenCode); não há mais `rc setup`.
-- **Skills e commands convertidos para prompt-only.** As skills que dirigiam o
-  pipeline pelo binário (`rc tasks run`, `rc reviews fix`, `rc exec`, `rc tasks
-  validate`, etc.) agora orientam o agente a executar cada fase diretamente.
-  Nenhuma invocação do binário `rc` permanece.
-- **Memória de projeto agora é file-based.** O subsistema `rc memory` (SQLite
-  `.rc/memory.db` + embeddings) foi substituído por arquivos markdown em
-  `.rc/memory/` (`<scope>__<key>.md`, um fato por arquivo), consultados por Grep
-  e versionados no git. Todas as skills consumidoras e os hooks de recall/
-  precompact foram atualizados.
-- **Docs reescritos** (README, CLAUDE.md, AGENTS.md, CONTRIBUTING.md, runbook do
-  plugin) para um repo markdown+shell sem binário.
+## [0.39.0] - 2026-07-08
 
 ### Added
 
-- **Agents do plugin Claude Code.** Os dez agentes de fase do OpenCode foram
-  portados para `agents/` (formato de agente de plugin): `rc` (orquestrador),
-  `rc-prd`, `rc-techspec`, `rc-tasks`, `rc-exec`, `rc-exec-bulk`, `rc-review`,
-  `rc-fix`, `rc-gan`, `rc-git` — cada um fixando um modelo à fase e delegando à
-  skill correspondente.
-- **Cinco skills** inspiradas em padrões do `oh-my-opencode-slim`, escritas no
-  nosso formato markdown: `rc-codemap` (mapa hierárquico por diretório),
-  `rc-worktrees` (git worktrees como lanes isoladas), `rc-deepwork` (scheduler
-  para sessões pesadas com gates), `rc-loop` (loop generate→verify→retry contra
-  um gate de sucesso explícito) e `rc-reflect` (recomenda o menor asset
-  reutilizável a criar).
-- **Dois agentes de apoio read-only** (Claude e OpenCode): `rc-explorer` (busca
-  rápida no codebase) e `rc-librarian` (pesquisa de libs/docs externas via
-  context7 + web), acionáveis pelo orquestrador `rc` em qualquer fase.
-- **Hook `phase-reminder`** (SessionStart, opt-in via `RC_PHASE_REMINDER=1`):
-  infere a fase do pipeline a partir dos artefatos em `.rc/tasks/<slug>` e injeta
-  um lembrete de uma linha com a fase atual e o próximo passo.
+- **6 skills novas (padrão hub + `references/`, auto-descobertas por diretório):**
+  - `rc-seo` — SEO técnico, on-page e programático (auditoria, otimização de
+    conteúdo, geração de páginas em escala).
+  - `rc-video` — processamento local com `ffmpeg`, criação de conteúdo
+    (Reels/Shorts/YouTube) e integração opcional com VideoDB (SaaS pago).
+  - `rc-a11y` — acessibilidade WCAG 2.2 AA (HTML semântico, ARIA, navegação por
+    teclado, gestão de foco, contraste, leitores de tela).
+  - `rc-sql` — otimização de query (EXPLAIN, índices, N+1) e design de schema;
+    read-only por padrão (Rule 9).
+  - `rc-observability` — logs, métricas, traces e resposta a incidentes
+    (instrumentação, SLOs, postmortem).
+  - `rc-resilience` — resiliência event-driven (idempotência, retry/backoff,
+    DLQ, poison message, timeouts, circuit breaker).
+
+### Fixed
+
+- **Drift de documentação do path de instincts.** `COMMANDS.md` e `README.md`
+  apontavam `.rc/instincts/` para as observações do hook `observe`; corrigido
+  para `.rc/memory/observations.jsonl`, que é onde o hook de fato grava.
+
+### Changed
+
+- **Extensão `rc-idea-factory` alinhada à versão do plugin (`0.39.0`).**
+
+## [0.38.0] - 2026-07-08
+
+### Added
+
+- **Skill `rc-python`** — Python 3.12+ idiomático e tipado, com references
+  dedicadas: typing/PEP 695, asyncio/`TaskGroup`, packaging com `uv` e testes
+  com pytest.
+- **Skill `rc-hookify`** — autoria de hooks RC a partir de uma regra em
+  linguagem natural: escreve o script fail-open, conecta no `hooks.json`,
+  documenta e verifica; inclui referência de eventos de hook.
+- **Hook `memory-load` (`SessionStart`)** — warm-start que injeta no contexto um
+  resumo limitado de `.rc/memory/` (fatos + learnings) e avisa quando há
+  observações a destilar. Nunca bloqueia; silencioso fora de projetos RC.
+
+### Changed
+
+- **Documentação de `model`/`effort`** e contrato de delegação dos agents
+  cost-tiered (`skills/rc/references/delegation-contract.md`).
+- Ajustes em `rc-memory`, `README.md` e `hooks/README.md` refletindo o hook
+  `memory-load`.
+
+## [0.37.2] - 2026-07-08
+
+### Fixed
+
+- **Hook `repair-guidance` disparava falso-positivo em todo edit bem-sucedido.**
+  Quando o `tool_response` do PostToolUse vem como objeto (builds atuais do
+  Claude Code), o hook fazia `tojson` do objeto inteiro — que num Edit de
+  sucesso embute o conteúdo do arquivo (`originalFile`/`structuredPatch`) — e
+  rodava o grep de falha nisso. Qualquer arquivo contendo frases como "not
+  found", "no changes" ou "old_string" fazia o hook emitir "Edit did not apply"
+  mesmo após um edit aplicado. O mesmo afetava o branch `Task` (grep
+  "error|failed" contra a saída inteira do subagente). Agora o hook inspeciona
+  apenas o texto de status/erro — a string, ou os campos
+  `.error`/`.message`/`.errorMessage` do objeto — nunca o objeto serializado.
+  Cobertura adicionada ao `--selftest` (`edit-ok-object`, `task-ok-object`).
+
+## [0.37.1] - 2026-07-08
+
+### Changed
+
+- **`model`/`effort` explícitos em 13 skills comportamentais.** Skills que são
+  unidade discreta de trabalho passaram a pinar tier (antes herdavam o da
+  sessão), alinhadas à convenção das skills de pipeline:
+  - **opus/high** — `rc-council`, `rc-adversarial-review`,
+    `rc-refactoring-analysis`, `rc-ubs`.
+  - **sonnet/high** — `rc-brainstorming`, `rc-graphify`, `rc-qa-execution`,
+    `rc-qa-report`, `rc-fix-coderabbit-review`, `rc-autoresearch`.
+  - **sonnet/medium** — `rc-enrichment-prompt`, `rc-to-prompt`,
+    `rc-lesson-learned`.
+
+  Cobertura de tier sobe de 27 → 40 das 75 skills. As demais 35 (referência de
+  biblioteca/design e guidance cross-cutting como `rc-tdd`,
+  `rc-systematic-debugging`, `rc-no-workarounds`, `rc-testing-anti-patterns`,
+  `rc-skill-best-practices`) seguem sem pin de propósito — rodam no modelo da
+  sessão.
+
+## [0.37.0] - 2026-07-07
+
+### Changed
+
+- **Consolidação de skills (82 → 75).** Skills que fatiavam a mesma
+  biblioteca/domínio ou tinham o mesmo job foram fundidas na skill primária,
+  preservando todo o conteúdo detalhado (os `rules/`/`references/` foram
+  movidos para dentro da primária, não descartados):
+  - `rc-tanstack` absorveu `rc-tanstack-query-best-practices`,
+    `rc-tanstack-router-best-practices` e `rc-tanstack-start-best-practices`
+    (agora em `references/{query,router,start}/`).
+  - `rc-git` absorveu `rc-git-rebase` (rebase/conflitos; `references/` e
+    `scripts/` movidos). O command `rc-commit-msg` permanece intacto.
+  - `rc-readme` absorveu `rc-crafting-effective-readmes` (templates/guidance
+    para escrever à mão; `references/`, `templates/` e guias movidos).
+  - `rc-vercel-react-best-practices` absorveu `rc-vercel-composition-patterns`
+    (em `rules/composition/`).
+  - `rc-refactoring-analysis` absorveu `rc-architectural-analysis` (auditoria de
+    dead code, anti-patterns e type confusion; metodologia em
+    `references/architectural-audit.md`).
 
 ### Removed
 
-- **Todo o módulo Go e o CLI**: `internal/`, `cmd/`, `pkg/`, `sdk/`,
-  `extensions/`, `rc.go`, `go.mod`/`go.sum`, o binário e o daemon.
-- **App web e desktop**, monorepo JS (`web/`, `apps/`, `packages/`) e todo o
-  tooling de build/release (Makefile, goreleaser, golangci, turbo, bun, vitest,
-  CI de build).
+- Skills `rc-tanstack-query-best-practices`, `rc-tanstack-router-best-practices`,
+  `rc-tanstack-start-best-practices`, `rc-git-rebase`,
+  `rc-crafting-effective-readmes`, `rc-vercel-composition-patterns` e
+  `rc-architectural-analysis` como entradas independentes. **Breaking**:
+  invocações por esses nomes deixam de resolver — use a skill primária
+  correspondente.
 
 ## [0.13.0] - 2026-06-22
 
@@ -184,7 +249,7 @@
 
 ### Added
 
-- **Suporte a monorepos com múltiplas pastas `.rc`.** O rc agora descobre a pasta
+- **Suporte a monorepos com múltiplas pastas `.rc`.** O RC agora descobre a pasta
   `.rc` ativa em projetos que têm mais de uma (ex.: `packages/*/.rc`, `apps/*/.rc`),
   tanto nas skills quanto no binário.
 
@@ -206,7 +271,7 @@
   perguntam em caso de ambiguidade; `rc-readme` varre todos os `.rc` por ADRs.
   Projetos de pasta única (com ou sem `.rc`) seguem idênticos — sem perguntas novas.
 
-#### Como atualizar o rc
+#### Como atualizar o RC
 
 ```bash
 rc upgrade
@@ -230,13 +295,13 @@ rc --version   # deve mostrar v0.10.0
 ### Added
 
 - **`rc setup --sync`** — novo modo de sincronização de skills. Rodando dentro de
-  um projeto, ele reconcilia as skills bundled do rc com a versão do binário:
+  um projeto, ele reconcilia as skills bundled do RC com a versão do binário:
   - ✅ **Atualiza** as skills bundled que o projeto já tem (quando mudaram).
   - ➕ **Adiciona** as skills bundled que estão faltando.
   - ⏭️ **Ignora** as que já estão atualizadas (não reescreve à toa).
   - 🔒 **Não toca** em skills de terceiros/customizadas no mesmo diretório.
 
-#### Como atualizar o rc
+#### Como atualizar o RC
 
 ```bash
 rc upgrade
@@ -310,9 +375,9 @@ Sync Claude Code (project scope)
 
 1. `rc upgrade` (atualiza o binário para v0.9.0).
 2. Dentro de cada projeto: `rc setup --sync --agent claude --yes` (ou `codex`).
-3. Repetir o passo 2 sempre que sair uma nova versão do rc — só o que mudou é atualizado.
+3. Repetir o passo 2 sempre que sair uma nova versão do RC — só o que mudou é atualizado.
 
 ## [0.2.4] - 2026-06-13
 
 ### Added
-- Initial rc release
+- Initial RC release

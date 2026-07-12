@@ -1,6 +1,6 @@
 ---
 name: rc-workflow-memory
-description: Maintains workflow-scoped task memory for rc runs using .rc/tasks/{name}/memory/ files. Use when a task prompt provides workflow memory paths and requires the agent to read, update, compact, and promote durable context across PRD task executions. Do not use for PR review remediation, global user preferences, or programmatic event-log summarization.
+description: Maintains workflow-scoped task memory for RC runs using .rc/tasks/{name}/memory/ files. Use when a task prompt provides workflow memory paths and requires the agent to read, update, compact, and promote durable context across PRD task executions. Do not use for PR review remediation, global user preferences, or programmatic event-log summarization.
 user-invocable: false
 model: sonnet
 effort: medium
@@ -28,7 +28,7 @@ Maintain the workflow memory files provided by the caller.
    - Update the current task memory whenever the objective changes, a non-obvious decision is made, an important learning appears, or an error changes the plan.
    - Promote only durable cross-task context into the shared workflow memory.
    - Keep task-local execution details in the current task memory file.
-   - If the `rc-instincts` skill has promoted high-confidence instincts (recurring trigger→action patterns for this project), treat them as a source of durable cross-task context worth carrying in shared memory.
+   - If the `rc-memory` skill has promoted high-confidence instincts (recurring trigger→action patterns for this project), treat them as a source of durable cross-task context worth carrying in shared memory.
 
 3. Close out the run cleanly.
    - Update memory before any completion claim, handoff, or commit.
@@ -68,8 +68,8 @@ All three must be "yes" to promote. If any is "no," the item stays in task memor
 
 Workflow memory is scoped to this workflow under `.rc/tasks/`. When a fact is durable for
 the whole project — a convention, a cross-cutting decision, a recurring gotcha — also record
-it in the per-project memory as a `.rc/memory/` file so other workflows and skills can find it
-(see the `rc-project-memory` skill). Keep workflow-local execution detail in workflow memory.
+it in the per-project memory via the `rc-memory` skill so other workflows and skills can find it
+(see the `rc-memory` skill). Keep workflow-local execution detail in workflow memory.
 
 ## Compaction Rules
 

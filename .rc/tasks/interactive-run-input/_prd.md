@@ -2,7 +2,7 @@
 
 ## Overview
 
-rc agents frequently need a human before they can keep going: to approve a
+RC agents frequently need a human before they can keep going: to approve a
 sensitive action, or to answer a question a workflow skill has asked. The escale
 web UI watches runs but cannot answer them — it streams events read-only, and the
 only write action is cancel. As a result the most valuable interactive
@@ -17,7 +17,7 @@ pauses — for a permission request or a skill question — the prompt appears w
 response area (clickable buttons when the agent offers discrete options, plus a
 free-text box), the user responds, and the same run continues.
 
-It is for anyone running rc workflows from the web UI (product/eng users driving
+It is for anyone running RC workflows from the web UI (product/eng users driving
 ideation, spec, and execution) who today must drop to the terminal to interact
 with the agent.
 
@@ -88,7 +88,7 @@ transcript, so a paused-and-resumed run reads as one coherent conversation.
 
 ## User Experience
 
-Primary persona: a rc web user driving a workflow (ideation/spec/execution).
+Primary persona: a RC web user driving a workflow (ideation/spec/execution).
 
 Primary flow:
 

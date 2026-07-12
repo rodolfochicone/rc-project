@@ -1,6 +1,6 @@
 ---
 name: rc-code-review
-description: Performs a rigorous, standards-driven review of the current change set, writing a categorized, severity-ranked report to .rc/tasks/{slug}/ covering correctness, security, performance, and project-convention conformance. Use for an on-demand quality gate of a diff or branch before merge. Do not use to generate a review-round directory for remediation (use rc-review-round), to fix existing review issues (use rc-fix-reviews), or to edit source code.
+description: Performs a rigorous, standards-driven review of the current change set, writing a categorized, severity-ranked report to .rc/tasks/<slug>/ covering correctness, security, performance, and project-convention conformance. Use for an on-demand quality gate of a diff or branch before merge. Do not use to generate a review-round directory for remediation (use rc-review-round), to fix existing review issues (use rc-fix-reviews), or to edit source code.
 model: opus
 effort: xhigh
 ---
@@ -29,7 +29,7 @@ Fall back to Grep/Glob + Read when Serena is unavailable or for plain-text (non-
 
 ## Resolving the `.rc` base directory
 
-rc supports monorepos, where more than one `.rc` directory can exist. Before reading or writing any `.rc/...` path, resolve which `.rc` directory this run uses; its parent is the base directory. Treat every `.rc/...` path in this skill as relative to that base.
+RC supports monorepos, where more than one `.rc` directory can exist. Before reading or writing any `.rc/...` path, resolve which `.rc` directory this run uses; its parent is the base directory. Treat every `.rc/...` path in this skill as relative to that base.
 
 1. Search the project recursively for `.rc` directories, skipping `node_modules`, `.git`, `vendor`, and any `_archived/` directory.
 2. Resolve the base from what you find:
@@ -139,10 +139,10 @@ A review's worth is measured by precision, not by finding count. An inflated rep
 
 ## Project memory
 
-Before reviewing, search `.rc/memory/` (with Grep) for the changed files' terms to recover the
+Before reviewing, consult project memory (the `rc-memory` skill, scanning `.rc/memory/INDEX.md`) for the changed files' terms to recover the
 project's conventions and known gotchas, and flag deviations from them (see the
-`rc-project-memory` skill). When the review surfaces a durable, non-obvious gotcha, record it
-as a `.rc/memory/gotcha__<key>.md` file so future work avoids it.
+`rc-memory` skill). When the review surfaces a durable, non-obvious gotcha, record
+it via the `rc-memory` skill (scope: gotcha) so future work avoids it.
 
 ## Critical Rules
 
@@ -153,7 +153,6 @@ as a `.rc/memory/gotcha__<key>.md` file so future work avoids it.
 - Enforce the project's documented conventions over personal taste; flag a harmful convention rather than ignoring it.
 - Assign severity by actual impact; do not inflate findings to pad the report.
 - Verify a pattern is genuinely problematic before flagging it.
-- Apply the confidence threshold (>80%) and the pre-report gate to every finding; a clean change with zero findings is a valid, expected result.
 
 ## Error Handling
 

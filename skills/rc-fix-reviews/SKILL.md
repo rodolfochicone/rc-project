@@ -24,6 +24,16 @@ If the Serena MCP is available, prefer its symbolic tools over whole-file reads 
 
 Fall back to Grep/Glob + Read/Edit when Serena is unavailable or for plain-text (non-symbol) searches.
 
+## Delegation
+
+Keep this skill's context lean by routing to specialist subagents per the delegation contract in
+the `rc` skill (`references/delegation-contract.md`): hand broad recon to a `rc-explorer`
+(cheap/fast, read-only), route version-specific library/API lookups to a `rc-librarian` (cheap,
+read-only), and escalate a stubborn root-cause hunt or a risky fix to `rc-oracle` (strong model).
+Do the bounded remediation here yourself; when issues are genuinely independent, the upgrade path
+is worktree-isolated `rc-fixer`s with per-folder ownership — never fan out writers over the shared
+tree that this batch commits.
+
 ## Required Inputs
 
 - The scoped issue files listed in `<batch_issue_files>`.
@@ -61,13 +71,13 @@ Fall back to Grep/Glob + Read/Edit when Serena is unavailable or for plain-text 
 
 ## Project memory
 
-Before fixing, search `.rc/memory/` (with Grep) for the issue terms to recover relevant
-conventions and gotchas (see the `rc-project-memory` skill). When a fix reveals a durable,
-non-obvious gotcha, record it as a `.rc/memory/gotcha__<key>.md` file.
+Before fixing, consult project memory (the `rc-memory` skill, scanning `.rc/memory/INDEX.md`) for the issue terms to recover relevant conventions
+and gotchas (see the `rc-memory` skill). When a fix reveals a durable, non-obvious
+gotcha, record it via the `rc-memory` skill (scope: gotcha).
 
 ## Critical Rules
 
-- Do not fetch or export reviews inside this workflow. The review round files already exist under `reviews-NNN/`.
-- Do not call provider-specific scripts or `gh` mutations. rc resolves provider threads after the batch succeeds.
+- Do not fetch or export reviews inside this workflow. The review round files already exist (produced by the `rc-review-round` or `rc-review-workflow` skill).
+- Do not call provider-specific scripts or `gh` mutations. RC resolves provider threads after the batch succeeds.
 - Do not modify issue files outside the scoped batch.
 - Do not mark an issue `resolved` before the underlying work and verification are actually complete.

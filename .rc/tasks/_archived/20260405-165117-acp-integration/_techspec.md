@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-This specification describes the replacement of rc's custom per-agent CLI driver system with ACP (Agent Client Protocol), a JSON-RPC 2.0 protocol over stdio that standardizes communication between clients and coding agents. The current architecture requires hand-coded `commandFunc`/`shellPreviewFunc` implementations for each of 6 agents, with Claude-specific output parsing and heuristic timeout detection. ACP normalizes all agent communication into typed session updates with structured content blocks (text, tool_use, diff, terminal_output, etc.), eliminating per-agent branching throughout the codebase.
+This specification describes the replacement of RC's custom per-agent CLI driver system with ACP (Agent Client Protocol), a JSON-RPC 2.0 protocol over stdio that standardizes communication between clients and coding agents. The current architecture requires hand-coded `commandFunc`/`shellPreviewFunc` implementations for each of 6 agents, with Claude-specific output parsing and heuristic timeout detection. ACP normalizes all agent communication into typed session updates with structured content blocks (text, tool_use, diff, terminal_output, etc.), eliminating per-agent branching throughout the codebase.
 
 The implementation vendors `coder/acp-go-sdk` (Apache 2.0) as the protocol foundation, redesigns the content model to expose ACP's typed content blocks to the UI, and replaces the activity-monitor timeout with ACP's session lifecycle events. All 6 current agents (Claude, Codex, Droid, Cursor, OpenCode, Pi) have ACP adapters and will be migrated in a single release.
 

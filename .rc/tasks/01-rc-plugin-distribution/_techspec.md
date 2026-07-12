@@ -82,7 +82,7 @@ type marketplaceManifest struct {
 {
   "name": "rc",
   "version": "0.14.0",
-  "description": "rc AI-assisted development workflow skills and commands",
+  "description": "RC AI-assisted development workflow skills and commands",
   "author": { "name": "Escale" }
 }
 ```
@@ -98,7 +98,7 @@ type marketplaceManifest struct {
       "name": "rc",
       "source": ".",
       "version": "0.14.0",
-      "description": "rc workflow skills and slash commands"
+      "description": "RC workflow skills and slash commands"
     }
   ]
 }

@@ -1,0 +1,12 @@
+[extension]
+name = "rc-idea-factory"
+version = "0.39.0"
+description = "Idea-factory workflow skill and council reusable agents"
+min_rc_version = "0.0.1"
+
+[security]
+capabilities = ["skills.ship", "agents.ship"]
+
+[resources]
+skills = ["skills/*"]
+agents = ["agents/*"]

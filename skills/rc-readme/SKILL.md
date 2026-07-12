@@ -1,6 +1,6 @@
 ---
 name: rc-readme
-description: Creates or updates a project README by analyzing the real codebase, then rewriting README.md with accurate, evidence-based content. Use when generating a README from scratch, refreshing an outdated one, or syncing docs after features land. Do not use for API reference files (use rc-openapi or rc-postman), changelog generation, or editing source code.
+description: Creates or updates a project README by analyzing the real codebase, then rewriting README.md with accurate, evidence-based content — or guides writing/improving a README by hand with templates and guidance matched to audience and project type (open source, personal, internal, config). Use when generating a README from scratch, refreshing an outdated one, syncing docs after features land, or drafting/reviewing a README manually. Do not use for API reference files (use rc-openapi or rc-postman), changelog generation, or editing source code.
 model: sonnet
 effort: medium
 ---
@@ -71,3 +71,67 @@ Produce a `README.md` that reflects what the code actually does — never invent
 - If no manifest or recognizable stack can be found, report what was inspected and ask the user to confirm the project type before writing.
 - If the codebase is too large to analyze fully, document the core surfaces, note what was not covered, and do not imply full coverage.
 - If the target file cannot be written, stop and report the filesystem error.
+
+## Escrevendo/aprimorando um README à mão — templates e guidance
+
+Use este modo quando o pedido é sobre redigir ou revisar um README manualmente (sem necessariamente varrer todo o codebase), ou quando o foco é adequar o conteúdo à audiência certa. READMEs respondem às perguntas que a audiência vai ter — um contribuidor de projeto OSS precisa de contexto diferente de um "eu do futuro" abrindo uma pasta de config.
+
+**Sempre pergunte:** Quem vai ler isso, e o que essa pessoa precisa saber?
+
+### Passo 1: identificar a tarefa
+
+Pergunte: "Em qual tarefa de README você está trabalhando?"
+
+| Tarefa | Quando |
+|--------|--------|
+| **Criar** | Projeto novo, ainda sem README |
+| **Adicionar** | Precisa documentar algo novo |
+| **Atualizar** | Capacidades mudaram, conteúdo está desatualizado |
+| **Revisar** | Checar se o README ainda está preciso |
+
+### Passo 2: perguntas específicas da tarefa
+
+**Criando o README inicial:**
+1. Que tipo de projeto é? (ver Tipos de projeto abaixo)
+2. Que problema isso resolve, em uma frase?
+3. Qual o caminho mais rápido até "funcionando"?
+4. Algo notável para destacar?
+
+**Adicionando uma seção:**
+1. O que precisa ser documentado?
+2. Onde isso deve entrar na estrutura existente?
+3. Quem mais precisa dessa informação?
+
+**Atualizando conteúdo existente:**
+1. O que mudou?
+2. Leia o README atual, identifique seções desatualizadas.
+3. Proponha edições específicas.
+
+**Revisando/atualizando:**
+1. Leia o README atual.
+2. Confira contra o estado real do projeto (package.json, arquivos principais, etc.).
+3. Sinalize seções desatualizadas.
+4. Atualize a data de "última revisão", se existir.
+
+### Passo 3: sempre pergunte
+
+Depois de redigir, pergunte: **"Tem mais alguma coisa para destacar ou incluir que eu possa ter deixado passar?"**
+
+### Tipos de projeto
+
+| Tipo | Audiência | Seções-chave |
+|------|-----------|--------------|
+| **Open Source** | Contribuidores, usuários no mundo todo | Install, Usage, Contributing, License |
+| **Pessoal** | Você do futuro, visitantes de portfólio | O que faz, Stack, Aprendizados |
+| **Interno** | Colegas de time, novos contratados | Setup, Arquitetura, Runbooks |
+| **Config** | Você do futuro (confuso) | O que tem aqui, Por quê, Como estender, Pegadinhas |
+
+**Pergunte ao usuário** se não estiver claro. Não assuma o padrão OSS para tudo.
+
+### Seções essenciais (todos os tipos)
+
+Todo README precisa, no mínimo:
+
+1. **Nome** — título autoexplicativo.
+2. **Descrição** — o quê + por quê em 1-2 frases.
+3. **Uso** — como usar (exemplos ajudam).

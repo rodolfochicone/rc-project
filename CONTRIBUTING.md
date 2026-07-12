@@ -1,7 +1,14 @@
-# Contributing to rc
+# Contributing to RC
 
-Thanks for your interest in contributing. This repository is **plain markdown and shell** —
-skills, slash commands, hooks, and agents for Claude Code and OpenCode. There is no build step.
+Thanks for your interest in contributing. RC is a **pure agent plugin** — skills, commands, agents,
+and hooks (plus a couple of small Node/Bash helper scripts). There is no compiled binary and no
+build step.
+
+## Prerequisites
+
+- `git`
+- `node` (runs the validation scripts) and `jq` (used by the bash hooks)
+- Optionally, an agent host (Claude Code, OpenCode, …) to try a change end-to-end
 
 ## Getting Started
 
@@ -9,56 +16,62 @@ skills, slash commands, hooks, and agents for Claude Code and OpenCode. There is
 git clone git@github.com:<your-user>/rc-project.git
 cd rc-project
 git remote add upstream git@github.com:rodolfochicone/rc-project.git
+node scripts/plugin-smoke.mjs   # must pass — validates all components
 ```
 
 ## Development Workflow
 
 1. Sync your `main` with upstream before creating a branch.
 2. Create a feature branch from `main`.
-3. Make your changes.
-4. Verify (see below).
+3. Make your changes — components are markdown, JSON, and small scripts.
+4. Validate:
+   ```bash
+   node scripts/plugin-smoke.mjs               # frontmatter of skills/agents/commands + hook wiring
+   node scripts/validate-tasks.mjs --selftest  # if you touched the task validator
+   ```
+   `plugin-smoke` is the blocking gate; it must report `OK` before you open a PR.
 5. Push to your fork and open a PR against `upstream/main`.
 
-## Verification
+## Contributing components
 
-There is no `make verify`. Check your change by inspection and by exercising the artifact:
-
-- **Skills / commands** — confirm valid YAML frontmatter (`name`, `description`) and that any
-  `references/` links resolve.
-- **Hooks** — shell-check every script you touch (`bash -n hooks/scripts/<name>.sh`) and, when
-  practical, run it against a sample tool payload.
-- **Plugin manifests** — confirm `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json`
-  stay valid JSON and share the same `version`.
-- **Parity** — when changing a command or a hook, update both the Claude Code and OpenCode sides
-  (`commands/` + `opencode/commands/`, `hooks/` + `opencode/plugin/rc-hooks.ts`).
-
-## Skills
-
-Each skill lives in `skills/<skill-name>/` with:
-
-```
-skills/<skill-name>/
-  SKILL.md          # Skill definition with frontmatter
-  references/       # Supporting persona and template files
-```
-
-When contributing a new skill or modifying an existing one:
-
-- Follow the frontmatter format (`name`, `description`, optional `model`, `effort`).
-- Keep references self-contained within the skill's `references/` directory.
-- Write all skill content in English.
+- **Skills** — `skills/<name>/SKILL.md` with frontmatter (`name`, `description` required; plus
+  `model`, `effort`, `user-invocable`, `argument-hint` as needed). Keep supporting files
+  self-contained in the skill's `references/` and `scripts/`. Write skill content in **English**.
+- **Agents** — `agents/<name>.md` with frontmatter (`name`, `description` required; `tools`,
+  `model`, `color`). Bundled specialists are leaf workers — do not give them the `Task`/`Agent`
+  tool.
+- **Commands** — thin `commands/<name>.md` wrappers that delegate to a skill.
+- **Hooks** — bash under `hooks/scripts/`, wired in `hooks/hooks.json`; source `_lib.sh`, gate with
+  `rc_hook_active`, fail open, and reference scripts with `${CLAUDE_PLUGIN_ROOT}`.
+- **Keep docs in sync** — update the affected skill's description/references and
+  `skills/rc/SKILL.md` when behavior changes.
 
 ## Commit Messages
 
-- Use [Conventional Commits](https://www.conventionalcommits.org/): `feat:`, `fix:`, `refactor:`, `docs:`, `test:`, `chore:`.
+- Use [Conventional Commits](https://www.conventionalcommits.org/): `feat:`, `fix:`, `refactor:`,
+  `docs:`, `test:`, `chore:`.
 - Keep the subject line under 72 characters.
 - Focus on **why**, not what.
 
 ## Pull Requests
 
 - Keep PRs focused. One logical change per PR.
-- Write a clear description with a summary.
+- Write a clear description with a summary and how you validated it.
 - Link related issues when applicable.
+- `node scripts/plugin-smoke.mjs` must pass.
+
+## Releasing
+
+RC ships through the **Claude Code plugin marketplace**, which reads the version from the manifests
+on `main` — there is no build, tag, or package step. To cut a release:
+
+1. Bump `version` in **both** `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json`
+   (semver: minor for new skills/agents/hooks, patch for fixes).
+2. `node scripts/plugin-smoke.mjs` must pass.
+3. Commit (e.g. `chore(release): bump rc plugin to X.Y.Z`) and push to `main`.
+
+Hosts pick up the new version via `/plugin marketplace update`. There is no GitHub-release or npm
+channel today.
 
 ## Maintainers
 

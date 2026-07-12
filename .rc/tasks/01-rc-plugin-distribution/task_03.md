@@ -42,7 +42,7 @@ that the plugin channel serves Claude Code only.
 Update the three documentation surfaces. In `README.md`, add the plugin install path
 next to the existing CLI install / "Quick Reference" content so both channels sit
 together. In `CLAUDE.md`, note the plugin as an alternative distribution for Claude Code.
-In `skills/rc/SKILL.md` (the root `rc` skill that explains rc capabilities), mention the
+In `skills/rc/SKILL.md` (the root `rc` skill that explains RC capabilities), mention the
 plugin install option. Reference the TechSpec "API Endpoints" section for the exact slash
 commands and the "Integration Points" / "Testing Approach → Integration Tests" sections
 for the runbook steps and the `GH_TOKEN` prerequisite. Do not duplicate ADR rationale into
@@ -54,7 +54,7 @@ this feature is the task_01 consistency test under `make verify`.
 ### Relevant Files
 - `README.md` — primary user-facing install/usage doc; add the plugin section here.
 - `CLAUDE.md` — project guidance; note the additive Claude-only plugin channel.
-- `skills/rc/SKILL.md` — root `rc` skill describing rc capabilities and install paths.
+- `skills/rc/SKILL.md` — root `rc` skill describing RC capabilities and install paths.
 - `.claude-plugin/marketplace.json` — source of the marketplace/plugin names referenced in docs (from task_01).
 
 ### Dependent Files

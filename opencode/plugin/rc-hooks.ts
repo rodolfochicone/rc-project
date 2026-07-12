@@ -5,8 +5,8 @@ import { join } from "node:path";
 // Code; it exposes a plugin API instead. Rather than reimplement the guard logic
 // in TypeScript, this plugin shells out to the SAME bundled shell scripts the
 // Claude channel uses (git-guard, commit-guard, go-mod-guard, gateguard, go-fmt),
-// so there is one source of truth. When installing manually, copy this repo's
-// hooks/scripts/ so they are reachable at <opencode-root>/rc/hooks/scripts/.
+// so there is one source of truth. The plugin ships those scripts next to this
+// file under <opencode-root>/rc/hooks/scripts/.
 //
 // The scripts read a Claude-style JSON payload on stdin and exit 2 to block; this
 // plugin maps OpenCode's tool events to that payload and turns an exit-2 into a
@@ -15,11 +15,11 @@ import { join } from "node:path";
 
 const SCRIPTS_DIR = join(import.meta.dir, "..", "rc", "hooks", "scripts");
 
-export const RcHooks: Plugin = async ({ $ }) => {
-  // This plugin may be installed into BOTH .opencode/plugin/ and
-  // .opencode/plugins/ for cross-version compatibility (opencode has used both
-  // names). If a version loads both copies in the same process, register the
-  // hooks only once so guards don't run twice.
+export const RCHooks: Plugin = async ({ $ }) => {
+  // The plugin ships into BOTH .opencode/plugin/ and .opencode/plugins/ for
+  // cross-version compatibility (opencode has used both names). If a version
+  // loads both copies in the same process, register the hooks only once so
+  // guards don't run twice.
   const g = globalThis as Record<string, unknown>;
   if (g.__rcHooksActive) return {};
   g.__rcHooksActive = true;

@@ -1,6 +1,6 @@
 ---
 name: rc-jira
-description: Acts as a Product Manager to shape task ideas and drive Jira work — discuss an idea, create a card, update a card, finalize a card, or create/edit a GMUD (change-management record) — exclusively through the official Atlassian MCP server, always applying a mandatory card or GMUD template, discovering each project's required fields before creating, and confirming every outward-facing write. Use when the user wants to brainstorm a task or feature idea, open a Jira card, update or comment on an issue, move or finalize a card, create or edit a change-management record (GMUD), or search issues by JQL. Do not use when the Atlassian MCP is unavailable and the user declines to configure it, for non-Jira Atlassian products (Confluence, Compass), or for bulk imports.
+description: Acts as a Product Manager to shape task ideas and drive Jira work — discuss an idea, create a card, update a card, finalize a card, refine a card into a PRD/TechSpec/task breakdown with native sub-tasks, execute a card's child tickets with test evidence, or create/edit a GMUD (change-management record) — exclusively through the official Atlassian MCP server, always applying a mandatory card or GMUD template, discovering each project's required fields before creating, and confirming every outward-facing write. Use when the user wants to brainstorm a task or feature idea, open a Jira card, update or comment on an issue, move or finalize a card, refine a card into PRD/TechSpec/sub-tasks, execute the child tickets of a card and attach test evidence, create or edit a change-management record (GMUD), or search issues by JQL. Do not use when the Atlassian MCP is unavailable and the user declines to configure it, for non-Jira Atlassian products (Confluence, Compass), or for bulk imports.
 model: sonnet
 effort: medium
 ---
@@ -36,10 +36,11 @@ All work goes through these Atlassian MCP tools (reference them by these capabil
 | List valid status transitions | `getTransitionsForJiraIssue` |
 | Apply a status transition | `transitionJiraIssue` |
 
-**Two rules that apply to every call:**
+**Three rules that apply to every call:**
 
 1. **Always pass `cloudId`** — obtained in Phase 0. It is required by every tool.
 2. **Always send rich text as markdown.** Set `contentFormat: "markdown"` on `createJiraIssue` / `addCommentToJiraIssue`, and `responseContentFormat: "markdown"` on reads. Do **not** hand-build Atlassian Document Format (ADF) JSON — the MCP converts markdown for you.
+3. **Sub-tasks need a `parent`.** Create a native sub-task with `createJiraIssue` using the project's sub-task issue type plus `parent: <PARENT-KEY>`. The type name varies by project ("Sub-task", "Subtarefa", …), so discover the exact name and its required fields with `getJiraProjectIssueTypesMetadata` / `getJiraIssueTypeMetaWithFields` before creating.
 
 ## Phase 0 — Connectivity & site (always first)
 
@@ -50,7 +51,7 @@ All work goes through these Atlassian MCP tools (reference them by these capabil
 
 ## Phase 1 — Choose what to do
 
-After Phase 0, present the entry menu with **AskUserQuestion** (localize the labels to the user's language). Offer exactly these four options:
+After Phase 0, present the entry menu with **AskUserQuestion** (localize the labels to the user's language). Offer exactly these six options:
 
 | Option | Means | Goes to |
 | --- | --- | --- |
@@ -58,6 +59,8 @@ After Phase 0, present the entry menu with **AskUserQuestion** (localize the lab
 | **Create card** | Open a new Jira issue | *Create a card* |
 | **Update card** | Comment on, or move forward, an existing card | *Update a card* |
 | **Finalize card** | Transition an existing card to a Done/closed status | *Finalize a card* |
+| **Refine card** | Turn a card into PRD → TechSpec → tasks, created as native sub-tasks | *Refine a card* |
+| **Execute card** | Run the card's child tickets and attach test evidence | *Execute a card* |
 
 The auto-added **"Other"** lets the user do something else (e.g. just read or search). Skip the menu only when the user's request already names the operation unambiguously (e.g. "create a card for X" → go straight to *Create a card*). Operations chain naturally: *Discuss → Create*, *Search → Update/Finalize*.
 
@@ -93,8 +96,8 @@ Never assume project, issue type, or required fields — discover them. (Coming 
 3. **Required-field discovery (mandatory)** — call `getJiraIssueTypeMetaWithFields` for that project + issue type. Collect every field with `required: true`. `summary` is always required; this surfaces project-specific required fields (priority, components, due date, story points, custom fields). Company-managed and team-managed projects differ here, so never skip this step.
 4. **Gather content** — ask for the fields you don't yet have, prioritizing:
    - **summary** (required) — a clear, specific title.
-   - **description** (required) — structure it with the mandatory *Card template* below (Story/Task or Bug). Offer to draft it and let the user adjust; never create a bare summary with no description.
-   - **acceptance criteria** — required: fold into the description for Story/Task; for a Bug capture steps to reproduce, expected vs. actual, environment.
+   - **description** (required) — structure it with the single mandatory *Card template* below (Resumo, Contexto, Critérios de aceitação, DoR, Outras informações), used for every issue type. Ask the user one topic at a time to fill each section; offer to draft each and let them adjust. Never create a bare summary with no description.
+   - **DoR (blocking gate)** — required: keep asking until the *DoR* section answers how to implement, how the metrics' data is collected, how it's operated (UI/config), where the metrics are tracked, plus any card-specific open questions. **Do not create the card while the DoR is incomplete**, regardless of issue type.
    - Every other **required** field from step 3, plus any optional field the user explicitly wants (assignee, labels, components, priority, epic/parent, story points, sprint, due date).
 5. **Assignee** — if assigning, resolve the person with `lookupJiraAccountId` and use the returned `assignee_account_id`. Don't guess account ids.
 6. **Confirm & create** — show a compact preview (project, type, summary, description, and every field you'll set). On explicit yes, call `createJiraIssue` with `cloudId`, `projectKey`, `issueTypeName`, `summary`, `description`, `contentFormat: "markdown"`, and put everything without a dedicated parameter (priority, labels, components, fixVersions, custom fields) inside `additional_fields`. Examples: `{"priority": {"name": "High"}}`, `{"labels": ["bug"]}`, `{"components": [{"name": "Backend"}]}`, `{"customfield_10001": "value"}`.
@@ -119,6 +122,47 @@ Close out a card by moving it to a Done/closed status, with an optional wrap-up.
 3. **List transitions** with `getTransitionsForJiraIssue` and identify the terminal one (e.g. Done, Closed, Resolved) from those actually available.
 4. **Confirm & transition** — finalizing is an outward-facing write; on explicit yes, apply with `transitionJiraIssue` using that transition `id` (set the resolution if the workflow asks for one).
 5. **Report** the final status and the browse URL.
+
+## Refine a card
+
+Turn a single Jira card into a full PRD → TechSpec → task breakdown, then create each task as a **native Sub-task** under that card. This chains the RC creation skills and bridges their local artifacts to Jira — the card is the parent, its sub-tasks are the executable units consumed later by *Execute a card*.
+
+1. **Locate & read the parent** — get the card by key (or *Search (JQL)* then confirm) and read it (*Read an issue*). Native sub-tasks require the parent to be a **Story or Task**. If it is an **Epic**, stop and explain: an Epic takes child Stories, not sub-tasks — offer to pick/create a Story under the Epic and refine that instead. Do not silently change the chosen hierarchy.
+2. **Derive the slug** — build `<KEY>-<short-title-kebab>` (e.g. `PROJ-123-export-csv`). This is the RC feature name and the directory `.rc/tasks/<slug>/`.
+3. **Run the creation chain** — invoke these skills in order with the `Skill` tool, passing the slug as the feature name. Each keeps its own interaction (the PRD brainstorming, the TechSpec clarifications); you only stitch the Jira edges. Seed the PRD from the card's summary, description, and acceptance criteria so the work stays anchored to the card.
+   1. `rc-create-prd` → `.rc/tasks/<slug>/_prd.md`
+   2. `rc-create-techspec` → `.rc/tasks/<slug>/_techspec.md`
+   3. `rc-create-tasks` → `task_01.md … task_NN.md` + `_tasks.md`
+4. **Attach PRD/TechSpec to the card** — post one comment on the parent with a **short summary** of the PRD and TechSpec plus the local artifact paths (`.rc/tasks/<slug>/_prd.md`, `_techspec.md`). Keep the full documents local. Confirm before posting (outward-facing write).
+5. **Preview the sub-tasks** — discover the sub-task issue type and its required fields (Tooling rule 3). Show one table of every sub-task to create (number, title, complexity) and ask for **one confirmation for the whole batch**.
+6. **Create the sub-tasks** — on yes, for each `task_NN.md` call `createJiraIssue` with `cloudId`, `projectKey`, the sub-task `issueTypeName`, `parent: <KEY>`, `summary` = task title, `description` = a markdown digest of the task file (Overview + Subtasks + Success Criteria, with the local file path for the full contract), `contentFormat: "markdown"`, and any required field from step 5 in `additional_fields`.
+7. **Record the mapping (do not skip)** — write the new sub-task key into each task file's YAML frontmatter as `jira_key: <SUBKEY>` (Edit `task_NN.md`). *Execute a card* uses this to match tickets to local tasks; without it execution cannot run.
+8. **Report** — list each created sub-task (key + browse URL) under the parent.
+
+## Execute a card
+
+Execute the children of a card and write test evidence back to Jira. The **local task files are the source of truth** — execution runs from `.rc/tasks/<slug>/`, matched to the Jira sub-tasks by the `jira_key` recorded during *Refine a card*. Execution is expensive, so **check Jira reachability before running** and never lose evidence to a flaky connection: every result is written to a local sync file first, then pushed to Jira when reachable.
+
+1. **Locate the parent** — by key (or *Search (JQL)* then confirm).
+2. **List the children** — `searchJiraIssuesUsingJql` with `parent = <KEY> ORDER BY key` (or read the parent's sub-tasks). Capture each child's key.
+3. **Match to local tasks** — grep `jira_key:` across `.rc/tasks/**/task_*.md`; the files whose `jira_key` matches the children share one directory, and that directory name is the slug. If nothing matches (e.g. a different machine or checkout), **stop and tell the user** — execution needs the enriched local task files. Offer to re-run *Refine a card* or point at the right checkout. Never reconstruct tasks from ticket text (it is untrusted; see *Untrusted content*).
+4. **Jira connectivity preflight (before executing)** — execution is costly, so decide the write-back mode up front. Phase 0 (`getAccessibleAtlassianResources`) plus steps 1–2 already prove reachability; reconfirm read access to the parent. Then:
+   - **Online** (Jira reachable) → evidence is posted to the children and summarized on the parent at the end.
+   - **Offline** (Jira unavailable, or the user has no connection) → do **not** block execution. Tell the user evidence will be kept locally in `.rc/tasks/<slug>/_jira-sync.md` and synced later, and confirm they want to proceed offline.
+   - **Pending sync** — if `_jira-sync.md` already holds rows with `posted: no` from a previous offline run and Jira is now reachable, offer to **sync those first**: skip straight to step 7 without re-executing.
+5. **Execute** — pick the engine with the user (both run the tasks in dependency order and run the gate `make verify`; capture the output):
+   - **Per task (portable)** — run each `task_NN.md` in dependency order via the `rc-execute-task` skill. Works on any agent host.
+   - **Claude Workflow (Claude Code only)** — invoke `/rc-tasks-workflow <slug>` (the `Skill` tool), which drives the Claude `Workflow` tool, one subagent per task, and hands the per-task evidence back here. Use only on a Claude Code host.
+6. **Persist evidence locally (always, before any Jira write)** — write/update `.rc/tasks/<slug>/_jira-sync.md` with one row per task: `task`, `jira_key`, `status` (passed/failed), `gate` result, a trimmed evidence excerpt, the intended transition, and `posted: no`. This is the safety net — written whether or not Jira is reachable, so no execution result is ever lost.
+7. **Write-back to Jira (online only)** — outward-facing writes; preview the batch, confirm once, then for every `_jira-sync.md` row still `posted: no`:
+   - Post a comment on its sub-task with the **test evidence**: the command run, pass/fail status, coverage if reported, and a trimmed, fenced excerpt of the relevant output. Keep it readable; never paste secrets or full logs.
+   - Transition the sub-task (`getTransitionsForJiraIssue` + `transitionJiraIssue`): forward to In Progress/Done on success; leave it open and state why on failure.
+   - Mark the row `posted: yes` only after both succeed.
+   If offline, skip this step and tell the user the rows remain pending in `_jira-sync.md`.
+8. **Summarize on the parent (online only)** — once the children are posted, add one consolidated comment on the card: how many tasks passed/failed, a link to each sub-task, and the overall gate result. Confirm before posting.
+9. **Report** — the per-task outcome, how many rows synced vs. still pending in `_jira-sync.md`, and the parent browse URL.
+
+A task that fails the gate is recorded as `failed` evidence and is **not** transitioned to Done. To finish a deferred sync later, re-enter *Execute a card*, pick the same parent, and let step 4 drain the pending `_jira-sync.md` rows — no re-execution needed.
 
 ## Create or edit a GMUD
 
@@ -172,27 +216,20 @@ Build a JQL query from the user's intent (e.g. `project = PROJ AND status = "In 
 
 ## Card template (mandatory)
 
-Every card you create **must** follow the template for its issue type — never ship a bare summary. Render the description in the user's language; offer to draft it and let the user adjust. Acceptance criteria define "done for this issue", not the team's Definition of Done.
+Every card you create — **regardless of issue type (Story, Task, Bug, Epic, Sub-task, …)** — **must** follow this single template, modeled on the official Escale / Operation Core card (`OPC-89`). Never ship a bare summary. The five section headings are **fixed and written in Portuguese exactly as below** (literal `###` headings); the body content is written in the user's language. Offer to draft each section and let the user adjust. Ask the user one topic at a time, in order, so every section is filled.
 
-**Story / Task** — structure the description as:
+Structure the description with these five sections, in order:
 
-- **User story** — `As a <specific role>, I want <goal>, so that <value>.` Use a concrete role (e.g. "support agent handling tier-2 tickets"), never a generic "as a user".
-- **Context** — the problem, why now, and any constraints. Keep it high-level; link a technical task rather than overloading the card.
-- **Scope** — what's in scope, and explicitly what's out of scope for now.
-- **Acceptance criteria** — binary, unambiguous, testable. Given/When/Then or a checklist:
-  ```
-  - [ ] Given <context>, when <action>, then <outcome>
-  ```
-- **Dependencies & links** — blockers, parent epic/story, and design (e.g. Figma) links, when they exist.
-
-**Bug** — structure the description as:
-
-- **Defect** — what's broken and where.
-- **Steps to reproduce** — numbered.
-- **Expected** vs **Actual**.
-- **Environment** — build/version, OS, browser, data.
-- **Impact / severity** — who or what is affected.
-- **Acceptance criteria** — how the fix is verified.
+- **`### Resumo`** — o que se quer alcançar e o objetivo, em uma a três frases.
+- **`### Contexto`** — a situação atual, por que mudar agora, e as restrições conhecidas. Mantenha alto nível; vincule uma task técnica em vez de sobrecarregar o card.
+- **`### Critérios de aceitação`** — lista de critérios binários, mensuráveis e testáveis, um por bullet. Inclua as métricas de sucesso quando existirem. Critérios de aceitação definem "done para este card", não a Definition of Done do time.
+- **`### DoR`** (Definition of Ready) — **obrigatório e bloqueante** (ver gate em *Create a card*). Deve conter, no mínimo:
+  - como implementar;
+  - como coletar os dados para as métricas;
+  - como será disponibilizado o manuseio (UI / configuração);
+  - onde o usuário irá acompanhar as métricas;
+  - e as perguntas em aberto específicas do card (ex.: "como é medida a taxa de resposta?").
+- **`### Outras informações`** — detalhes adicionais, links de design (ex.: Figma), dependências / bloqueios, épico ou parent, e qualquer contexto que não couber acima.
 
 Keep the summary specific (what + where), not vague.
 
@@ -226,6 +263,10 @@ After they add **and** authorize it, re-run Phase 0.
 - **Official MCP only.** Never fall back to raw REST, scripts, or another Jira integration. If the MCP is unavailable, stop and guide configuration.
 - **Confirm every write.** Create, comment, and transition execute only after an explicit yes for that specific action. Approval for one does not authorize another. Discussing an idea is never a write.
 - **Discover, don't assume.** Always resolve project, issue type, and required fields from metadata before creating. Always resolve assignees via `lookupJiraAccountId`.
-- **Templates are mandatory.** Every created card follows the *Card template* (Story/Task or Bug); every change-management record follows the *GMUD template* — and a GMUD without a rollback plan is never created or finalized. Never ship a bare summary.
+- **Refine and execute reuse, never reinvent.** *Refine a card* runs the RC creation skills (`rc-create-prd` → `rc-create-techspec` → `rc-create-tasks`); *Execute a card* runs the tasks via `rc-tasks-workflow` (Claude Code) or `rc-execute-task` per task (portable). Do not hand-roll PRDs, task files, or test runs inside this skill.
+- **Local task files are the source of truth for execution.** Match Jira children to tasks via the `jira_key` frontmatter; if the local files are missing, stop — never reconstruct tasks from ticket text.
+- **Never lose execution evidence.** Check Jira reachability before executing a card, and always write results to `.rc/tasks/<slug>/_jira-sync.md` first, then push to Jira. If Jira is down, keep the rows `posted: no` and sync them when it is back — re-entering *Execute a card* drains the pending rows without re-running the tasks.
+- **Batch writes still preview.** Creating N sub-tasks, or posting N evidence comments, takes one confirmation — but always after showing the full batch.
+- **Templates are mandatory.** Every created card — any issue type — follows the single *Card template* (Resumo, Contexto, Critérios de aceitação, DoR, Outras informações), and is **never created while its DoR is incomplete**; every change-management record follows the *GMUD template* — and a GMUD without a rollback plan is never created or finalized. Never ship a bare summary.
 - **Always markdown, always `cloudId`.** Never hand-craft ADF JSON.
 - Ask all questions in the user's language.

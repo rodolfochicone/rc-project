@@ -26,7 +26,7 @@ Fall back to Grep/Glob + Read when Serena is unavailable or for plain-text (non-
 
 ## Resolving the `.rc` base directory
 
-rc supports monorepos, where more than one `.rc` directory can exist. Before reading or writing any `.rc/...` path, resolve which `.rc` directory this run uses; its parent is the base directory. Treat every `.rc/...` path in this skill as relative to that base.
+RC supports monorepos, where more than one `.rc` directory can exist. Before reading or writing any `.rc/...` path, resolve which `.rc` directory this run uses; its parent is the base directory. Treat every `.rc/...` path in this skill as relative to that base.
 
 1. Search the project recursively for `.rc` directories, skipping `node_modules`, `.git`, `vendor`, and any `_archived/` directory.
 2. Resolve the base from what you find:
@@ -95,7 +95,7 @@ rc supports monorepos, where more than one `.rc` directory can exist. Before rea
 6. Enrich each task file.
    - For each task file, check whether it already has `## Overview`, `## Deliverables`, and `## Tests` sections. If all three exist, skip enrichment for that file.
    - Map the task to PRD requirements and TechSpec guidance.
-   - Spawn an Agent tool call to discover relevant files, dependent files, integration points, and project rules for this specific task.
+   - Spawn a `rc-explorer` subagent (cheap/fast read-only recon — see the delegation contract in the `rc` skill, `references/delegation-contract.md`) to discover relevant files, dependent files, integration points, and project rules for this specific task.
    - Fill all template sections from `references/task-template.md`. Every task file must contain each of the following sections, because the task executor reads them as its contract and a missing section leaves it guessing at intent:
      - `## Overview`: what the task accomplishes and why, in 2-3 sentences.
      - `<critical>` block: the standard critical reminders block (read PRD/TechSpec, reference TechSpec, focus on WHAT, minimize code, tests required).
@@ -114,16 +114,16 @@ rc supports monorepos, where more than one `.rc` directory can exist. Before rea
    - Update the task file in place with enriched content.
    - If enrichment fails for one task, continue to the next and report all failures at the end.
 
-7. Validate the task files.
-   - Confirm every task file has the required frontmatter fields (`status`, `title`, `type`, `complexity`, `dependencies`) with valid values, and that `dependencies` reference existing task ids.
-   - If any file is invalid, fix the reported issues and re-check.
-   - Do not mark the skill complete until every task file validates.
+7. Run task validation.
+   - Run the bundled task validator: `node "$CLAUDE_PLUGIN_ROOT/scripts/validate-tasks.mjs" --slug <feature>` (the rc plugin ships it; replaces the legacy `rc tasks validate`).
+   - If it exits non-zero, fix the reported issues and re-run.
+   - Do not mark the skill complete until it exits 0.
 
 ## Project memory
 
-Before decomposing, search `.rc/memory/` (with Grep) for the feature and package terms to
-recover conventions and gotchas that should shape task boundaries and implementation notes
-(see the `rc-project-memory` skill).
+Before decomposing, consult project memory via the `rc-memory` skill (scan
+`.rc/memory/INDEX.md`) for the feature and package terms to recover conventions and gotchas
+that should shape task boundaries and implementation notes.
 
 ## Anti-Patterns
 

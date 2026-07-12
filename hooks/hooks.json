@@ -1,5 +1,15 @@
 {
     "hooks": {
+        "SessionStart": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/memory-load.sh"
+                    }
+                ]
+            }
+        ],
         "PreToolUse": [
             {
                 "matcher": "Bash",
@@ -11,6 +21,10 @@
                     {
                         "type": "command",
                         "command": "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/commit-guard.sh"
+                    },
+                    {
+                        "type": "command",
+                        "command": "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/db-guard.sh"
                     }
                 ]
             },
@@ -46,6 +60,15 @@
                         "command": "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/observe.sh"
                     }
                 ]
+            },
+            {
+                "matcher": "Edit|Write|MultiEdit|Task",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/repair-guidance.sh"
+                    }
+                ]
             }
         ],
         "Stop": [
@@ -64,30 +87,6 @@
                     {
                         "type": "command",
                         "command": "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/notify.sh"
-                    }
-                ]
-            }
-        ],
-        "SessionStart": [
-            {
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/session-recall.sh"
-                    },
-                    {
-                        "type": "command",
-                        "command": "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/phase-reminder.sh"
-                    }
-                ]
-            }
-        ],
-        "PreCompact": [
-            {
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/precompact-capture.sh"
                     }
                 ]
             }

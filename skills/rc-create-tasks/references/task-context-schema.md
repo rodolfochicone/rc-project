@@ -1,6 +1,6 @@
 # Task Frontmatter Schema
 
-Task metadata is parsed from YAML frontmatter by rc's `ParseTaskFile()` function in `internal/core/prompt/common.go`.
+Task metadata is parsed from YAML frontmatter by RC's `ParseTaskFile()` function in `internal/core/prompt/common.go`.
 
 ## Required Fields
 
@@ -32,4 +32,4 @@ The leading underscore prefix is reserved for meta documents:
 
 ## Parser Compatibility
 
-rc reads task files matching the regex `^task_\d+\.md$`. Files with the old `_task_` prefix are not recognized. The file MUST start with YAML frontmatter for `ParseTaskFile()` to read the metadata.
+RC reads task files matching the regex `^task_\d+\.md$`. Files with the old `_task_` prefix are not recognized. The file MUST start with YAML frontmatter for `ParseTaskFile()` to read the metadata.

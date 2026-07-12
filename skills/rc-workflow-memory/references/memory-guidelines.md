@@ -1,6 +1,6 @@
 # Workflow Memory Guidelines
 
-Use these rules to keep rc workflow memory useful across repeated PRD task runs.
+Use these rules to keep RC workflow memory useful across repeated PRD task runs.
 
 ## File Roles
 

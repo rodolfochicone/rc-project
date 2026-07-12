@@ -1,8 +1,8 @@
 {
     "name": "rc",
-    "version": "1.0.3",
-    "description": "rc AI-assisted development workflow skills, commands, hooks and agents",
+    "version": "0.42.0",
+    "description": "RC AI-assisted development workflow skills and commands",
     "author": {
-        "name": "Escale"
+        "name": "Rodolfo Chicone"
     }
 }

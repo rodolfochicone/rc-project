@@ -15,7 +15,7 @@ The context window is a budget, not free space. Every always-loaded agent descri
 Discover and measure each contributor (skip what does not exist):
 
 - **Always-loaded prose**: `CLAUDE.md`, `AGENTS.md`, and any always-on rules/`.cursor/rules` injected globally.
-- **Agents**: `.claude/agents/**`, `.opencode/agent/**`, `~/.rc/agents/**` — every agent's `description` is loaded whenever the orchestrator considers delegating (Task tool). Long descriptions cost on every invocation.
+- **Agents**: `.claude/agents/**`, `.opencode/agent/**`, and plugin-bundled `agents/**` — every agent's `description` is loaded whenever the orchestrator considers delegating (Task tool). Long descriptions cost on every invocation.
 - **Skills**: bundled + installed `*/SKILL.md`. The `description` frontmatter is what loads for routing; the body loads only when the skill activates.
 - **MCP servers**: each enabled server's tool schemas load up front. Estimate **~400–600 tokens per tool**; a server exposing 20 tools is ~10k tokens always-on.
 - **Slash commands**: their `description`/`argument-hint`.

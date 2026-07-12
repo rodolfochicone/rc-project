@@ -29,7 +29,7 @@ Fall back to Grep/Glob + Read when Serena is unavailable or for plain-text (non-
 
 ## Resolving the `.rc` base directory
 
-rc supports monorepos, where more than one `.rc` directory can exist. Before reading or writing any `.rc/...` path, resolve which `.rc` directory this run uses; its parent is the base directory. Treat every `.rc/...` path in this skill as relative to that base.
+RC supports monorepos, where more than one `.rc` directory can exist. Before reading or writing any `.rc/...` path, resolve which `.rc` directory this run uses; its parent is the base directory. Treat every `.rc/...` path in this skill as relative to that base.
 
 1. Search the project recursively for `.rc` directories, skipping `node_modules`, `.git`, `vendor`, and any `_archived/` directory.
 2. Resolve the base from what you find:
@@ -130,10 +130,10 @@ rc supports monorepos, where more than one `.rc` directory can exist. Before rea
 
 ## Project memory
 
-Before reviewing, search `.rc/memory/` (with Grep) for the implementation's terms to recover
-the project's conventions and known gotchas, and check the change against them (see the
-`rc-project-memory` skill). When the review surfaces a durable, non-obvious gotcha, record it
-as a `.rc/memory/gotcha__<key>.md` file.
+Before reviewing, consult project memory (the `rc-memory` skill, scanning `.rc/memory/INDEX.md`) for the implementation's terms to recover the
+project's conventions and known gotchas, and check the change against them (see the
+`rc-memory` skill). When the review surfaces a durable, non-obvious gotcha, record
+it via the `rc-memory` skill (scope: gotcha).
 
 ## Critical Rules
 

@@ -20,12 +20,12 @@ Fall back to Grep/Glob + Read when Serena is unavailable or for plain-text (non-
 
 ## Required Inputs
 
-- The analytical prompt: the question or topic to investigate (e.g. "how does session auth work", "why does the cache return stale data under load", "is the locking around the shared registry consistent or is there a race", "what is the impact of changing the config file format", "where does input validation happen and is it consistent").
+- The analytical prompt: the question or topic to investigate (e.g. "how does run shutdown work", "why does the daemon exit before flushing the journal", "is the locking around the run registry consistent or is there a race", "what is the impact of changing the event journal format", "where does config validation happen and is it consistent").
 - Optional: a slug or scope (specific files/directories/packages) to focus the analysis.
 
 ## Resolving the `.rc` base directory
 
-rc supports monorepos, where more than one `.rc` directory can exist. Before reading or writing any `.rc/...` path, resolve which `.rc` directory this run uses; its parent is the base directory. Treat every `.rc/...` path in this skill as relative to that base.
+RC supports monorepos, where more than one `.rc` directory can exist. Before reading or writing any `.rc/...` path, resolve which `.rc` directory this run uses; its parent is the base directory. Treat every `.rc/...` path in this skill as relative to that base.
 
 1. Search the project recursively for `.rc` directories, skipping `node_modules`, `.git`, `vendor`, and any `_archived/` directory.
 2. Resolve the base from what you find:
@@ -76,9 +76,9 @@ rc supports monorepos, where more than one `.rc` directory can exist. Before rea
 
 ## Project memory
 
-Before investigating, search `.rc/memory/` (with Grep) for the question's key terms to recover
-prior decisions, conventions, and gotchas that may already answer or inform it (see the
-`rc-project-memory` skill).
+Before investigating, consult project memory (the `rc-memory` skill, scanning `.rc/memory/INDEX.md`) for the question's key terms to recover prior
+decisions, conventions, and gotchas that may already answer or inform it (see the
+`rc-memory` skill).
 
 ## Critical Rules
 

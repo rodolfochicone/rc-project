@@ -1,0 +1,10 @@
+{
+  "name": "rc-project",
+  "version": "0.2.4",
+  "private": true,
+  "description": "RC — skills, hooks, commands and agents for Claude Code, OpenCode and other agent tools",
+  "scripts": {
+    "plugin:smoke": "node scripts/plugin-smoke.mjs",
+    "plugin:validate-tasks": "node scripts/validate-tasks.mjs"
+  }
+}

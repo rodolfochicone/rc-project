@@ -26,7 +26,7 @@ Fall back to Grep/Glob + Read/Edit when Serena is unavailable or for plain-text 
 
 ## Resolving the `.rc` base directory
 
-rc supports monorepos, where more than one `.rc` directory can exist. Before reading or writing any `.rc/...` path, resolve which `.rc` directory this run uses; its parent is the base directory. Treat every `.rc/...` path in this skill as relative to that base.
+RC supports monorepos, where more than one `.rc` directory can exist. Before reading or writing any `.rc/...` path, resolve which `.rc` directory this run uses; its parent is the base directory. Treat every `.rc/...` path in this skill as relative to that base.
 
 1. Search the project recursively for `.rc` directories, skipping `node_modules`, `.git`, `vendor`, and any `_archived/` directory.
 2. Resolve the base from what you find:
@@ -64,9 +64,9 @@ rc supports monorepos, where more than one `.rc` directory can exist. Before rea
 
 ## Project memory
 
-Before applying the plan, search `.rc/memory/` (with Grep) for the target terms to recover
-relevant decisions and gotchas (see the `rc-project-memory` skill). When the change establishes
-a durable decision or reveals a non-obvious gotcha, record it as a `.rc/memory/` file.
+Before applying the plan, consult project memory (the `rc-memory` skill, scanning `.rc/memory/INDEX.md`) for the target terms to recover relevant
+decisions and gotchas (see the `rc-memory` skill). When the change establishes a
+durable decision or reveals a non-obvious gotcha, record it via the `rc-memory` skill.
 
 ## Critical Rules
 

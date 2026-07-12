@@ -1,230 +1,335 @@
 <div align="center">
-  <img src="imgs/rc-avatar-dark.png" alt="rc" width="140">
-
-  <h1>rc</h1>
-  <p><strong>AI-assisted development workflows as skills, slash commands, hooks, and agents — for Claude Code and OpenCode.</strong></p>
+  <h1>RC</h1>
+  <p><strong>Orchestrate AI coding agents from idea to shipped code — one structured pipeline, shipped as a plugin.</strong></p>
   <p>
-    <a href="LICENSE">
-      <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT">
-    </a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
+    <a href="https://github.com/rodolfochicone/rc-project/releases"><img src="https://img.shields.io/github/v/release/rodolfochicone/rc-project?include_prereleases" alt="Release"></a>
   </p>
 </div>
 
-rc is a bundle of **skills, slash commands, hooks, and agents** that drive the full lifecycle of AI-assisted development — product ideation (PRD), technical specification, codebase-informed task breakdown, task execution, and PR-review remediation — directly inside your coding agent.
+RC is an **agent plugin** — skills, commands, agents, and hooks — that drives the full lifecycle of
+AI-assisted development: optional ideation → PRD → TechSpec → tasks → execution → review →
+remediation. It runs **inside your agent host** (Claude Code, OpenCode, and other tools); every
+artifact is plain markdown under a project's `.rc/`. No binary, no daemon, no lock-in.
 
-Everything here is **plain markdown and shell**. There is no binary to install and nothing to build: the skills run inside Claude Code or OpenCode, the commands are slash commands, and the hooks are shell scripts your agent invokes at lifecycle events.
+## ✨ Highlights
 
-## 📦 Install
+- **Idea to code in a structured pipeline.** Each phase produces plain-markdown artifacts that feed
+  the next: idea (optional) → PRD → TechSpec → tasks → execution → review. Start from an idea for full
+  research and debate, or jump straight to a PRD if the scope is clear.
+- **Runs in your host.** Claude Code, OpenCode, and other agent tools load the same skills, commands,
+  agents, and hooks — auto-discovered from the plugin.
+- **Cost-tiered specialists.** Bundled leaf-worker agents route work to the right model: recon on a
+  cheap/fast tier (`rc-explorer`, `rc-librarian` on haiku), hard reasoning/review on the strong tier
+  (`rc-oracle` on opus), bounded implementation mid-tier (`rc-fixer` on sonnet).
+- **Codebase-aware.** Tasks aren't generic prompts — RC explores your codebase to discover patterns
+  and grounds each task in real project context.
+- **Memory & instincts between runs.** Curated per-project memory, cross-task workflow memory, and an
+  observe→distill instincts loop keep context fresh without manual bookkeeping.
+- **Multi-perspective review.** `rc-review-round` (multi-lens) and `rc-review-workflow` (automated
+  review→fix loop) find and remediate issues.
+- **Markdown everywhere.** PRDs, specs, tasks, reviews, and ADRs are human-readable, diffable markdown.
+- **Resilience hooks.** Guardrails (git/commit/gate/db), formatting, observability, and a repair-guidance
+  hook that helps the agent recover from a failed edit or delegation.
+- **Local-first.** All state lives in `.rc/` — nothing leaves your machine.
 
-### Claude Code (plugin marketplace)
+## 📦 Installation
+
+RC installs through your host's plugin/marketplace mechanism; skills, commands, agents, and hooks are
+auto-discovered.
+
+**Claude Code:**
 
 ```text
-/plugin marketplace add rodolfochicone/rc-project   # register the marketplace
-/plugin install rc@rc-project                       # install the plugin
+/plugin marketplace add rodolfochicone/rc-project
+/plugin install rc@rc-project
 ```
 
-Plugin skills are namespaced under the plugin, so slash commands surface as `/rc:rc-create-prd`, `/rc:rc-create-techspec`, `/rc:rc-create-tasks`, `/rc:rc-review-round`, and so on. Update with `/plugin marketplace update`.
+Commands are namespaced `/rc:rc-*`; update with `/plugin marketplace update`. The marketplace add
+clones the private repo, so GitHub read access is required (`gh auth login` or `GH_TOKEN`).
 
-The plugin ships from this repo's layout (`skills/`, `commands/`, `agents/`, `hooks/hooks.json`) — Claude Code discovers them by convention. See [`docs/claude-code-plugin.md`](docs/claude-code-plugin.md) for the full runbook.
+**OpenCode and other hosts:** clone this repo and symlink its asset directories — skills into the
+cross-tool `~/.agents/skills` path and the OpenCode-specific agents/commands/plugin (under
+`opencode/`) into `~/.config/opencode/`; update with `git pull`. Step-by-step in
+[docs/claude-code-plugin.md](docs/claude-code-plugin.md).
 
-> **Repo is private.** `/plugin marketplace add` clones this repository, so the Claude Code environment needs GitHub read access — sign in with `gh auth login` or export `GH_TOKEN` / `GITHUB_TOKEN` before adding the marketplace.
+> **Recommended companion: [Serena MCP](https://github.com/oraios/serena).** When Serena is connected,
+> the code-touching skills (analyze, create-tasks/techspec/prd, execute-task, fix-analysis,
+> fix-reviews, review-round, code-review) prefer its LSP-backed symbolic tools for more accurate,
+> token-efficient navigation and editing, falling back to Grep/Glob when unavailable. Install it with
+> `uv` per Serena's docs.
 
-### OpenCode
+## 🔄 How It Works
 
-OpenCode reads agents, commands, and plugins from its config directory. Copy the `opencode/` bundle into place:
-
-```bash
-# Project-local (recommended)
-cp -R opencode/agent    .opencode/agent
-cp -R opencode/commands .opencode/command
-cp -R opencode/plugin   .opencode/plugin
-
-# or global
-cp -R opencode/agent    ~/.config/opencode/agent
-cp -R opencode/commands ~/.config/opencode/command
-cp -R opencode/plugin   ~/.config/opencode/plugin
+```text
+idea (optional) → PRD → TechSpec → tasks → execution → review → remediation → ship
+      /rc-idea-factory        /rc-create-*        rc-tasks-workflow /       /rc-git
+                                                  rc-execute-task
 ```
 
-The `opencode/plugin/rc-hooks.ts` plugin gives OpenCode Claude-parity hook enforcement by shelling out to the shared scripts under `hooks/scripts/`.
+Each phase is a skill. Artifacts land under `.rc/tasks/<slug>/` (`_prd.md`, `_techspec.md`, task
+files, `adrs/`, `reviews-NNN/`) and are consumed by the next phase. See `skills/rc/SKILL.md` for the
+full reference and `skills/rc/references/workflow-guide.md` for a step-by-step walkthrough.
 
-## 🧩 What's inside
+---
 
-| Directory        | Contents                                                                             |
-| ---------------- | ------------------------------------------------------------------------------------ |
-| `skills/`        | 31 skills (`SKILL.md` + references) — the workflow logic                             |
-| `commands/`      | Claude Code slash commands that route to the skills                                  |
-| `agents/`        | 12 Claude Code plugin agents — one per pipeline phase plus two read-only helpers     |
-| `hooks/`         | `hooks.json` + shell scripts run at agent lifecycle events                           |
-| `opencode/`      | OpenCode agents, commands, and the `rc-hooks` plugin                                 |
-| `rules/`         | Coding rules injected into agent context (`common.md`, `go.md`)                      |
-| `.claude-plugin/`| Plugin + marketplace manifests                                                       |
+## 🧩 Skill catalog
 
-## 🛠️ Skills
+Skills run **inside** your AI agent — no context switching. Every skill is namespaced under the
+plugin: the host auto-routes to a skill by its `description`, or you can invoke one explicitly as
+`/rc:<skill>` (e.g. `/rc:rc-analyze`). The catalog below is grouped by job; **"Use when"** tells the
+agent (and you) exactly when each one fires.
 
-The core pipeline — Idea → PRD → TechSpec → Tasks → Execution → Review — where each phase produces plain markdown artifacts under `.rc/tasks/<name>/` that feed the next:
+### Meta — start here
 
-| Skill                  | Purpose                                                             |
-| ---------------------- | ------------------------------------------------------------------ |
-| `rc`                   | Orchestrator — routes to the right phase skill                     |
-| `rc-create-prd`        | Idea → Product Requirements Document with ADRs                     |
-| `rc-create-techspec`   | PRD → Technical Specification with architecture exploration        |
-| `rc-create-tasks`      | PRD + TechSpec → independently implementable task files            |
-| `rc-execute-task`      | Execute one task end-to-end: implement, validate, track            |
-| `rc-review-round`      | Comprehensive code review → structured issue files                 |
-| `rc-fix-reviews`       | Triage, fix, verify, and resolve review issues                     |
-| `rc-fix-analysis`      | Turn an analysis plan into applied code changes                    |
-| `rc-final-verify`      | Enforce verification evidence before any completion claim          |
-| `rc-git`               | Branch, push, and open a PR with a confirmation at each step       |
+| Skill | Purpose | Use when |
+| --- | --- | --- |
+| `rc` | Explains RC itself — pipeline, artifacts, agents, hooks, config. | You want to know what exists or how the workflow fits together (not to run a step). |
+| `rc-find-skills` | Discovers and installs agent skills. | "Is there a skill for X?", "find a skill that…", extending capabilities. |
+| `rc-enrichment-prompt` | Rewrites a rough request into a structured, execution-ready prompt (Objective / Context / Requirements / Acceptance criteria). | A request is vague/underspecified, or you ask to "enhance/enrich this prompt" before work starts. |
+| `rc-to-prompt` | Packages code + context into a detailed prompt for **another** LLM to solve (the *what*, not the *how*). | Handing a problem off to an external model or teammate. |
+| `rc-brainstorming` | Explores intent, requirements, and design before implementation. | Before any creative/greenfield work — features, components, new behavior. |
+| `rc-council` | Multi-advisor debate (3–5 archetypes) with opening statements, tensions, and synthesis. | High-impact architecture/tech/product trade-offs; stress-testing a PRD or spec. Not for yes/no lookups. |
 
-Quality, analysis, and review:
+### Pipeline — plan
 
-| Skill                | Purpose                                                                       |
-| -------------------- | ----------------------------------------------------------------------------- |
-| `rc-analyze`         | Deep, evidence-based diagnosis / tracing of existing code                     |
-| `rc-code-review`     | Review a change set for correctness, security, and performance defects        |
-| `rc-simplify-review` | Single-lens over-engineering pass → ranked delete-list                        |
-| `rc-audit`           | Audit the agent config surface (settings, MCP, hooks) for secrets and risks   |
-| `rc-doctor`          | Health-check the rc installation itself — hooks, manifests, parity, frontmatter |
-| `rc-gan`             | Adversarial generator↔evaluator loop that drives subjective quality up        |
+| Skill | Purpose | Use when |
+| --- | --- | --- |
+| `rc-create-prd` | Idea → Product Requirements Document (interactive brainstorming + codebase/web research + ADRs). | Starting a new feature/product or capturing requirements. Not for tech design or code. |
+| `rc-create-techspec` | PRD → Technical Specification via architecture exploration and clarification. | A PRD exists and needs an implementation design. |
+| `rc-create-tasks` | PRD + TechSpec → independently implementable task files, enriched from the codebase. | Breaking a spec into executable, context-grounded tasks. |
 
-Deep work, execution, and navigation:
+### Pipeline — execute
 
-| Skill          | Purpose                                                                          |
-| -------------- | -------------------------------------------------------------------------------- |
-| `rc-deepwork`  | Scheduler discipline for heavy sessions: plan → review → phased, gated execution |
-| `rc-loop`      | Generate → verify → retry against an explicit pass/fail success gate             |
-| `rc-worktrees` | Git worktrees as isolated lanes for parallel or risky work                       |
-| `rc-codemap`   | Hierarchical per-directory `codemap.md` for token-efficient navigation           |
+| Skill | Purpose | Use when |
+| --- | --- | --- |
+| `rc-execute-task` | Implements one task end-to-end: code, validate, track, commit. | A prompt includes a concrete task file to implement. Not for generic coding without a task file. |
+| `rc-tasks-workflow` | Runs a slug's task files via the Claude Code `Workflow` tool — one subagent per task, in dependency order, with test evidence. | Executing all of a slug's tasks, Claude-orchestrated (Claude Code only). |
+| `rc-fix-analysis` | Applies the "Implementation plan" from a prior `rc-analyze` report, with tests + verification. | An analysis exists and you want its plan implemented. |
 
-Memory, context, and learning:
+### Analysis & understanding
 
-| Skill                 | Purpose                                                                    |
-| --------------------- | -------------------------------------------------------------------------- |
-| `rc-workflow-memory`  | Cross-task context so agents pick up where the last run left off           |
-| `rc-project-memory`   | Durable project facts that persist across sessions                         |
-| `rc-instincts`        | Distill recurring corrections into atomic, confidence-scored instincts     |
-| `rc-reflect`          | Review recent work and recommend the smallest reusable asset to add        |
-| `rc-context-budget`   | Audit what consumes the context window and recommend the highest-impact trims |
-| `rc-compact`          | Compact the conversation deliberately at logical task boundaries           |
+| Skill | Purpose | Use when |
+| --- | --- | --- |
+| `rc-analyze` | Deep, evidence-based read-only analysis → thorough report ending in an actionable plan. | Diagnose a bug, trace a flow, assess impact/feasibility. Not to review a diff for defects. |
+| `rc-codemap` | Builds/refreshes a per-directory `codemap.md`; only re-maps changed dirs. | Read first in exploration-heavy tasks to cut token cost. |
+| `rc-refactoring-analysis` | Fowler-catalog refactoring audit **plus** architectural audit (dead code, duplication, anti-patterns, type confusion) → prioritized report in `docs/_refacs/`. | Auditing code quality/codebase health, finding dead code, or preparing a refactoring sprint. |
+| `rc-graphify` | Turns a codebase (or any input) into a persistent knowledge graph with query/path/explain tools. | Questions about architecture, file relationships, or when `graphify-out/` exists. |
+| `rc-ubs` | Runs the Ultimate Bug Scanner over code. | Pre-commit quality checks or validating AI-generated code for bugs/security. |
 
-Docs, APIs, and integrations:
+### Review & remediation
 
-| Skill            | Purpose                                                     |
-| ---------------- | ----------------------------------------------------------- |
-| `rc-readme`      | Generate or refresh a README grounded in the real codebase  |
-| `rc-openapi`     | Produce an OpenAPI spec from the codebase                   |
-| `rc-postman`     | Produce a Postman collection                                |
-| `rc-jira`        | Create, read, comment, and transition Jira issues via MCP   |
-| `rc-new-project` | Scaffold a new project agentically                          |
+| Skill | Purpose | Use when |
+| --- | --- | --- |
+| `rc-code-review` | Rigorous, standards-driven review of the change set → categorized, severity-ranked report in `.rc/`. | On-demand quality gate of a diff/branch before merge. |
+| `rc-review-round` | Multi-lens review → structured issue files compatible with `rc-fix-reviews`. | Creating a manual review round (no external provider). |
+| `rc-review-workflow` | Automated review→fix→re-review loop via the `Workflow` tool until clean or a round cap. | Hands-off multi-lens review-and-remediate on a slug (Claude Code only). |
+| `rc-simplify-review` | Single lens — over-engineering only → ranked delete-list with net lines/deps removable. | Opt-in pre-PR bloat pass, or auditing legacy code. |
+| `rc-fix-reviews` | Triage, fix, verify, and resolve batched review issues under `reviews-NNN/`. | Remediating an existing review round. |
+| `rc-fix-coderabbit-review` | End-to-end CodeRabbit remediation by PR number (export → fix → resolve threads). | Clearing CodeRabbit feedback on a specific PR. |
+| `rc-adversarial-review` | Spawns reviewers on the **opposite** model (Claude↔Codex) to challenge the work. | You want a true cross-model critical pass. |
+| `rc-impl-peer-review` | Optional cross-model Opus peer review of a diff, packaged for user-directed fixes. | You explicitly ask for an independent Opus review before commit/PR. |
 
-## ⌨️ Slash commands
+### Quality, testing & discipline
 
-Claude Code commands (`commands/`) and OpenCode commands (`opencode/commands/`) route to the skills:
+| Skill | Purpose | Use when |
+| --- | --- | --- |
+| `rc-final-verify` | Enforces fresh verification evidence before any "done"/commit/PR claim. | About to report success, hand off, or commit. |
+| `rc-gan` | Adversarial generator↔evaluator loop that **exercises the running artifact** to drive subjective quality up to a target. | Refining UI/UX, copy, or CLI ergonomics that a pass/fail gate can't capture. |
+| `rc-tdd` | Red-green-refactor loop with vertical tracer-bullet slices. | Building features/fixing bugs test-first; integration-style tests. |
+| `rc-testing-anti-patterns` | Prevents testing mock behavior, test-only production methods, and blind mocking. | Writing/changing tests or adding mocks. |
+| `rc-systematic-debugging` | Structured root-cause process before proposing fixes. | Any bug, test failure, or unexpected behavior. |
+| `rc-no-workarounds` | Gate that rejects hacks/symptom patches (type assertions, lint suppressions, error swallowing…). | Debugging, fixing, or reviewing — to force root-cause fixes. |
+| `rc-extreme-software-optimization` | Profile-driven perf optimization with behavior proofs. | "slow / bottleneck / p95 / latency / throughput" or algorithmic wins. |
+| `rc-qa-execution` | Full-project QA as a real user: discover contract, run build/lint/test/startup, exercise flows E2E, fix regressions, re-gate. | Validating a branch/release/migration/refactor. Pairs with `rc-qa-report`. |
+| `rc-qa-report` | Test plans, test cases, regression suites, and bug reports (Figma MCP validation). | Planning/documenting QA before execution. |
 
-`/rc-plan` · `/rc-exec` · `/rc-pipe` · `/rc-review` · `/rc-git` · `/rc-gan` · `/rc-docs` (Claude) · `/rc-prd` · `/rc-techspec` · `/rc-tasks` · `/rc-fix` (OpenCode)
+### Docs
 
-## 🤖 Agents
+| Skill | Purpose | Use when |
+| --- | --- | --- |
+| `rc-readme` | Rewrites `README.md` from the real codebase (evidence-based), or guides writing/improving one by hand with templates matched to audience/project type. | Generating/refreshing a README, syncing docs after features land, or drafting/reviewing a README manually. |
+| `rc-openapi` | Discovers HTTP endpoints/schemas from source → keeps `openapi.yaml` in sync. | After API changes, or to bootstrap a spec. |
+| `rc-postman` | Discovers endpoints/contracts → Postman Collection (v2.1.0) + environments. | After routes/request schemas change. |
 
-One agent per pipeline phase plus two read-only support agents, each pinning a model to its role. In Claude Code they live under `agents/` (invoke via the Task tool or `@rc-*`); in OpenCode under `opencode/agent/`. The `rc` agent orchestrates the rest.
+### Ship & git
 
-| Agent          | Role                                    | Model  |
-| -------------- | --------------------------------------- | ------ |
-| `rc`           | Orchestrates the full pipeline          | sonnet |
-| `rc-prd`       | Idea → PRD                              | opus   |
-| `rc-techspec`  | PRD → TechSpec                          | opus   |
-| `rc-tasks`     | PRD + TechSpec → task files             | sonnet |
-| `rc-exec`      | Implement one hard task end to end      | opus   |
-| `rc-exec-bulk` | Implement many simple tasks in parallel | sonnet |
-| `rc-review`    | Independent, critical code review       | opus   |
-| `rc-fix`       | Resolve review/QA issues at root cause  | opus   |
-| `rc-gan`       | Adversarial quality loop (UI/CLI/copy)  | opus   |
-| `rc-git`       | Branch, commit messages, PR             | haiku  |
-| `rc-explorer`  | Fast read-only codebase navigation      | haiku  |
-| `rc-librarian` | Read-only library / docs research       | sonnet |
+| Skill | Purpose | Use when |
+| --- | --- | --- |
+| `rc-git` | Ships work as a branch + PR (confirming each outward step and the PR target), and handles rebases / conflict resolution while preserving a clean history. | Shipping local work as a branch + PR, or rebasing feature branches / resolving conflicts. Not for in-place commits or force-push. |
+
+### Memory & context
+
+| Skill | Purpose | Use when |
+| --- | --- | --- |
+| `rc-memory` | The single durable, cross-session memory: curated project facts **and** distilled instincts, as markdown under `.rc/memory/`. | Consult before working; record durable facts/learnings after. |
+| `rc-workflow-memory` | Task-scoped memory across a slug's task executions under `.rc/tasks/{name}/memory/`. | A task prompt provides workflow-memory paths to read/update/promote. |
+| `rc-compact` | Deliberate conversation compaction at logical boundaries, driven by real token usage. | Long multi-phase runs, to control what context survives. |
+| `rc-context-budget` | Audits what fills the context window (agents, skills, rules, MCP schemas) and recommends cuts. | Sessions compact too early, or before adding more tooling. |
+| `rc-lesson-learned` | Extracts engineering lessons from recent git history. | "What's the lesson here / takeaway?" reflection on a diff. |
+
+### Config, security, integrations & scaffolding
+
+| Skill | Purpose | Use when |
+| --- | --- | --- |
+| `rc-audit` | Security-audits the agent config surface (`.claude`, `.mcp.json`, hooks, installed skills) for secrets, over-broad perms, injection vectors. | Reviewing an agent setup before sharing, or a periodic config audit. |
+| `rc-jira` | PM-mode Jira via the Atlassian MCP: shape ideas, create/refine cards into PRD/TechSpec/sub-tasks, execute child tickets, GMUDs. | Any Jira work through the official MCP, with confirmation on writes. |
+| `rc-new-project` | Scaffolds a new private repo in `rodolfochicone` from the TypeScript template. | Starting a brand-new TypeScript project. |
+
+### Skill authoring & self-improvement
+
+| Skill | Purpose | Use when |
+| --- | --- | --- |
+| `rc-skill-best-practices` | Authors professional-grade skills to the agentskills.io spec (validation script + template + checklist). | Creating a new skill directory or optimizing metadata for discovery. |
+| `rc-autoresearch` | Autonomously optimizes a skill: run → score against evals → mutate prompt → keep wins. | "Improve/optimize/benchmark this skill." |
+| `rc-hookify` | Authors a new fail-open RC hook from a plain-language rule: writes the script, wires `hooks.json`, documents + verifies it. | Turning an every-time guardrail/formatter/observer into a hook. |
+
+### Frontend & design
+
+| Skill | Purpose | Use when |
+| --- | --- | --- |
+| `rc-frontend-design` | Distinctive, production-grade interfaces that avoid generic AI aesthetics. | Building web components/pages/apps, or when a design skill needs project context. |
+| `rc-interface-design` | Dashboards, admin panels, tools, interactive products (not marketing pages). | App/tool UI with craft and consistency. |
+| `rc-minimalist-ui` | Editorial minimalism: warm monochrome, typographic contrast, flat bento grids. | You want that specific clean, document-style aesthetic. |
+| `rc-redesign-existing-projects` | Audits and upgrades an existing site/app to premium quality without breaking it. | Modernizing existing UI in any CSS framework. |
+| `rc-a11y` | Accessibility (WCAG 2.2 AA): semantic HTML, ARIA, keyboard nav, focus management, contrast, screen readers. | Building or reviewing UI that must be accessible. |
+| `rc-shadcn-ui` | Complete shadcn/ui patterns: install, config, forms (RHF + Zod), theming, components. | Building UI with shadcn/ui + Radix + Tailwind. |
+| `rc-storybook-stories` | Create/update/refactor Storybook stories to project patterns. | Adding stories for new components or fixing Storybook issues. |
+| `rc-tech-logos` | Installs official tech/brand logos from the Elements registry. | Needing brand logos for landing pages, auth UIs, integrations. |
+| `rc-drawio` | Diagrams: flowcharts, architecture, ER, sequence, class, wireframes → PNG/SVG/PDF. | Any request to draw/generate a diagram or `.drawio` file. |
+
+### Content & media
+
+| Skill | Purpose | Use when |
+| --- | --- | --- |
+| `rc-seo` | Technical, on-page, and programmatic SEO — audit, content optimization, pages at scale. | Auditing or optimizing a site/content for search ranking. Not for paid media or off-page/backlinks. |
+| `rc-video` | Video work — local `ffmpeg` processing, content/script planning, optional VideoDB. | Cutting/transcoding/subtitling media, or planning video content (Reels/Shorts/YouTube). |
+
+### Library & framework references
+
+Deep, opinionated guides for a specific library/runtime — auto-fire on the matching tech.
+
+| Skill | Use when |
+| --- | --- |
+| `rc-react` | React 19+ components, hooks, state, `useEffect` patterns, TS integration. |
+| `rc-vercel-react-best-practices` | React/Next.js **performance** patterns + composition patterns (compound components, render props, context) — Vercel Engineering. |
+| `rc-tanstack` | TanStack ecosystem — Query/DB, Form, Router overview **plus** per-rule best practices for Query, Router and Start (server functions, middleware, SSR, auth). |
+| `rc-app-renderer-systems` | Domain feature systems under a `systems/` directory (service layer + Query hooks + XState). |
+| `rc-tailwindcss` | Tailwind CSS v4 patterns, responsive layouts, `tailwind-variants`. |
+| `rc-zustand` | Zustand store organization and client-state patterns. |
+| `rc-typescript-advanced` | Generics, conditional/mapped types, template literals, utility types. |
+| `rc-zod` | Zod schemas, parsing, `safeParse`, `z.infer`, error handling. |
+| `rc-vitest` | Vitest: tests, mocking, coverage, filtering, fixtures. |
+| `rc-golang-pro` | Idiomatic concurrent Go, gRPC/REST microservices, pprof, generics. |
+| `rc-python` | Idiomatic typed Python 3.12+ — PEP 695 generics, asyncio/TaskGroup, pytest, ruff, uv packaging. |
+| `rc-ai-sdk` | Vercel AI SDK: `generateText`/`streamText`, tools, agents, providers, streaming. |
+
+### Backend, data & operations
+
+| Skill | Purpose | Use when |
+| --- | --- | --- |
+| `rc-sql` | Relational DB — query optimization (EXPLAIN, indexes, N+1), schema design; read-only by default. | Writing/reviewing queries or modeling schema. Not for repo-specific migrations or NoSQL. |
+| `rc-observability` | Logs, metrics, traces, and incident response — instrumentation, SLOs, postmortems. | Instrumenting a service, defining alerts, or running root-cause analysis. |
+| `rc-resilience` | Event-driven resilience — idempotency, retries/backoff, DLQ, poison messages, timeouts, circuit breaker. | Designing/reviewing message producers/consumers (EventBridge, SQS) or cross-service calls. |
+
+### TUI, CLI & multi-agent
+
+| Skill | Use when |
+| --- | --- |
+| `rc-tui-design` | Framework-agnostic TUI design — layouts, color, keybindings, dashboards. |
+| `rc-tui-glamorous` | Charmbracelet ecosystem router — Gum (shell), Lip Gloss, Bubble Tea, Wish/SSH. |
+| `rc-bubbletea` | Deep Go Bubble Tea app patterns — Elm architecture, dual-pane, weight-based layout. |
+| `rc-smux` | Control tmux panes and message between AI agents (tmux-bridge CLI). |
+| `rc-smux-rc-pairing` | Interactive tmux pairing: orchestrator + Codex author + Claude challenger driving a RC run. |
+
+### Research
+
+| Skill | Use when |
+| --- | --- |
+| `rc-exa-web-search-free` | Free web/code/company search via the Exa MCP (no API key). |
+
+### Project-specific (Escale)
+
+| Skill | Use when |
+| --- | --- |
+| `rc-automation-guides` | Working in the `rc-automation` repo — routes to the right dev/ops guide (endpoint, migration, event, deploy, docs…). |
+| `rc-portal-design` | Any UI work in `rc-portal` — design system, tokens, Tailwind, Storybook, a11y gates. |
+
+### Bundled extension
+
+Optional, under `extensions/rc-idea-factory`: **`rc-idea-factory`** — raw idea → structured idea spec
+with market research, business analysis, and a council debate. Sits before `rc-create-prd`.
+
+---
+
+## ⌨️ Commands
+
+Commands are explicit entry points (`/rc:<command>`) that chain skills for a whole phase. Skills
+auto-fire from context; commands are what you type to drive a stage on purpose.
+
+| Command | What it does |
+| --- | --- |
+| `/rc-plan` | Planning pipeline — PRD → TechSpec → task breakdown, in sequence. |
+| `/rc-exec` | Executes a feature's implemented tasks via `rc-execute-task`. |
+| `/rc-review` | Review-and-fix loop — one simplify pass, then up to 3 rounds of review-round + fix-reviews. |
+| `/rc-pipe` | The **full** pipeline end to end — plan → execute → review → docs → PR. |
+| `/rc-gan` | Adversarial quality loop for subjective quality (UI/UX, CLI, copy) against a target score. |
+| `/rc-git` | Ships current work as a branch + PR (`rc-git`), then distills session learnings (`rc-memory`). |
+| `/rc-docs` | Generates/refreshes project docs — README, Postman, OpenAPI. |
+| `/rc-commit-msg` | Generates a Conventional Commit message from the **staged** diff (does not commit). |
+| `/rc-plano` | Lightweight Explore→Plan flow — investigate first, deliver a plan for approval, no code yet. |
+
+## 🤖 Bundled specialist agents
+
+Leaf-worker subagents (under `agents/`, discovered as `rc:<name>`) you delegate to, each on a
+cost-appropriate model tier. They carry no `Task`/`Agent` tool, so they cannot spawn further
+subagents (the recursion cap). See `skills/rc/references/delegation-contract.md`.
+
+| Agent | Lane | Model | Use when |
+| --- | --- | --- | --- |
+| `rc-explorer` | Read-only codebase recon — returns a compressed map, not file dumps. | haiku | Start of any non-trivial task, to discover what exists. |
+| `rc-librarian` | External docs / web / library research. | haiku | The task hinges on current, version-specific library or API behavior. |
+| `rc-fixer` | Bounded implementation of well-scoped, mechanical work. | sonnet | Objective, files, and constraints are known — execution, not discovery. |
+| `rc-oracle` | Strategic advisor & read-only reviewer for high-stakes calls. | opus | Major architectural decisions or hard debugging with an unclear root cause. |
+
+**Council archetypes** (dispatched by the `rc-council` skill for multi-perspective debate, not called
+directly): `architect-advisor` (systems & long-horizon), `pragmatic-engineer` (execution reality),
+`security-advocate` (assume-breach), `product-mind` (user value & opportunity cost), `devils-advocate`
+(informed skeptic), `the-thinker` (reframing).
+
+## 🧠 Memory & instincts
+
+- **Project memory** — `.rc/memory/` (`INDEX.md` + one file per durable fact), curated by `rc-memory`.
+- **Workflow memory** — `.rc/tasks/<slug>/memory/` (shared `MEMORY.md` + per-task files), maintained
+  by `rc-workflow-memory` so each agent inherits context from previous tasks.
+- **Instincts** — the `observe` hook appends tool observations to `.rc/memory/observations.jsonl`;
+  `rc-memory` distills recurring patterns into confidence-scored learnings.
 
 ## 🪝 Hooks
 
-Shell hooks under `hooks/scripts/`, wired in `hooks/hooks.json` (Claude Code) and mirrored by `opencode/plugin/rc-hooks.ts` (OpenCode):
+Harness-only guardrails (no model-context cost), wired in `hooks/hooks.json`:
 
-| Hook                     | Event         | Enforces                                                  |
-| ------------------------ | ------------- | -------------------------------------------------------- |
-| `git-guard.sh`           | PreToolUse    | Blocks destructive git commands without permission        |
-| `commit-guard.sh`        | PreToolUse    | Guards commit messages / attribution rules                |
-| `go-mod-guard.sh`        | PreToolUse    | Blocks hand-editing `go.mod` in Go projects               |
-| `gateguard.sh`           | PreToolUse    | Gate before edits/writes                                  |
-| `go-fmt.sh`              | PostToolUse   | Formats Go after edits                                    |
-| `observe.sh`             | PostToolUse   | Records tool observations for `rc-instincts`             |
-| `session-recall.sh`      | SessionStart  | Recalls project memory into the session                   |
-| `phase-reminder.sh`      | SessionStart  | Reminds the active workflow's pipeline phase and next step |
-| `precompact-capture.sh`  | PreCompact    | Captures context before compaction                        |
-| `notify.sh`              | Stop / notify | Desktop notifications on terminal state                   |
+- **`git-guard`** — blocks destructive/history-rewriting git commands.
+- **`commit-guard`** — gates commits behind verification.
+- **`db-guard`** — enforces read-only database access by default (blocks write/DDL SQL without approval).
+- **`go-mod-guard`** / **`gateguard`** — protect `go.mod` and force investigation before risky edits.
+- **`go-fmt`** — formats Go on write. **`observe`** — feeds the instincts loop. **`repair-guidance`** —
+  helps the agent recover from a failed edit/delegation. **`notify`** — Stop/Notification signals.
+- **`memory-load`** — `SessionStart` warm-start: surfaces a bounded summary of `.rc/memory/` (facts +
+  learnings) and nudges distillation when observations pile up. Silent outside RC projects.
 
-> The Go-specific hooks (`go-mod-guard`, `go-fmt`) only act inside Go projects; they are no-ops elsewhere.
+## 🖥️ Supported hosts
 
-## 🗺️ Usage map
+RC ships for Claude Code, OpenCode, and other agent tools. Skills, commands, agents, and hooks are
+auto-discovered when the plugin is installed; OpenCode-specific variants live under `opencode/`.
+Output styles under `output-styles/` are versioned here but applied per-host (Claude Code loads them
+from `~/.claude/output-styles/`).
 
-How the pieces fit: **slash commands** are the entry points, each command drives one or more **skills** (the workflow logic), heavy phases delegate to **agents** (each pinned to the right model), **hooks** guard and observe everything in the background, and the **memory skills** make the next run smarter than the last.
+## 🤝 Contributing
 
-### The pipeline at a glance
-
-```mermaid
-flowchart LR
-    A(["💡 Idea"]) --> B["/rc-plan<br/>PRD → TechSpec → Tasks"]
-    B --> C["/rc-exec<br/>implement each task"]
-    C --> D{"Subjective<br/>surface?"}
-    D -- "UI / CLI / copy" --> E["/rc-gan<br/>quality loop"]
-    D -- no --> F
-    E --> F["/rc-review<br/>simplify + review ≤3 rounds + fix"]
-    F --> G["/rc-docs<br/>README · OpenAPI · Postman"]
-    G --> H["/rc-git<br/>branch → push → PR"]
-    H --> I(["📚 rc-instincts<br/>distill learnings"])
-    P["/rc-pipe — runs the whole line end to end"] -.-> B
-```
-
-Every phase writes markdown artifacts under `.rc/tasks/<slug>/`, so you can stop, edit an artifact by hand, and resume at any phase.
-
-### "I want to…" — the decision table
-
-| I want to…                                        | Claude Code                       | OpenCode                          |
-| ------------------------------------------------- | --------------------------------- | --------------------------------- |
-| Build a feature end to end                        | `/rc-pipe <idea>`                 | `/rc-pipe <idea>`                 |
-| Plan only (PRD → TechSpec → Tasks)                | `/rc-plan <idea>`                 | `/rc-plan <idea>`                 |
-| Run a single planning phase                       | `/rc:rc-create-prd` · `-techspec` · `-tasks` | `/rc-prd` · `/rc-techspec` · `/rc-tasks` |
-| Execute the planned tasks                         | `/rc-exec <slug>`                 | `/rc-exec <slug>`                 |
-| Review-and-fix until clean                        | `/rc-review <slug>`               | `/rc-review <slug>` + `/rc-fix`   |
-| Raise UI/CLI/copy quality to a score              | `/rc-gan <target>`                | `/rc-gan <target>`                |
-| Ship as branch + PR, then distill learnings       | `/rc-git`                         | `/rc-git`                         |
-| Refresh docs (README, OpenAPI, Postman)           | `/rc-docs`                        | ask the `rc` agent                |
-| Diagnose a bug / trace how code works             | `rc-analyze` → `rc-fix-analysis`  | same skills via the `rc` agent    |
-| Ad-hoc quality gate on a diff                     | `rc-code-review`                  | `rc-review` agent                 |
-| Hunt over-engineering only                        | `rc-simplify-review`              | same skill                        |
-| Ask "where is X?" cheaply                         | `rc-explorer` agent               | `rc-explorer` agent               |
-| Research a library before adopting it             | `rc-librarian` agent              | `rc-librarian` agent              |
-| Health-check the rc install itself                | `rc-doctor`                       | `rc-doctor` skill                 |
-| Audit agent config for secrets/risks              | `rc-audit`                        | `rc-audit`                        |
-| See what bloats the context window                | `rc-context-budget`               | `rc-context-budget`               |
-| Compact the session at a sane boundary            | `rc-compact`                      | `rc-compact`                      |
-| Remember a durable project fact                   | `rc-project-memory`               | `rc-project-memory`               |
-| Turn repeated corrections into instincts          | `rc-instincts`                    | `rc-instincts`                    |
-| Find the smallest reusable asset to add           | `rc-reflect`                      | `rc-reflect`                      |
-| Work in parallel/risky lanes                      | `rc-worktrees`                    | `rc-worktrees`                    |
-| Heavy multi-phase session discipline              | `rc-deepwork`                     | `rc-deepwork`                     |
-| Loop until a machine-checkable gate passes        | `rc-loop`                         | `rc-loop`                         |
-| Learn what rc can do                              | `rc` skill                        | `rc` agent                        |
-
-### A typical day
-
-1. **New feature** — `/rc-plan payment-retries`, answer the PRD/TechSpec questions, review the generated task files.
-2. **Build** — `/rc-exec payment-retries`; each task is implemented, verified, and tracked; hooks guard git and gate edits throughout.
-3. **Harden** — `/rc-review payment-retries` loops simplify → review → fix until a round comes back clean.
-4. **Ship** — `/rc-git` moves it to a branch and opens the PR, confirming each outward-facing step; `rc-instincts` captures what the session taught.
-5. **Anytime** — `rc-explorer` for quick lookups, `rc-analyze` when something breaks, `rc-doctor` when rc itself misbehaves.
-
-An interactive HTML version of this map lives at [`docs/usage-map.html`](docs/usage-map.html).
-
-## 🔎 CI
-
-Every push runs [`validate.yml`](.github/workflows/validate.yml): `bash -n` on all hook scripts, JSON validity + version consistency of the manifests, skill/command/agent frontmatter checks (including the marketplace angle-bracket rule), and Claude↔OpenCode guard-hook parity.
+There is no build step — components are markdown, JSON, and small Node/Bash scripts. Validate a change
+with `node scripts/plugin-smoke.mjs` (frontmatter + hook wiring) and, for task files,
+`node scripts/validate-tasks.mjs --slug <slug>`. See `AGENTS.md` for conventions and `CONTRIBUTING.md`.
 
 ## 📄 License
 

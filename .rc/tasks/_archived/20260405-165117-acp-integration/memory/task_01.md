@@ -18,7 +18,7 @@ Keep only task-local execution context here. Do not duplicate facts that are obv
 - The prompt's lowercase `/dev/...` paths map to this checkout under `/Users/pedronauck/Dev/rc/looper`.
 - `internal/core/run` still calls `agent.Command(...)`, so task_01 cannot blindly remove compatibility with the legacy runtime before task_02 lands.
 - `internal/setup/agents.go` is unrelated to the ACP agent registry and should not be conflated with `internal/core/agent`.
-- `github.com/coder/acp-go-sdk@v0.6.3` provides the client/session stdio transport surface needed for ACP, but it does not expose a rc-ready usage model, so `model.Usage` remains repo-owned.
+- `github.com/coder/acp-go-sdk@v0.6.3` provides the client/session stdio transport surface needed for ACP, but it does not expose a RC-ready usage model, so `model.Usage` remains repo-owned.
 - Repo-wide tests were stable once the ACP permission-outcome assertion stopped depending on a direct SDK union field selector and the helper shutdown timeout matched the production client default.
 
 ## Files / Surfaces

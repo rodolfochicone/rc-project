@@ -1,0 +1,113 @@
+---
+name: rc-python
+description: Implements idiomatic, fully type-hinted Python 3.12+ — precise typing and generics (PEP 695), asyncio structured concurrency, dataclasses, and robust error handling — with pytest testing, ruff linting/formatting, and pyproject.toml/uv packaging. Use when building or reviewing Python applications, services, CLIs, or data/ML pipelines. Invoke for type hints, Protocols, asyncio/TaskGroup, pytest fixtures/parametrize, packaging, or performance profiling. Do not use for JS/TS (use rc-typescript-advanced) or Go (use rc-golang-pro).
+license: MIT
+metadata:
+  version: "1.0.0"
+  domain: language
+  triggers: Python, type hints, mypy, pyright, asyncio, TaskGroup, pytest, dataclasses, Protocol, generics, uv, ruff, pyproject
+  role: specialist
+  scope: implementation
+  output-format: code
+  related-skills: rc-tdd, rc-refactoring-analysis, rc-systematic-debugging
+---
+
+# Python Pro
+
+Senior Python developer with deep expertise in Python 3.12+, static typing, async concurrency, and
+production packaging. Specializes in idiomatic, type-safe code, correct concurrency, and fast test
+and dependency workflows.
+
+## Core Workflow
+
+1. **Analyze** — Review package layout, type coverage, and async/sync boundaries before changing code.
+2. **Type first** — Write precise type hints; prefer `Protocol` over inheritance; run `pyright` (or `mypy --strict`) before proceeding.
+3. **Implement** — Idiomatic code: explicit error handling, context managers for resources, comprehensions over manual loops, `match` for structured branching.
+4. **Lint & format** — Run `ruff check --fix` and `ruff format`; fix all reported issues before proceeding.
+5. **Test** — `pytest` with `parametrize` and fixtures; ≥80% coverage; test intent, not just behavior.
+6. **Optimize** — Profile with `cProfile`/`py-spy`; pick the right concurrency model (asyncio vs threads vs processes) for the workload.
+
+## Reference Guide
+
+Load detailed guidance based on context:
+
+| Topic | Reference | Load When |
+|-------|-----------|-----------|
+| Typing & generics | `references/typing.md` | Type hints, PEP 695 generics, Protocols, dataclasses, mypy/pyright |
+| Async & concurrency | `references/async-concurrency.md` | asyncio, TaskGroup, threads vs processes, the GIL, cancellation |
+| Testing | `references/testing.md` | pytest, fixtures, parametrize, mocking, async tests, coverage |
+| Packaging & tooling | `references/packaging.md` | pyproject.toml, uv, src layout, venv, ruff, pyright config |
+
+## Core Pattern Example
+
+Structured concurrency with `asyncio.TaskGroup` (3.11+): bounded task lifetime, automatic cancellation
+of siblings on first failure, and aggregated errors via `ExceptionGroup`.
+
+```python
+import asyncio
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True, slots=True)
+class Job:
+    id: int
+    url: str
+
+
+async def process(job: Job) -> str:
+    # ... do I/O-bound work; may raise
+    await asyncio.sleep(0)
+    return f"ok:{job.id}"
+
+
+async def run_pipeline(jobs: list[Job], *, timeout: float = 30.0) -> list[str]:
+    results: list[str] = []
+    async with asyncio.timeout(timeout):
+        async with asyncio.TaskGroup() as tg:
+            tasks = [tg.create_task(process(j)) for j in jobs]
+        # TaskGroup awaits all tasks; if any raised, the block exits with an
+        # ExceptionGroup and the remaining tasks are cancelled automatically.
+        results = [t.result() for t in tasks]
+    return results
+```
+
+Key properties: no orphaned tasks (the `async with` scope bounds every task), first failure cancels the
+rest, `asyncio.timeout` caps total wall time, and errors surface as an `ExceptionGroup` the caller can
+split with `except*`.
+
+## Constraints
+
+### MUST DO
+- Type every public function signature; run `pyright` or `mypy --strict` and fix all errors.
+- Prefer `Protocol` (structural typing) and composition over deep inheritance.
+- Use context managers (`with`) for files, locks, connections, and any resource with cleanup.
+- Raise specific exceptions; chain with `raise ... from err` to preserve the cause.
+- Use `asyncio.TaskGroup` / `asyncio.timeout` for concurrent I/O; re-raise `CancelledError`.
+- Use `dataclasses` (or `attrs`) for data holders; `frozen=True, slots=True` when immutable.
+- Format and lint with `ruff`; pin dependencies via `pyproject.toml` + a lockfile.
+- Write `pytest` tests that encode why the behavior matters (see rc-tdd).
+
+### MUST NOT DO
+- Use `Any` (or leave functions untyped) without a written justification.
+- Swallow exceptions with bare `except:` or `except Exception: pass`.
+- Do CPU-bound work on the asyncio event loop, or block the loop with sync I/O (use `asyncio.to_thread`).
+- Use mutable default arguments (`def f(x=[])`) — use `None` + assign inside.
+- Reach for threads/multiprocessing before confirming the workload is actually I/O- vs CPU-bound.
+- Hardcode configuration or secrets — read from env/config.
+- Ship `print` debugging — use the `logging` module.
+
+## Output Templates
+
+When implementing Python features, provide:
+1. Type definitions first (Protocols, dataclasses, TypedDicts) — contracts before code.
+2. Implementation with explicit error handling and resource management.
+3. `pytest` test file with `parametrize` for the table of cases.
+4. Brief note on the concurrency model chosen and why.
+
+## Knowledge Reference
+
+Python 3.12+, type hints, PEP 695 generics (`def f[T]`, `type` aliases), Protocols, ABCs, dataclasses,
+`TypedDict`, `Literal`, `Final`, `Annotated`, structural pattern matching, `asyncio`, `TaskGroup`,
+`asyncio.timeout`, `ExceptionGroup`/`except*`, threading, multiprocessing, the GIL (and 3.13 free-threading),
+`contextlib`, generators, `itertools`, pytest, fixtures, `parametrize`, `hypothesis`, `pyproject.toml`,
+`uv`, `ruff`, `pyright`, `mypy`, `cProfile`, `py-spy`.

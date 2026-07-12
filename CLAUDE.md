@@ -1,44 +1,81 @@
 # CLAUDE.md
 
-Guidance for coding agents working in this repository.
+This file provides project guidance for coding agents working in this repository.
 
-## What this repo is
+## HIGH PRIORITY
 
-rc is a bundle of **AI-assisted development workflows** distributed as **skills, slash commands, hooks, and agents** for **Claude Code** and **OpenCode**. It is **plain markdown and shell** — there is no Go, no build step, and no binary. Do not add a compiled language, a package manager, or a build pipeline; if a change seems to need one, stop and discuss first.
+- **IF YOU DON'T CHECK SKILLS** your task will be invalidated and we will generate rework
+- **NEVER** use workarounds — always use the `no-workarounds` skill for any fix/debug task
+- **NEVER** use web search tools to search local project code — for local code, use Grep/Glob instead
+- This repository ships **plain markdown and small scripts** — there is no build, no binary, no `make`. "Done" means the content is coherent, every referenced file exists, and frontmatter is valid.
 
-## Layout
+## Project Overview
 
-| Path              | Responsibility                                                       |
-| ----------------- | ------------------------------------------------------------------- |
-| `skills/`         | Skills — each is a directory with `SKILL.md` (+ optional `references/`) |
-| `commands/`       | Claude Code slash commands (markdown with frontmatter)              |
-| `agents/`         | Claude Code plugin agents (one phase agent per file)               |
-| `hooks/`          | `hooks.json` + shell scripts run at agent lifecycle events          |
-| `opencode/`       | OpenCode `agent/`, `commands/`, and the `plugin/rc-hooks.ts` plugin |
-| `rules/`          | Coding rules injected into agent context                            |
-| `.claude-plugin/` | Plugin (`plugin.json`) + marketplace (`marketplace.json`) manifests |
-| `docs/`           | `claude-code-plugin.md` install/maintainer runbook                  |
+RC is an **agent plugin** — skills, commands, agents, and hooks — that drives the full lifecycle
+of AI-assisted development: optional ideation → PRD → TechSpec → tasks → execution → review →
+remediation. It runs inside the agent host (Claude Code, OpenCode, and other tools); every
+workflow artifact lives as plain markdown under a consumer project's `.rc/`. There is no CLI,
+no daemon, and no database.
 
-## Editing rules
+Distribution: the Claude Code plugin marketplace (manifests under `.claude-plugin/`). OpenCode
+assets live under `opencode/`.
 
-- **Skills** are markdown. A skill lives in `skills/<name>/SKILL.md` with YAML frontmatter (`name`, `description`). Keep the description a precise trigger — it is how the agent decides relevance.
-- **Commands** are markdown with frontmatter under `commands/` (Claude) and `opencode/commands/` (OpenCode). Keep the two in sync when a command exists on both sides.
-- **Hooks** are POSIX/bash shell scripts under `hooks/scripts/`, wired in `hooks/hooks.json`. Paths use `${CLAUDE_PLUGIN_ROOT}`. When adding or renaming a hook, update `hooks.json` **and** `opencode/plugin/rc-hooks.ts` so both runtimes stay at parity.
-- **Keep Claude Code and OpenCode in parity.** A workflow change usually touches both `commands/` + `opencode/commands/` and, if it affects enforcement, `hooks/` + `opencode/plugin/rc-hooks.ts`.
-- **The command sets differ by design, and that is intentional — do not "fix" it by forcing a 1:1 match.** OpenCode has per-phase commands (`rc-prd`, `rc-techspec`, `rc-tasks`, `rc-fix`) because its commands route to phase *agents*; on Claude those phases are reached by invoking the skills directly (`/rc:rc-create-prd`, …) plus the `rc-plan`/`rc-pipe` aggregate commands, so separate per-phase commands are redundant. `rc-docs` is Claude-only. Session hooks (`session-recall`, `phase-reminder`, `precompact-capture`) and `notify` are Claude-only; OpenCode gets equivalent behavior through the plugin's own event API, so they are not mirrored in `rc-hooks.ts` — only the guard hooks are.
-- **Match existing style** in each file. Skills follow a consistent SKILL.md shape — read a neighbor before writing a new one.
+## Repository Layout
 
-## Do not
+| Path             | Responsibility                                                             |
+| ---------------- | -------------------------------------------------------------------------- |
+| `skills/`        | All skills — one directory per skill: `SKILL.md` (+ `references/`, `assets/`, `scripts/`) |
+| `commands/`      | Slash commands (`/rc-plan`, `/rc-exec`, `/rc-review`, `/rc-pipe`, …)       |
+| `agents/`        | Reusable agents: cost-tiered leaf workers (`rc-explorer`, `rc-librarian`, `rc-fixer`, `rc-oracle`) and the council archetypes (`pragmatic-engineer`, `architect-advisor`, `security-advocate`, `product-mind`, `devils-advocate`, `the-thinker`) |
+| `hooks/`         | Hook manifest (`hooks.json`) + guard/format/observe scripts                |
+| `opencode/`      | OpenCode-specific assets (agents, commands)                                |
+| `.claude-plugin/`| Claude Code plugin + marketplace manifests                                 |
+| `docs/`          | Operational docs (install channels, plugin usage)                          |
+| `scripts/`       | Utility scripts shipped to consumers (e.g. `validate-tasks.mjs`)           |
+| `extensions/`    | Extension definitions                                                      |
 
-- Do not reintroduce Go, a `go.mod`, a `Makefile`, or any build tooling.
-- Do not add a web app, a daemon, an HTTP API, or an SDK.
-- Do not run destructive git commands (`git restore`, `git reset`, `git clean`, `git checkout -- …`, `git rm`) without explicit user permission.
-- Do not commit, branch, or push without explicit authorization.
+## Authoring rules (skills, commands, agents, hooks)
 
-## Verifying a change
+- One directory per skill; the `SKILL.md` frontmatter needs `name` (kebab-case, matches the
+  directory) and `description`. Deep content goes in `references/` — loaded on demand, never
+  inlined into the description.
+- **Descriptions are a context budget** (see the `rc-context-budget` skill): every skill/agent
+  description is loaded in every session. State the trigger ("Use when…") and the anti-trigger
+  ("Do not use for…") in a few lines; no marketing prose.
+- Agents: frontmatter `name`, `description`, `tools` (least privilege), optional `model`
+  (omit to inherit the session model) and `color`. One agent = one responsibility.
+- Hooks must fail open (environment problems never block the tool call) and guard by file
+  extension/command pattern — see `hooks/scripts/` for the house style.
+- Before editing any skill, read it fully — including its `references/` — and keep every
+  internal link valid. If a rule must hold every time, it belongs in a hook, not in prose.
+- Never reference the retired `rc` CLI (`rc setup`, `rc exec`, `rc tasks run`, `rc reviews`) —
+  hosts load the plugin directly; execution happens through host-owned tools.
 
-There is no `make verify`. Verify by inspection and by exercising the artifact:
+## Verification before completion
 
-- Skill/command markdown: confirm valid frontmatter and that the references it links to exist.
-- Hooks: shell-check the script (`bash -n hooks/scripts/<name>.sh`) and, when practical, run it against a sample tool payload.
-- Plugin manifests: confirm `plugin.json` / `marketplace.json` stay valid JSON after edits.
+1. Every file you touched parses: valid frontmatter, no broken relative links, referenced
+   `references/`/`assets/` files exist.
+2. `grep` the repo for the thing you renamed or removed — no dangling mentions.
+3. Activate `rc-final-verify` before claiming any task is done.
+
+## CRITICAL: Git Commands Restriction
+
+- **ABSOLUTELY FORBIDDEN**: **NEVER** run `git restore`, `git checkout`, `git reset`, `git clean`, `git rm`, or any other git commands that modify or discard working directory changes **WITHOUT EXPLICIT USER PERMISSION**
+- **DATA LOSS RISK**: These commands can **PERMANENTLY LOSE CODE CHANGES** and cannot be easily recovered
+- **REQUIRED ACTION**: If you need to revert or discard changes, **YOU MUST ASK THE USER FIRST**
+- If the worktree contains unexpected edits, read them and work around them; do not revert them
+
+## Code Search and Discovery
+
+- **TOOL HIERARCHY**: Grep/Glob for repository content; the `find-docs` skill for external
+  library documentation; web search only for web research — **never** for local project code.
+
+## Anti-Patterns for Agents
+
+1. **Skip skill activation** because "it's a small change" — every domain change requires its skill
+2. **Bloat a description** — long frontmatter descriptions cost every session, everywhere
+3. **Inline deep content in SKILL.md** that belongs in `references/` (progressive disclosure)
+4. **Leave dangling references** after renaming/removing a skill, agent, or script
+5. **Reintroduce CLI-era instructions** (`rc setup`, `rc exec`, `~/.rc/agents` provisioning)
+6. **Run destructive git commands without permission** — `git restore`, `git reset`, `git clean` require explicit user approval
+7. **Duplicate an existing skill** — search `skills/` before creating; extend or reference instead

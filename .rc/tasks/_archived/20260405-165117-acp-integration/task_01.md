@@ -25,7 +25,7 @@ Define the ACP content model types, vendor the `coder/acp-go-sdk` dependency, im
 - MUST vendor `coder/acp-go-sdk` via `go get` — never hand-edit `go.mod`
 - MUST implement `Client` interface that spawns agent binary and wires JSON-RPC 2.0 over stdin/stdout via the SDK
 - MUST implement `Session` interface that streams `SessionUpdate` via a channel and exposes `Done()`/`Err()` for lifecycle
-- MUST wrap SDK types behind rc's own interfaces — SDK types must NOT leak beyond `internal/core/agent/`
+- MUST wrap SDK types behind RC's own interfaces — SDK types must NOT leak beyond `internal/core/agent/`
 - MUST define `AgentSpec` struct and registry entries for all 7 agents (Claude, Codex, Droid, Cursor, OpenCode, Pi, Gemini)
 - MUST preserve existing exported function signatures: `ValidateRuntimeConfig()`, `EnsureAvailable()`, `DisplayName()`, `BuildShellCommandString()`
 - MUST build a mock ACP server test helper that emits configurable `SessionUpdate` sequences over stdio for integration tests

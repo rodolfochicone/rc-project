@@ -70,7 +70,7 @@ Add the panel and parser under `web/src/systems/runs/components` and wire it int
 the live event in `run-transcript-panel.tsx`'s event handling
 (`runUIMessageFromLiveEvent`). For permissions, options come structured from the
 event payload; for questions, parse the text (frontend heuristic per ADR decision).
-Reuse `@rodolfochicone/ui` primitives (Button, SurfaceCard) consistent with existing
+Reuse `@escaletech/ui` primitives (Button, SurfaceCard) consistent with existing
 run components. See TechSpec "User Experience"/"API Endpoints".
 
 ### Relevant Files
@@ -85,7 +85,7 @@ run components. See TechSpec "User Experience"/"API Endpoints".
 
 ### Dependent Files
 - `web/src/systems/runs/components/run-detail-view.test.tsx` — extended coverage.
-- `@rodolfochicone/ui` — shared Button/Card primitives (consumed, not modified).
+- `@escaletech/ui` — shared Button/Card primitives (consumed, not modified).
 
 ### Related ADRs
 - [ADR-001: Pause-and-resume interactive runs inside the run detail view](../adrs/adr-001.md) — the response surface lives in the run detail.

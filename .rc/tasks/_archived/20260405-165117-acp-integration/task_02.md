@@ -11,7 +11,7 @@ dependencies:
 
 ## Overview
 
-Replace the process-based execution and Claude-specific logging pipelines with ACP session lifecycle management. This is the highest-impact task: it rewires how rc spawns agents, monitors liveness, processes output, tracks token usage, and handles retries — all through ACP's typed `SessionUpdate` stream instead of raw stdout parsing and heuristic activity monitoring.
+Replace the process-based execution and Claude-specific logging pipelines with ACP session lifecycle management. This is the highest-impact task: it rewires how RC spawns agents, monitors liveness, processes output, tracks token usage, and handles retries — all through ACP's typed `SessionUpdate` stream instead of raw stdout parsing and heuristic activity monitoring.
 
 <critical>
 - ALWAYS READ the PRD and TechSpec before starting

@@ -6,24 +6,24 @@ Running `rc` with no subcommand today shows a welcome banner (wordmark, tips, an
 
 This feature adds an **interactive home menu** to the bare `rc` command. The existing banner stays at the top, and a navigable list of actions appears directly below it in the same screen. From this menu the user can List Skills, Install RTK, run Setup, open Help, or Quit — each action runs within the same session.
 
-The menu serves two audiences equally: newcomers, who discover what rc can do without memorizing commands, and recurring users, who get a fast hub on the bare command. Named subcommands continue to work directly and bypass the menu, so the menu is an additive entry point, not a gate.
+The menu serves two audiences equally: newcomers, who discover what RC can do without memorizing commands, and recurring users, who get a fast hub on the bare command. Named subcommands continue to work directly and bypass the menu, so the menu is an additive entry point, not a gate.
 
 ## Goals
 
 - Give every user a single, discoverable entry point when they type `rc` with no arguments.
 - Let users reach the most common actions (List Skills, Install RTK, Setup, Help) and exit, without knowing subcommand names.
-- Preserve the existing rc banner and brand identity.
+- Preserve the existing RC banner and brand identity.
 - Keep expert workflows frictionless: direct subcommands still bypass the menu.
 - Make the home menu the consistent default face of the bare command.
 
 ## User Stories
 
-**Primary persona — New rc user (just installed):**
+**Primary persona — New RC user (just installed):**
 - As a new user, I want to see a list of things I can do when I run `rc`, so that I can start without reading docs or memorizing commands.
-- As a new user, I want to browse the available skills, so that I understand what rc offers before committing to setup.
-- As a new user, I want to run setup from the menu, so that I can get rc configured immediately.
+- As a new user, I want to browse the available skills, so that I understand what RC offers before committing to setup.
+- As a new user, I want to run setup from the menu, so that I can get RC configured immediately.
 
-**Primary persona — Recurring rc user:**
+**Primary persona — Recurring RC user:**
 - As a recurring user, I want a quick hub on the bare command, so that I can jump to common actions without typing subcommands.
 - As a recurring user, I want to install RTK from the menu when it is missing, so that I complete my environment in one place.
 - As a recurring user, I want to leave the menu quickly, so that it never gets in my way.
@@ -43,9 +43,9 @@ Listed in priority order. The MVP is exactly the five menu items below.
 
 4. **Install RTK** — Selecting this runs the RTK installation guidance/flow within the session (RTK is the optional external skills runtime). If RTK is already present, the user is informed.
 
-5. **Setup** — Selecting this runs the existing rc setup flow within the session.
+5. **Setup** — Selecting this runs the existing RC setup flow within the session.
 
-6. **Help** — Selecting this presents the standard rc help/usage content.
+6. **Help** — Selecting this presents the standard RC help/usage content.
 
 7. **Quit** — Selecting this (or pressing Esc/q) exits cleanly with no action.
 
@@ -70,7 +70,7 @@ Listed in priority order. The MVP is exactly the five menu items below.
 **UI/UX considerations:**
 - Navigation must accept both arrow keys and j/k; Enter confirms; Esc/q quits.
 - The highlighted item and the available keys should be visibly indicated.
-- Visual style stays consistent with the current rc banner and brand theme.
+- Visual style stays consistent with the current RC banner and brand theme.
 - "Quit" is always present as an explicit, obvious exit.
 
 **Onboarding and discoverability:** The menu turns "what can this do?" into a browsable list, which is the central onboarding benefit. Labels use plain action language (List Skills, Install RTK, Setup, Help, Quit).
@@ -78,8 +78,8 @@ Listed in priority order. The MVP is exactly the five menu items below.
 ## High-Level Technical Constraints
 
 - Must integrate with the existing bare-command splash so the banner and menu render together.
-- Must reuse the existing rc brand visual identity.
-- The five menu actions map to capabilities rc already exposes (skill catalog, RTK install guidance, setup, help); the menu must not introduce a divergent second way of performing them that could drift from the canonical flows.
+- Must reuse the existing RC brand visual identity.
+- The five menu actions map to capabilities RC already exposes (skill catalog, RTK install guidance, setup, help); the menu must not introduce a divergent second way of performing them that could drift from the canonical flows.
 - Must not break direct subcommand invocation.
 - Must not hang non-interactive callers (CI, pipes, agents) — see Risks and Open Questions.
 

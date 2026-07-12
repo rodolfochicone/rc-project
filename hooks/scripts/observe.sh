@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # PostToolUse(Edit|Write|MultiEdit|Bash): append a compact observation for the
-# instincts loop (the `rc-instincts` skill distills these into learned patterns).
+# learning loop (the `rc-memory` skill distills these into learned patterns).
 #
-# Opt-in: does nothing unless RC_INSTINCTS=1, so it adds zero overhead by default.
-# Never blocks. Captures only the tool name and a truncated target (file path or
-# command) — never file contents — into <project>/.rc/instincts/observations.jsonl.
+# On by default; set RC_INSTINCTS=0 to opt out. Never blocks and adds negligible
+# overhead per tool call. Captures only the tool name and a truncated target (file
+# path or command) — never file contents — into <project>/.rc/memory/observations.jsonl.
 set -u
-[ "${RC_INSTINCTS:-0}" = "1" ] || exit 0
+[ "${RC_INSTINCTS:-1}" = "0" ] && exit 0
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 . "$SCRIPT_DIR/_lib.sh"
 rc_hook_active "observe" "minimal" || exit 0
@@ -33,9 +33,9 @@ while :; do
     dir="$(dirname "$dir")"
 done
 [ -z "$rc_dir" ] && rc_dir="$PWD/.rc"
-mkdir -p "$rc_dir/instincts" 2>/dev/null || exit 0
+mkdir -p "$rc_dir/memory" 2>/dev/null || exit 0
 
 ts="$(date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || echo unknown)"
 jq -nc --arg ts "$ts" --arg tool "$tool" --arg target "$target" \
-    '{ts:$ts, tool:$tool, target:$target}' >>"$rc_dir/instincts/observations.jsonl" 2>/dev/null || exit 0
+    '{ts:$ts, tool:$tool, target:$target}' >>"$rc_dir/memory/observations.jsonl" 2>/dev/null || exit 0
 exit 0

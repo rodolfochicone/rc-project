@@ -1,9 +1,9 @@
 ---
-description: Generate or refresh rc project documentation — README, Postman collection, and OpenAPI spec.
+description: Generate or refresh RC project documentation — README, Postman collection, and OpenAPI spec.
 disable-model-invocation: true
 ---
 
-You are running the **rc documentation phase**. Run these skills in order, using the Skill tool:
+You are running the **RC documentation phase**. Run these skills in order, using the Skill tool:
 
 1. **README** — invoke `rc-readme` to generate or update the project README from the built code.
 2. **Postman** — invoke `rc-postman` to generate or update the Postman collection from the project's HTTP API.

@@ -49,7 +49,7 @@ Once the user has answered the technical clarification questions and approved an
 
 ## Resolving the `.rc` base directory
 
-rc supports monorepos, where more than one `.rc` directory can exist. Before reading or writing any `.rc/...` path, resolve which `.rc` directory this run uses; its parent is the base directory. Treat every `.rc/...` path in this skill as relative to that base.
+RC supports monorepos, where more than one `.rc` directory can exist. Before reading or writing any `.rc/...` path, resolve which `.rc` directory this run uses; its parent is the base directory. Treat every `.rc/...` path in this skill as relative to that base.
 
 1. Search the project recursively for `.rc` directories, skipping `node_modules`, `.git`, `vendor`, and any `_archived/` directory.
 2. Resolve the base from what you find:
@@ -156,11 +156,11 @@ Rules for the contract:
 
 ## Project memory
 
-Before designing, search `.rc/memory/` (with Grep) for the feature and component terms to
-recover prior architectural decisions, conventions, and known gotchas (see the
-`rc-project-memory` skill). After the techspec is settled, record any durable cross-cutting
-decision as a `.rc/memory/decision__<key>.md` file — only decisions not already captured in
-the techspec or the ADRs.
+Before designing, consult project memory (the `rc-memory` skill, scanning `.rc/memory/INDEX.md`) for the feature and component terms to recover
+prior architectural decisions, conventions, and known gotchas (see the `rc-memory`
+skill). After the techspec is settled, record any durable cross-cutting decision with
+the `rc-memory` skill (scope: decision) — only decisions not already captured in the techspec or
+the ADRs.
 
 ## Error Handling
 

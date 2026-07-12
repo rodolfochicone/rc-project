@@ -795,6 +795,6 @@ os.WriteFile; return a clear error if validation fails.
 ## Triage
 
 - Decision: `valid`
-- Rationale: The current `ReadTextFile` and `WriteTextFile` handlers trust `params.Path` directly even though ACP includes `SessionId` on both requests and rc already knows each session's working directory. That means a buggy adapter can read or overwrite files outside the session root, and overwrite mode is always reset to `0o600` even when updating an existing file.
+- Rationale: The current `ReadTextFile` and `WriteTextFile` handlers trust `params.Path` directly even though ACP includes `SessionId` on both requests and RC already knows each session's working directory. That means a buggy adapter can read or overwrite files outside the session root, and overwrite mode is always reset to `0o600` even when updating an existing file.
 - Fix plan: Store the resolved working directory on each session, resolve file requests through the session identified by `params.SessionId`, reject paths outside that root, and preserve an existing file's mode on overwrite.
 - Resolution: `clientImpl` now records per-session file roots, scopes read/write requests through `params.SessionId`, rejects paths outside the allowed roots, and preserves the existing file mode when overwriting tracked files. `make verify` passed after adding client helper coverage for allowed roots, relative paths, outside-root rejection, unknown sessions, and permission preservation.

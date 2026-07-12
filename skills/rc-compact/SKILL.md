@@ -1,6 +1,6 @@
 ---
 name: rc-compact
-description: Decides when and how to compact the conversation at logical task boundaries, driven by the session's real token usage rather than waiting for automatic mid-task compaction. Use during long multi-phase runs to compact deliberately so the right context survives. Do not use for context inventory of installed tooling (use rc-context-budget) or for persistent cross-session memory (use rc-workflow-memory / rc-project-memory).
+description: Decides when and how to compact the conversation at logical task boundaries, driven by the session's real token usage rather than waiting for automatic mid-task compaction. Use during long multi-phase runs to compact deliberately so the right context survives. Do not use for context inventory of installed tooling (use rc-context-budget) or for persistent cross-session memory (use rc-workflow-memory / rc-memory).
 model: haiku
 effort: low
 ---

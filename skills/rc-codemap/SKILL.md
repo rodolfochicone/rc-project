@@ -1,44 +1,56 @@
 ---
 name: rc-codemap
-description: Builds and maintains a hierarchical repository map — one `codemap.md` per directory summarizing the WHY and HOW of that folder — so agents navigate a codebase from architectural summaries instead of re-reading source on every task. Use to onboard into an unfamiliar repo, to give the pipeline a token-efficient navigation layer, or to refresh the map after structural changes. Do not use to diagnose a specific bug (use rc-analyze), to review a change set (use rc-code-review), or to record durable prose facts (use rc-project-memory).
+description: Generates and incrementally refreshes a per-directory codemap (a codemap.md in each significant folder) so agents get a cheap, always-fresh structure map before exploring. Only regenerates maps for directories that changed since the last run, tracked via .rc/codemap state. Use to build or refresh the repo's codemaps; read the maps first in any exploration-heavy task to cut token cost. Do not use to analyze a specific bug or trace one flow (use rc-analyze).
+user-invocable: true
 model: sonnet
 effort: medium
-user-invocable: true
-argument-hint: "[path] [--refresh]"
 ---
 
 # Codemap
 
-Maintain a hierarchical `codemap.md` in each significant directory of the repository. A codemap describes a folder's *purpose, key files, and how it connects to its neighbors* — the durable architecture, not line-level detail. Agents read the maps to understand a codebase in seconds and to read only the folders a task actually touches.
+Maintain a hierarchical, per-directory map of the repository so every exploration-heavy task
+starts from a written summary instead of re-scanning source. Each significant directory gets a
+`codemap.md`; a root `codemap.md` links them. Regeneration is **incremental** — only directories
+that changed since the last run are rebuilt.
 
-## What a `codemap.md` contains
+## Store & staleness
 
-Keep each map short (aim for under ~40 lines). For the directory it lives in:
+- Maps live as `codemap.md` inside each mapped directory (committed alongside the code).
+- State lives at `.rc/codemap/last-commit` (the git SHA at the last generation).
+- `scripts/stale.sh [root]` prints the directories that changed since that SHA — or every
+  directory when there is no state yet (first build). `scripts/stale.sh --record [root]` records
+  the current HEAD after a successful generation. Both **fail open**: on any git problem they
+  behave as if everything is stale, which is safe.
 
-- **Purpose** — one or two sentences: why this directory exists.
-- **Key files** — the handful that matter, each with a one-line role. Skip trivial files.
-- **Entry points / public surface** — what the rest of the repo calls into here.
-- **Depends on / used by** — the main inbound and outbound directories.
-- **Subdirectories** — one line each, linking to their own `codemap.md`.
+## Workflow
 
-Describe design intent, not implementation. A codemap should stay valid across refactors that don't change the architecture.
-
-## Building or refreshing the map
-
-1. Determine scope: the given `path`, or the repo root if none. Respect `.gitignore`; skip `node_modules`, `.git`, `vendor`, `dist`, build output, and generated dirs.
-2. Detect init vs. update:
-   - **Init** — no `codemap.md` exists under scope: walk the tree bottom-up and write one map per significant directory.
-   - **Update** — maps exist: only re-analyze directories whose contents changed since the map was last written (compare against git status / mtimes). Leave unchanged folders alone.
-3. For each directory, read its files enough to summarize intent (prefer the local `codemap.md` of child dirs over re-reading their files), then write/overwrite its `codemap.md`.
-4. Keep a root `codemap.md` as the index that links down into the tree.
-
-## Using the map
-
-- Before touching an unfamiliar area, read the nearest `codemap.md` (and the root index), then descend only into the folders the task needs.
-- When you change a directory's architecture, update its `codemap.md` in the same change so the map never drifts.
+1. **Scope.** Run `scripts/stale.sh` to get the stale directories. If it returns everything,
+   you're doing a first full build.
+2. **Regenerate stale maps.** For each stale directory — skipping vendored/generated dirs
+   (`.git`, `node_modules`, `vendor`, build output, fixtures) — read its files enough to
+   summarize, then (re)write its `codemap.md` with: the directory's responsibility, its key
+   files and their roles, notable patterns, and how it connects to sibling directories. Anchor
+   claims to real paths.
+3. **Update the index.** Refresh the root `codemap.md` so it links every directory map.
+4. **Record state.** Run `scripts/stale.sh --record` so the next run only rebuilds what changes
+   after this point.
 
 ## Rules
 
-- Maps are committed documentation — keep them in git alongside the code.
-- Never paste code blocks, full APIs, or exhaustive file lists into a map — that is how it rots into noise.
-- If a map contradicts the code, trust the code and correct the map.
+- A codemap is a map, not a copy: summarize roles and wiring; never paste large code blocks.
+- Keep each map short and skimmable — a reader should grasp a directory in under a minute.
+- Do not map throwaway directories (build output, vendored deps, fixtures, generated code).
+- On a first build of a large repo, map top-down: root + top-level directories first, then
+  descend only into directories that hold real logic.
+
+## When to read (not generate)
+
+In any task that begins with codebase exploration, **read the relevant `codemap.md` files
+first** and fall back to grep/Read only for what the maps don't cover. That is the token-saving
+payoff — the maps exist so agents don't re-derive structure every session.
+
+## Error handling
+
+- Not a git repository → `stale.sh` fails open and reports all directories; do a full build and
+  skip the `--record` step (nothing to record without git).
+- A directory that is pure generated output → skip it; do not write a map you'll never trust.

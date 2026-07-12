@@ -12,6 +12,7 @@ dist/
 web/dist/*
 !web/dist/.keep
 apps/desktop/dist-packaged/
+RELEASE_NOTES.md
 coverage.out
 coverage.html
 .codex/CONTINUITY*
@@ -21,22 +22,12 @@ coverage.html
 skills/*/autoresearch-*/
 skills-lock.json
 .claude/skills
-.claude/ship/
-.claude/workflows/
-
-# Local agent-tool config and third-party skills — not part of the rc plugin.
-.agents/
-.junie/
-.kilocode/
-.pi/
-.qwen/
 ai-docs
 **/**/node_modules
 node_modules/
 .rc/runs
 .rc/analysis/
-.rc/memory.db*
-.rc/instincts/observations.jsonl
+.rc/memory.db
 .rc/tasks/daemon-improvs/analysis/qa/logs/live-daemon-run-id.txt
 .turbo/
 coverage/
@@ -44,7 +35,3 @@ coverage/
 
 # TanStack Router generated tree — regenerated at build/dev time.
 web/src/routeTree.gen.ts
-
-# graphify generated output and cache — recreated by running the graphify skill.
-graphify-out/
-**/graphify-out/
