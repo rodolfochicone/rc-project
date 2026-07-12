@@ -173,8 +173,7 @@ agent (and you) exactly when each one fires.
 | Skill | Purpose | Use when |
 | --- | --- | --- |
 | `rc-audit` | Security-audits the agent config surface (`.claude`, `.mcp.json`, hooks, installed skills) for secrets, over-broad perms, injection vectors. | Reviewing an agent setup before sharing, or a periodic config audit. |
-| `rc-jira` | PM-mode Jira via the Atlassian MCP: shape ideas, create/refine cards into PRD/TechSpec/sub-tasks, execute child tickets, GMUDs. | Any Jira work through the official MCP, with confirmation on writes. |
-| `rc-new-project` | Scaffolds a new private repo in `rodolfochicone` from the TypeScript template. | Starting a brand-new TypeScript project. |
+| `rc-linear` | PM-mode Linear via the official Linear MCP: shape ideas, create/refine issues into PRD/TechSpec/sub-issues, execute child issues. | Any Linear work through the official MCP, with confirmation on writes. |
 
 ### Skill authoring & self-improvement
 
@@ -252,7 +251,6 @@ Deep, opinionated guides for a specific library/runtime — auto-fire on the mat
 
 | Skill | Use when |
 | --- | --- |
-| `rc-automation-guides` | Working in the `rc-automation` repo — routes to the right dev/ops guide (endpoint, migration, event, deploy, docs…). |
 | `rc-portal-design` | Any UI work in `rc-portal` — design system, tokens, Tailwind, Storybook, a11y gates. |
 
 ### Bundled extension

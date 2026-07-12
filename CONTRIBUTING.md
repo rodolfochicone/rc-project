@@ -75,7 +75,7 @@ channel today.
 
 ## Maintainers
 
-- Rodolfo Chicone (<rodolfo.chicone@escale.com.br>)
+- Rodolfo Chicone (<rchicone103@gmail.com>)
 
 ## License
 
