@@ -73,3 +73,35 @@ When compaction is required:
 - `## Files / Surfaces`
 - `## Errors / Corrections`
 - `## Ready for Next Run`
+
+## Decision and handoff entry format
+
+When a loop (`rc-loop`) or a card flow (`rc-card`) records a durable decision or closes a
+phase/sub-issue, use these shapes so the record stays scannable and resumable. These live in the
+shared `MEMORY.md` sections above — they are a format, not a new file.
+
+### `## Shared Decisions` — one entry per durable, cross-task decision (`AD-NNN`)
+
+```markdown
+### AD-007
+- **Decision**: <what was decided, one line>
+- **Reason**: <why — the forcing constraint>
+- **Trade-off**: <what it costs / defers>
+- **Scope**: <which phases/tasks it binds>
+- **Status**: active | superseded by AD-NNN
+```
+
+Number sequentially (`AD-001`, `AD-002`, …); never renumber. Supersede, don't delete — flip the
+old entry's status to `superseded by AD-NNN` so the history survives.
+
+### `## Handoffs` — one entry per completed phase / sub-issue, newest first
+
+```markdown
+**<Phase or sub-issue> — COMPLETE (verification PASS, <date>).**
+<AC/gate result>; <gate evidence: command + pass count>; <what the next phase needs to know>.
+```
+
+A handoff exists so a re-invoked loop resumes without re-deriving context. Record the gate
+evidence (the command run and its result), any blocker the phase hit and how it was resolved, and
+the one or two facts the next phase must start from. Keep it to a few lines — trim it in the next
+compaction if it grows.
