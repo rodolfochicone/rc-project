@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+_Nada ainda — registre aqui as mudanças da próxima versão sob `### Added` / `### Changed` / `### Fixed` / `### Removed`, movendo-as para uma seção versionada no release._
+
+## [2.2.1] - 2026-07-12
+
 ### Fixed
 
 - **`commit-guard` não bloqueia mais co-autoria humana.** O hook barrava qualquer
@@ -462,7 +466,8 @@ Sync Claude Code (project scope)
 - Initial RC release
 
 <!-- GitHub releases (apenas versões que têm seção acima e release publicado) -->
-[Unreleased]: https://github.com/rodolfochicone/rc-project/compare/v2.2.0...main
+[Unreleased]: https://github.com/rodolfochicone/rc-project/compare/v2.2.1...main
+[2.2.1]: https://github.com/rodolfochicone/rc-project/releases/tag/v2.2.1
 [2.2.0]: https://github.com/rodolfochicone/rc-project/releases/tag/v2.2.0
 [2.1.0]: https://github.com/rodolfochicone/rc-project/releases/tag/v2.1.0
 [1.0.1]: https://github.com/rodolfochicone/rc-project/releases/tag/v1.0.1
