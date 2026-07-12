@@ -114,3 +114,8 @@ Technical challenges and mitigation strategies:
 
 ADRs documenting key decisions made during PRD brainstorming and technical design:
 - [ADR-NNN: Title](adrs/adr-NNN.md) — One-line summary of the decision
+
+## Related Artifacts
+
+- PRD: [_prd.md](_prd.md)
+- Tasks: [_tasks.md](_tasks.md)

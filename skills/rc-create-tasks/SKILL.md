@@ -81,6 +81,8 @@ RC supports monorepos, where more than one `.rc` directory can exist. Before rea
      ```markdown
      # [Feature Name] — Task List
 
+     > PRD: [_prd.md](_prd.md) · TechSpec: [_techspec.md](_techspec.md)
+
      ## Tasks
 
      | # | Title | Status | Complexity | Dependencies |

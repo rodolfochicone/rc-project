@@ -94,6 +94,11 @@ Do NOT include technical risks such as architectural complexity or technical deb
 ADRs documenting key decisions made during brainstorming:
 - [ADR-NNN: Title](adrs/adr-NNN.md) — One-line summary of the decision
 
+## Related Artifacts
+
+- TechSpec: [_techspec.md](_techspec.md)
+- Tasks: [_tasks.md](_tasks.md)
+
 ## Open Questions
 
 Remaining items that need clarification:
