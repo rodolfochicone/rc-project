@@ -28,6 +28,7 @@ node_modules/
 .rc/runs
 .rc/analysis/
 .rc/memory.db
+.rc/memory/observations.jsonl
 .rc/tasks/daemon-improvs/analysis/qa/logs/live-daemon-run-id.txt
 .turbo/
 coverage/
