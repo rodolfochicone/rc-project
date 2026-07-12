@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+_Nada ainda — registre aqui as mudanças da próxima versão sob `### Added` / `### Changed` / `### Fixed` / `### Removed`, movendo-as para uma seção versionada no release._
+
 ## [2.1.0] - 2026-07-12
 
 ### Added
