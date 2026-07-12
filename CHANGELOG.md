@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+_Nada ainda — registre aqui as mudanças da próxima versão sob `### Added` / `### Changed` / `### Fixed` / `### Removed`, movendo-as para uma seção versionada no release._
+
+## [2.2.0] - 2026-07-12
+
 ### Added
 
 - **Grafo navegável entre os artefatos do pipeline.** Seções `Related Artifacts`
