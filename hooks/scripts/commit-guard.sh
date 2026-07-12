@@ -14,8 +14,8 @@ case "$cmd" in
 *) exit 0 ;;
 esac
 
-if printf '%s' "$cmd" | grep -qiE 'Co-Authored-By:|Generated with \[?Claude|Claude Code|🤖'; then
-    printf 'rc commit-guard: remove AI attribution from the commit message (no "Co-Authored-By", "Generated with Claude", or 🤖 trailer).\n' >&2
+if printf '%s' "$cmd" | grep -qiE 'Co-Authored-By:.*(Claude|Anthropic)|Generated with \[?Claude|Claude Code|🤖'; then
+    printf 'rc commit-guard: remove AI attribution from the commit message (no AI "Co-Authored-By", "Generated with Claude", or 🤖 trailer).\n' >&2
     exit 2
 fi
 

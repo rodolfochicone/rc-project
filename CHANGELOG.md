@@ -2,7 +2,13 @@
 
 ## [Unreleased]
 
-_Nada ainda — registre aqui as mudanças da próxima versão sob `### Added` / `### Changed` / `### Fixed` / `### Removed`, movendo-as para uma seção versionada no release._
+### Fixed
+
+- **`commit-guard` não bloqueia mais co-autoria humana.** O hook barrava qualquer
+  trailer `Co-Authored-By:`, independentemente do co-autor — o que impedia creditar
+  uma pessoa num commit pareado, uma prática legítima. A regra agora só dispara
+  quando o co-autor é uma IA (`Claude`/`Anthropic`); os demais gatilhos
+  (`Generated with Claude`, `Claude Code`, 🤖) seguem inalterados.
 
 ## [2.2.0] - 2026-07-12
 
