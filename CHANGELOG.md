@@ -2,6 +2,41 @@
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-07-12
+
+### Added
+
+- **Camada de loop engineering** — três skills novas para automatizar o ciclo de
+  desenvolvimento quando o harness permite:
+  - **`rc-loop`** — driver do loop criador autônomo (só Claude Code): anda o
+    `.rc/ROADMAP.md` fase a fase (plan → execute → verify → aprende → fecha) até
+    esgotar ou uma fase não ficar verde. Atrás do portão das 4 perguntas de
+    prontidão (`references/loop-readiness.md`).
+  - **`rc-roadmap`** — autoria/leitura do `.rc/ROADMAP.md` (fases-épico); o passo
+    de intenção humana que o loop executa mas não inventa.
+  - **`rc-lessons`** — máquina determinística de lições fundamentadas
+    (candidate → confirmed em 2 features → quarantine), respaldada por
+    `scripts/lessons.mjs`; carrega as confirmadas no plano e registra as novas no
+    verify.
+- **`scripts/lessons.mjs`** — bookkeeping determinístico das lições
+  (add/list/penalize/prune/status, `--selftest`), Node stdlib, sem dependências.
+- **`rc-jira`** — integração Jira/Atlassian restaurada e **agnóstica à empresa**:
+  discutir, criar/atualizar/finalizar card, refinar em sub-tasks nativas, executar
+  com evidência de teste, e GMUD (gestão de mudança com rollback obrigatório) via
+  Atlassian MCP.
+
+### Changed
+
+- **`rc-linear` e `rc-jira` — convenções por projeto.** O template de descrição e o
+  checklist de DoR deixam de ser fixos e passam a ser resolvidos por
+  `.rc/{linear,jira}-conventions.md` (ou perguntar + salvar), com o template
+  embutido como default documentado — não mais viesado a uma empresa.
+- **`/rc-card`** carrega lições confirmadas e memória compartilhada entre
+  sub-issues, registra lições fundamentadas no review e atualiza o handoff local
+  por sub-issue.
+- **`rc-workflow-memory`** ganha o formato de decisões `AD-NNN` e de entrada de
+  Handoff no `MEMORY.md` compartilhado.
+
 ## [0.42.0] - 2026-07-10
 
 ### Changed

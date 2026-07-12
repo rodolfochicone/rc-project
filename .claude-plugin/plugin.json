@@ -1,6 +1,6 @@
 {
     "name": "rc",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "description": "RC AI-assisted development workflow skills and commands",
     "author": {
         "name": "Rodolfo Chicone"
