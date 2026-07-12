@@ -2,7 +2,23 @@
 
 ## [Unreleased]
 
-_Nada ainda — registre aqui as mudanças da próxima versão sob `### Added` / `### Changed` / `### Fixed` / `### Removed`, movendo-as para uma seção versionada no release._
+### Added
+
+- **Grafo navegável entre os artefatos do pipeline.** Seções `Related Artifacts`
+  cross-linkam PRD ⇄ TechSpec ⇄ tasks (`rc-create-prd`, `rc-create-techspec`,
+  `rc-create-tasks`), o cabeçalho do `_tasks.md` aponta para PRD/TechSpec, e cada
+  `issue_NNN.md` de review linka de volta aos artefatos da feature
+  (`rc-review-round`). São links markdown relativos com nomes determinísticos
+  (`_prd.md`, `_techspec.md`, `_tasks.md`) — clicáveis no host e renderizáveis como
+  grafo em editores estilo wiki. Nos reviews o backlink fica no corpo da issue, nunca
+  no frontmatter (parseado por tooling estrito).
+
+### Fixed
+
+- **`rc-create-tasks` — link de ADR quebrado no `task-template.md`.** Usava
+  `../adrs/adr-NNN.md`, mas os `task_NN.md` ficam na raiz do slug junto de `adrs/`,
+  então o `../` subia um nível demais e apontava para `.rc/tasks/adrs/` inexistente.
+  Corrigido para `adrs/adr-NNN.md`.
 
 ## [2.1.0] - 2026-07-12
 
