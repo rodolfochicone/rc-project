@@ -63,15 +63,24 @@ node scripts/plugin-smoke.mjs   # must pass — validates all components
 ## Releasing
 
 RC ships through the **Claude Code plugin marketplace**, which reads the version from the manifests
-on `main` — there is no build, tag, or package step. To cut a release:
+on `main` — there is no build or package step. To cut a release:
 
 1. Bump `version` in **both** `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json`
-   (semver: minor for new skills/agents/hooks, patch for fixes).
-2. `node scripts/plugin-smoke.mjs` must pass.
-3. Commit (e.g. `chore(release): bump rc plugin to X.Y.Z`) and push to `main`.
+   (semver: minor for new skills/agents/hooks, patch for fixes). Do **not** bump `package.json`
+   or `extensions/*/extension.toml` — they version independently of the plugin.
+2. In `CHANGELOG.md`, move `## [Unreleased]` to `## [X.Y.Z] - YYYY-MM-DD`, leave a fresh empty
+   `[Unreleased]`, and update the link refs at the bottom: point `[Unreleased]` at
+   `compare/vX.Y.Z...main` and add `[X.Y.Z]` → `releases/tag/vX.Y.Z`.
+3. `node scripts/plugin-smoke.mjs` must pass.
+4. Commit `chore(release): vX.Y.Z` — the two manifests and `CHANGELOG.md`, nothing else. Push to `main`.
+5. Annotated tag: `git tag -a vX.Y.Z -m 'rc vX.Y.Z — <summary>'` and push it.
+6. Publish the GitHub release: `gh release create vX.Y.Z --notes-file -`, using the notes from the
+   version's CHANGELOG section.
 
-Hosts pick up the new version via `/plugin marketplace update`. There is no GitHub-release or npm
-channel today.
+Hosts pick up the new version via `/plugin marketplace update`. There is no npm channel today.
+
+> **Gotcha:** when publishing several releases in one go, `gh` marks as _Latest_ the one **created
+> last by date**, not the highest semver. Fix it with `gh release edit vHIGHEST --latest`.
 
 ## Maintainers
 
