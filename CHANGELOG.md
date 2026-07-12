@@ -59,6 +59,22 @@ _Nada ainda — registre aqui as mudanças da próxima versão sob `### Added` /
 - **`rc-workflow-memory`** ganha o formato de decisões `AD-NNN` e de entrada de
   Handoff no `MEMORY.md` compartilhado.
 
+## [1.0.1] - 2026-07-07
+
+### Fixed
+
+- Correções do coherence-audit e migração de memória legada.
+
+_Seção documentada retroativamente a partir da tag anotada `v1.0.1`._
+
+## [1.0.0] - 2026-07-07
+
+### Added
+
+- Primeiro release plugin-only: skills, commands, hooks e agents.
+
+_Seção documentada retroativamente a partir da tag anotada `v1.0.0`._
+
 ## [0.42.0] - 2026-07-10
 
 ### Changed
@@ -438,3 +454,10 @@ Sync Claude Code (project scope)
 
 ### Added
 - Initial RC release
+
+<!-- GitHub releases (apenas versões que têm seção acima e release publicado) -->
+[Unreleased]: https://github.com/rodolfochicone/rc-project/compare/v2.2.0...main
+[2.2.0]: https://github.com/rodolfochicone/rc-project/releases/tag/v2.2.0
+[2.1.0]: https://github.com/rodolfochicone/rc-project/releases/tag/v2.1.0
+[1.0.1]: https://github.com/rodolfochicone/rc-project/releases/tag/v1.0.1
+[1.0.0]: https://github.com/rodolfochicone/rc-project/releases/tag/v1.0.0
