@@ -185,6 +185,7 @@ and only behind a green harness. Normal feature work stays in `/rc-pipe`.
 | --- | --- | --- |
 | `rc-audit` | Security-audits the agent config surface (`.claude`, `.mcp.json`, hooks, installed skills) for secrets, over-broad perms, injection vectors. | Reviewing an agent setup before sharing, or a periodic config audit. |
 | `rc-linear` | PM-mode Linear via the official Linear MCP: shape ideas, create/refine issues into PRD/TechSpec/sub-issues, execute child issues. | Any Linear work through the official MCP, with confirmation on writes. |
+| `rc-jira` | Company-agnostic Jira/Atlassian via the Atlassian MCP: discuss, create/update/finalize a card, refine into native sub-tasks, execute with test evidence, plus GMUD (change management with mandatory rollback). | Any Jira work through the Atlassian MCP, with confirmation on writes. |
 
 ### Skill authoring & self-improvement
 

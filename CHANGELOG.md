@@ -2,7 +2,23 @@
 
 ## [Unreleased]
 
-_Nada ainda — registre aqui as mudanças da próxima versão sob `### Added` / `### Changed` / `### Fixed` / `### Removed`, movendo-as para uma seção versionada no release._
+### Added
+
+- **`plugin-smoke` ganhou dois sensores de conteúdo** — o gate antigo passava com
+  `OK (107 components)` enquanto três skills estavam invisíveis e o guia mandava instalar
+  um binário que não existe. Validava frontmatter, não coerência. Agora também falha em:
+  - **skill órfã** — toda `skills/<x>/SKILL.md` precisa aparecer no catálogo do `README.md`.
+    Uma skill fora dele carrega, mas nenhum humano a encontra (foi o que aconteceu com
+    `rc-loop`/`rc-roadmap`/`rc-lessons` entre a 2.1.0 e a 2.3.0).
+  - **resíduo da era-CLI** — menções prescritivas ao binário/daemon `rc` aposentado
+    (`rc sync`, `ACP runtime`, flags inexistentes) nos docs e no hub. Linhas que *negam* o
+    CLI ("there is no `rc exec` wrapper") não contam, e o `CLAUDE.md` é isento — a regra
+    precisa nomear o que proíbe.
+
+### Fixed
+
+- **`rc-jira` estava órfã** — a skill existe desde a 2.1.0 e nunca entrou no catálogo do
+  README. Encontrada pelo próprio check novo, na primeira execução.
 
 ## [2.3.0] - 2026-07-14
 

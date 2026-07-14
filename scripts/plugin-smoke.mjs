@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 // Plugin smoke test: validates that the RC Claude Code plugin is loadable purely from its
-// declarative parts — no Go, no build. Checks skill/agent/command frontmatter and that every
-// hook command references a script that exists and is executable. Exits non-zero on any
-// failure so CI can gate on it. Dependency-free (no YAML lib): frontmatter here is simple
-// `key: value` lines between the first two `---` fences.
+// declarative parts — no Go, no build. Checks skill/agent/command frontmatter, that every
+// hook command references a script that exists and is executable, that no skill is orphaned
+// (absent from the README catalog, and so undiscoverable), and that no CLI-era residue creeps
+// back into the docs. Exits non-zero on any failure so CI can gate on it. Dependency-free
+// (no YAML lib): frontmatter here is simple `key: value` lines between the first two `---` fences.
 //
 // Run: node scripts/plugin-smoke.mjs   (from the plugin root)
 
@@ -112,6 +113,45 @@ if (existsSync(hooksPath)) {
     if (!existsSync(abs)) { fail('hooks/hooks.json', `references missing script: ${rel}`); continue; }
     if (!(statSync(abs).mode & 0o111)) fail('hooks/hooks.json', `script not executable: ${rel}`);
   }
+}
+
+// --- orphan skills: a skill nobody can discover may as well not ship ---
+// README.md is the skill catalog (COMMANDS.md is curated, so it is not required here).
+// A skill absent from it loads but is invisible to humans — how rc-loop, rc-roadmap and
+// rc-lessons shipped in 2.1.0 and stayed undiscoverable until 2.3.0.
+const readme = existsSync(join(ROOT, 'README.md')) ? readFileSync(join(ROOT, 'README.md'), 'utf8') : '';
+for (const name of listDirs(join(ROOT, 'skills'))) {
+  if (!existsSync(join(ROOT, 'skills', name, 'SKILL.md'))) continue;
+  checked++;
+  if (!new RegExp(`\\b${name}\\b`).test(readme))
+    fail('README.md', `skill \`${name}\` is not in the catalog — undiscoverable`);
+}
+
+// --- CLI-era residue: the `rc` binary/daemon is retired (see CLAUDE.md) ---
+// Prescriptive mentions only: lines that *negate* the CLI ("there is no `rc exec` wrapper")
+// are the fix, not the bug. CLAUDE.md is exempt — the rule has to name what it forbids.
+const RESIDUE = [
+  /`rc` binary|rc binary/i,
+  /`rc (setup|exec|sync|init|tasks run|reviews)`/,
+  /ACP runtime|home-scoped daemon/i,
+  /--(auto-commit|dry-run|tui|concurrent|batch-size|persist|run-id|include-completed|include-resolved)\b/,
+];
+const NEGATED = /there is no|no longer|retired|never reference|reintroduce/i;
+const DOC_ROOTS = ['README.md', 'COMMANDS.md', 'AGENTS.md'];
+for (const dir of ['docs', 'commands', join('skills', 'rc', 'references')]) {
+  for (const f of listFiles(join(ROOT, dir), '.md')) DOC_ROOTS.push(join(dir, f));
+}
+DOC_ROOTS.push(join('skills', 'rc', 'SKILL.md'));
+for (const file of DOC_ROOTS) {
+  const abs = join(ROOT, file);
+  if (!existsSync(abs)) continue;
+  checked++;
+  readFileSync(abs, 'utf8').split('\n').forEach((line, i) => {
+    if (NEGATED.test(line)) return;
+    for (const re of RESIDUE) {
+      if (re.test(line)) { fail(`${file}:${i + 1}`, `CLI-era residue: ${line.trim().slice(0, 70)}`); break; }
+    }
+  });
 }
 
 // --- report ---
