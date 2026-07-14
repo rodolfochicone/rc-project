@@ -23,7 +23,7 @@ Follow these steps to generate a skill that adheres to the agentskills.io specif
 3.  Ensure no human-centric files (README.md, INSTALLATION.md) are created.
 
 ## Step 3: Draft Core Logic (SKILL.md)
-1.  Use the template in `assets/skill-template.md` as the starting point.
+1.  Use the template in `assets/SKILL.template.md` as the starting point.
 2.  Write all instructions in the **third-person imperative** (e.g., "Extract the text," "Run the build").
 3.  **Enforce Progressive Disclosure:**
     *   Keep the main logic under 500 lines.

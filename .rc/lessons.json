@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "promote_threshold": 2,
+  "window_days": 45,
+  "quarantine_threshold": 2,
+  "next_id": 3,
+  "lessons": [
+    {
+      "id": "L-001",
+      "key": "gate_fail::link pendurado tem duas causas raiz opostas se o arquivo existe fora do lugar mova o arquivo o link estava certo so apague a referencia quando o conteudo nao existe em lugar nenhum e ai apague a promessa inteira secao bullet de trigger claim na description nao so o link clicavel",
+      "text": "Link pendurado tem duas causas raiz opostas: se o arquivo existe fora do lugar, mova o arquivo (o link estava certo); so apague a referencia quando o conteudo nao existe em lugar nenhum — e ai apague a promessa inteira (secao, bullet de trigger, claim na description), nao so o link clicavel.",
+      "signal": "gate_fail",
+      "scope": "",
+      "status": "candidate",
+      "features": [
+        "asset-integrity"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "scripts/plugin-smoke.mjs dangling-asset; skills/rc-autoresearch/SKILL.md vs skills/rc-bubbletea/SKILL.md"
+      ],
+      "created": "2026-07-14T16:12:52Z",
+      "last_seen": "2026-07-14T16:12:52Z"
+    },
+    {
+      "id": "L-002",
+      "key": "gate_fail::quando o nome de um arquivo shipado e a referencia da skill divergem o conteudo do proprio arquivo decide quem esta stale depois de renomear um script confira o modo contra os irmaos 644 vs 755",
+      "text": "Quando o nome de um arquivo shipado e a referencia da skill divergem, o conteudo do proprio arquivo decide quem esta stale; depois de renomear um script, confira o modo contra os irmaos (644 vs 755).",
+      "signal": "gate_fail",
+      "scope": "",
+      "status": "candidate",
+      "features": [
+        "asset-integrity"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "skills/rc-smux-rc-pairing/scripts/run-compozy-start.sh (banner imprimia 'Usage: run-rc-start.sh')"
+      ],
+      "created": "2026-07-14T16:12:52Z",
+      "last_seen": "2026-07-14T16:12:52Z"
+    }
+  ]
+}

@@ -22,7 +22,7 @@ Zod is a TypeScript-first schema declaration and validation library. This skill 
 The skill is automatically loaded when working with Zod code. Reference specific rules:
 
 ```
-See rules/parse-use-safeparse.md for safeParse best practices
+See references/parse-use-safeparse.md for safeParse best practices
 ```
 
 ### For Developers
@@ -32,14 +32,11 @@ Read `SKILL.md` for a quick reference, or `AGENTS.md` for the full compiled guid
 ## File Structure
 
 ```
-zod/
+rc-zod/
 ├── SKILL.md          # Quick reference with rule index
 ├── AGENTS.md         # Full compiled guide (all rules)
-├── metadata.json     # Version, categories, references
 ├── README.md         # This file
-└── rules/
-    ├── _sections.md  # Category definitions
-    ├── _template.md  # Rule template
+└── references/
     ├── schema-*.md   # Schema definition rules
     ├── parse-*.md    # Parsing rules
     ├── type-*.md     # Type inference rules

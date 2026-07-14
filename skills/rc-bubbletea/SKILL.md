@@ -1,6 +1,6 @@
 ---
 name: rc-bubbletea
-description: Build terminal user interfaces with Go and Bubbletea framework. Use for creating TUI apps with the Elm architecture, dual-pane layouts, accordion modes, mouse/keyboard handling, Lipgloss styling, and reusable components. Includes production-ready templates, effects library, and battle-tested layout patterns from real projects.
+description: Build terminal user interfaces with Go and Bubbletea framework. Use for creating TUI apps with the Elm architecture, dual-pane layouts, accordion modes, mouse/keyboard handling, Lipgloss styling, and reusable components. Includes battle-tested layout patterns from real projects.
 license: MIT
 ---
 
@@ -16,7 +16,6 @@ Use this skill when:
 - Fixing layout/rendering issues (borders, alignment, overflow)
 - Implementing mouse/keyboard interactions
 - Building dual-pane or multi-panel layouts
-- Adding visual effects (metaballs, waves, rainbow text)
 - Troubleshooting TUI rendering problems
 
 ## Core Principles
@@ -74,17 +73,6 @@ See `references/components.md` for the complete catalog of reusable components:
 - **Status**: Status bar, title bar, breadcrumbs
 - **Preview**: Text, markdown, syntax highlighting, images, hex
 - **Tables**: Simple and interactive tables
-
-## Effects Library
-
-Beautiful physics-based animations available in the template:
-
-- 🔮 **Metaballs** - Lava lamp-style floating blobs
-- 🌊 **Wave Effects** - Sine wave distortions
-- 🌈 **Rainbow Cycling** - Animated color gradients
-- 🎭 **Layer Compositor** - ANSI-aware multi-layer rendering
-
-See `references/effects.md` for usage examples and integration patterns.
 
 ## Layout Implementation Pattern
 

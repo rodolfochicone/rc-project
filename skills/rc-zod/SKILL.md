@@ -106,9 +106,7 @@ Reference these guidelines when:
 
 Read individual reference files for detailed explanations and code examples:
 
-- [Section definitions](references/_sections.md) - Category structure and impact levels
-- [Rule template](assets/templates/_template.md) - Template for adding new rules
-- Individual rules: `references/{prefix}-{slug}.md`
+- Individual rules: `references/{prefix}-{slug}.md` — the prefix comes from the category table above (e.g. `references/parse-use-safeparse.md`)
 
 ## Full Compiled Document
 

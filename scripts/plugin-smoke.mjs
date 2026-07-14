@@ -154,6 +154,34 @@ for (const file of DOC_ROOTS) {
   });
 }
 
+// --- dangling assets: a skill that points at a file it does not ship is broken on use ---
+// Only markdown links `](path)` and backticked `` `path` `` into references/, assets/ or scripts/
+// count — bare prose mentions are illustrative ("Read references/api-spec.md when needed").
+// Scoped to the entry points (SKILL.md / AGENTS.md): files under references/ are prose and
+// vendored examples whose paths belong to the example, not to this repo. `#anchors` are stripped.
+// A path resolves if it exists under its own skill, the plugin root, or any sibling skill
+// (skills cross-reference each other, e.g. `references/delegation-contract.md` in the rc skill).
+const SKILL_DIRS = listDirs(join(ROOT, 'skills')).map((n) => join(ROOT, 'skills', n));
+const PLACEHOLDER = /NNN|<|\{|_prd|_techspec|_tasks\b/;
+const assetPaths = (text) => [
+  ...text.matchAll(/\]\(((?:references|assets|scripts)\/[^)\s]+)\)/g),
+  ...text.matchAll(/`((?:references|assets|scripts)\/[^`\s]+\.[a-z]+)(?=[`\s])/g), // may carry args: `scripts/x.sh --flag`
+].map((m) => m[1].split('#')[0]);
+
+for (const skillDir of SKILL_DIRS) {
+  const files = [join(skillDir, 'SKILL.md'), join(skillDir, 'AGENTS.md')].filter(existsSync);
+  for (const abs of files) {
+    checked++;
+    const rel = abs.slice(ROOT.length + 1);
+    for (const p of new Set(assetPaths(readFileSync(abs, 'utf8')))) {
+      if (PLACEHOLDER.test(p)) continue; // template placeholder, not a shipped file
+      const found = existsSync(join(skillDir, p)) || existsSync(join(ROOT, p)) ||
+        SKILL_DIRS.some((d) => existsSync(join(d, p)));
+      if (!found) fail(rel, `dangling asset: \`${p}\` does not exist`);
+    }
+  }
+}
+
 // --- report ---
 if (problems.length === 0) {
   console.log(`plugin-smoke: OK (${checked} components checked)`);
