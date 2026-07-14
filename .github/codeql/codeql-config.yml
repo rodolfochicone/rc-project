@@ -1,47 +1,13 @@
-name: "CodeQL Configuration for RC"
+name: "CodeQL config for RC"
 
-# Disable default queries and use security-focused queries
-disable-default-queries: false
+# RC ships plain markdown plus dependency-free Node scripts, shell hooks and an OpenCode
+# TS plugin. CodeQL has no shell analyzer, so the hooks are out of its reach — what it can
+# see is the JS/TS (scripts/, opencode/) and the workflows themselves (`actions`), where
+# untrusted PR input reaching a `run:` block is a real, checkable risk.
 
-# Additional queries to run
 queries:
   - uses: security-extended
-  - uses: security-and-quality
 
-# Paths to scan
-paths:
-  - "cmd/"
-  - "command/"
-  - "internal/"
-  - "rc.go"
-
-# Paths to ignore
 paths-ignore:
-  - "**/*_test.go"
-  - "vendor/"
-  - "**/*.pb.go"
-  - "**/*.gen.go"
-  - "**/*_generated.go"
-  - "*.md"
-  - "*.yml"
-  - "*.yaml"
-  - "*.json"
-
-# Additional configuration
-query-filters:
-  - exclude:
-      id: go/empty-block
-  - exclude:
-      id: go/unused-variable
-  - include:
-      severity: error
-  - include:
-      security-severity: high
-  - include:
-      security-severity: critical
-
-# Enable enhanced security analysis
-advanced-security: true
-
-# Configure build mode
-build-mode: none
+  # Example/reference code shipped inside skills — teaching material, not RC's own code.
+  - "skills/**"
