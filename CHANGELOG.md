@@ -4,6 +4,49 @@
 
 _Nada ainda — registre aqui as mudanças da próxima versão sob `### Added` / `### Changed` / `### Fixed` / `### Removed`, movendo-as para uma seção versionada no release._
 
+## [2.3.0] - 2026-07-14
+
+A camada de loop engineering entrou na 2.1.0 e **nunca foi documentada** — `rc-loop`,
+`rc-roadmap` e `rc-lessons` não apareciam no README, no `COMMANDS.md` nem no hub
+`skills/rc/SKILL.md`, e o loop era o único fluxo de topo sem command. Só dava para
+descobri-lo lendo o CHANGELOG. Esta versão corrige a entrega; o motor não mudou.
+
+### Added
+
+- **`/rc-loop`** — a porta de entrada que faltava. Encadeia os três portões em ordem:
+  gate de prontidão (as 4 perguntas de `loop-readiness.md`; qualquer "não" devolve o
+  usuário ao `/rc-pipe`) → gate de intenção (sem `.rc/ROADMAP.md`, chama `rc-roadmap`
+  `create` e confirma as fases) → só então roda o loop. Antes, `rc-loop` parava seco
+  apontando para uma skill que não estava documentada em lugar nenhum.
+- **`rc-loop` — seção "Triggering"** (o bloco *Automations* do loop engineering): o
+  batimento cardíaco é do **host** (`/loop`, agentes agendados) — RC não traz scheduler,
+  cron nem watcher. E a regra: só **fixed loops** (`rc-review-workflow`, `rc-qa-execution`)
+  são candidatos a agendamento desatendido; `rc-loop` é um loop **criador** (cada fase
+  constrói sobre a anterior), roda com o humano por perto.
+
+### Changed
+
+- **`rc-loop`, `rc-roadmap` e `rc-lessons` agora são descobríveis** — expostas no
+  `README.md` (nova seção "Pipeline — autonomous loop (opt-in)"), no `COMMANDS.md`
+  (seção "Loop autônomo") e no hub `skills/rc/SKILL.md` (tabela Core Skills + o loop
+  como alternativa opt-in às fases 4-7 do pipeline). Em todas, a mesma frase de corte:
+  autonomia se conquista — o loop é para migração e build-out grande atrás de um harness
+  verde; feature normal continua no `/rc-pipe`.
+
+### Fixed
+
+- **`skills/rc/references/workflow-guide.md` — expurgo da era-CLI.** A doc mais profunda
+  do hub ainda exigia o binário `rc` no PATH, descrevia um daemon/runtime ACP na fase de
+  execução, mandava rodar `rc sync` antes de arquivar e documentava flags que não existem
+  (`--auto-commit`, `--tui`, `--concurrent`, `--persist`) — tudo proibido pelo `CLAUDE.md`.
+  As fases 5 (execução), 7 (remediação) e 8 (arquivo) foram reescritas em torno do que de
+  fato roda: `rc-tasks-workflow` / `rc-execute-task`, e os próprios arquivos de task/issue
+  como fonte da verdade.
+- **`config.toml` fantasma.** O guia mandava registrar tipos de task customizados em
+  `.rc/config.toml` sob `[tasks].types`, mas o `config-reference.md` já dizia que RC não lê
+  mais esse arquivo. Além disso, o `validate-tasks.mjs` só exige que o campo `type` exista —
+  não restringe o valor. O texto agora descreve o comportamento real.
+
 ## [2.2.1] - 2026-07-12
 
 ### Fixed
@@ -466,7 +509,8 @@ Sync Claude Code (project scope)
 - Initial RC release
 
 <!-- GitHub releases (apenas versões que têm seção acima e release publicado) -->
-[Unreleased]: https://github.com/rodolfochicone/rc-project/compare/v2.2.1...main
+[Unreleased]: https://github.com/rodolfochicone/rc-project/compare/v2.3.0...main
+[2.3.0]: https://github.com/rodolfochicone/rc-project/releases/tag/v2.3.0
 [2.2.1]: https://github.com/rodolfochicone/rc-project/releases/tag/v2.2.1
 [2.2.0]: https://github.com/rodolfochicone/rc-project/releases/tag/v2.2.0
 [2.1.0]: https://github.com/rodolfochicone/rc-project/releases/tag/v2.1.0
