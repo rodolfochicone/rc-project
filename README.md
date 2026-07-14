@@ -107,6 +107,17 @@ agent (and you) exactly when each one fires.
 | `rc-tasks-workflow` | Runs a slug's task files via the Claude Code `Workflow` tool — one subagent per task, in dependency order, with test evidence. | Executing all of a slug's tasks, Claude-orchestrated (Claude Code only). |
 | `rc-fix-analysis` | Applies the "Implementation plan" from a prior `rc-analyze` report, with tests + verification. | An analysis exists and you want its plan implemented. |
 
+### Pipeline — autonomous loop (opt-in)
+
+Autonomy is **earned, not default**: it pays off for migrations and large mechanical build-outs,
+and only behind a green harness. Normal feature work stays in `/rc-pipe`.
+
+| Skill | Purpose | Use when |
+| --- | --- | --- |
+| `rc-roadmap` | Authors/reads `.rc/ROADMAP.md` — the human-owned list of epic phases a loop walks one at a time. | Before a loop runs, or when one exhausts and needs the next batch. The loop resolves *how*, never *whether*. |
+| `rc-loop` | Creator-loop driver: per phase, plan → execute → verify → record lessons → close, without per-step human gates (Claude Code only). | Advancing a roadmap unattended, **after** the four readiness questions all pass. Not for a single task or a fixed task set. |
+| `rc-lessons` | Grounded-lesson machine (candidate → confirmed → quarantine), backed by `scripts/lessons.mjs`. | Loading confirmed lessons into planning and recording new ones at verify — what stops a loop from repeating its own bugs. |
+
 ### Analysis & understanding
 
 | Skill | Purpose | Use when |
@@ -271,6 +282,7 @@ auto-fire from context; commands are what you type to drive a stage on purpose.
 | `/rc-exec` | Executes a feature's implemented tasks via `rc-execute-task`. |
 | `/rc-review` | Review-and-fix loop — one simplify pass, then up to 3 rounds of review-round + fix-reviews. |
 | `/rc-pipe` | The **full** pipeline end to end — plan → execute → review → docs → PR. |
+| `/rc-loop` | Autonomous loop — readiness gate → roadmap → walk the phases unattended (migrations, large build-outs). |
 | `/rc-gan` | Adversarial quality loop for subjective quality (UI/UX, CLI, copy) against a target score. |
 | `/rc-git` | Ships current work as a branch + PR (`rc-git`), then distills session learnings (`rc-memory`). |
 | `/rc-docs` | Generates/refreshes project docs — README, Postman, OpenAPI. |

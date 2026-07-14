@@ -49,6 +49,13 @@ Phases run in order; each produces artifacts consumed by the next.
 Repeat review/remediation until clean, then ship with `/rc-git`. For a step-by-step walkthrough,
 read `references/workflow-guide.md`.
 
+**Autonomous loop (opt-in, replaces phases 4-7).** For a migration or a large mechanical build-out,
+`/rc-loop` walks `.rc/ROADMAP.md` (authored by `/rc-roadmap`) one phase at a time — planning,
+executing and verifying each phase without per-step human gates, recording lessons (`rc-lessons`)
+as it goes. It runs only behind a readiness gate (`skills/rc-loop/references/loop-readiness.md`):
+a loop does not fix a weak harness, it compounds its errors. Ordinary feature work stays in the
+human-gated pipeline above. Outward-facing actions (PR, push, Linear writes) are never autonomous.
+
 ## Core Skills
 
 | Skill | Trigger | When To Use | Do Not Use For |
@@ -65,6 +72,9 @@ read `references/workflow-guide.md`.
 | `rc-final-verify` | `/rc-final-verify` | Enforcing verification before completion claims | Early planning, brainstorming |
 | `rc-memory` | `/rc-memory` | Durable cross-session memory + learnings (`.rc/memory/`) | Task-scoped notes (use rc-workflow-memory) |
 | `rc-workflow-memory` | (skill) | Cross-task workflow memory under `.rc/tasks/` | PR reviews, user preferences |
+| `rc-roadmap` | `/rc-roadmap` | Authoring/reading `.rc/ROADMAP.md` — the epic phases a loop walks | Planning one phase's tasks (use rc-create-tasks) |
+| `rc-loop` | `/rc-loop` | Walking the roadmap unattended, after the readiness gate passes (Claude Code only) | A single task (rc-execute-task), a fixed task set (rc-tasks-workflow), a weak harness |
+| `rc-lessons` | (skill) | Recording/loading grounded lessons so a loop stops repeating its own bugs | Durable project facts (use rc-memory) |
 | `rc` | `/rc` | Learning how to use RC | Executing workflow steps |
 
 ## Bundled specialist agents

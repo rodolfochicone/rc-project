@@ -4,10 +4,9 @@ End-to-end walkthrough of the RC development pipeline from setup through archive
 
 ## Prerequisites
 
-1. **Install RC.** Ensure the `rc` binary is available in the system PATH.
-2. **Install the plugin.** Install RC through your host's plugin/marketplace mechanism (Claude Code: `/plugin marketplace add rodolfochicone/rc-project` then `/plugin install rc@rc-project`). Skills, commands, agents, and hooks are auto-discovered.
-3. **Ideation extension.** `/rc-idea-factory` ships bundled under `extensions/rc-idea-factory`; its skills and council agents are available once the plugin is installed.
-4. **Configure workspace (optional).** Create `.rc/config.toml` to set default IDE, model, and other preferences. Read `config-reference.md` for all fields.
+1. **Install the plugin.** Install RC through your host's plugin/marketplace mechanism (Claude Code: `/plugin marketplace add rodolfochicone/rc-project` then `/plugin install rc@rc-project`). Skills, commands, agents, and hooks are auto-discovered. There is no binary, daemon, or CLI.
+2. **Ideation extension.** `/rc-idea-factory` ships bundled under `extensions/rc-idea-factory`; its skills and council agents are available once the plugin is installed.
+3. **Configure (optional).** Model and reasoning effort live in each skill's/agent's frontmatter; hook behavior is set via `RC_HOOK_PROFILE` / `RC_DISABLED_HOOKS`. Read `config-reference.md`.
 
 ## Phase 1: Ideation (Optional)
 
@@ -66,25 +65,22 @@ Bundled: `extensions/rc-idea-factory` (skills + council agents), available with 
 6. Validation runs via `node "$CLAUDE_PLUGIN_ROOT/scripts/validate-tasks.mjs" --slug <slug>`.
 7. Output: `task_01.md` through `task_N.md`, `_tasks.md` master list.
 
-**Task types:** `frontend`, `backend`, `docs`, `test`, `infra`, `refactor`, `chore`, `bugfix`. Custom types can be registered in `.rc/config.toml` under `[tasks].types`.
+**Task types:** `frontend`, `backend`, `docs`, `test`, `infra`, `refactor`, `chore`, `bugfix` — the conventional set `rc-create-tasks` writes. The validator requires the `type` field to be present but does not constrain its value, so a project-specific type is allowed.
 
 ## Phase 5: Execution
 
 **Run:** `/rc-tasks-workflow <slug>` (Claude Code) or the `rc-execute-task` skill per task in dependency order (any host)
 
-1. RC reads task files from `.rc/tasks/<slug>/` in order, respecting dependencies.
-2. The CLI auto-starts the home-scoped daemon when needed and starts the run through daemon transport.
-3. For each pending task, RC constructs a prompt including the task spec, PRD, TechSpec, ADRs, and workflow memory.
-4. The configured ACP runtime executes the task using the `rc-execute-task` skill.
-5. Each task: read spec -> implement -> validate with `rc-final-verify` -> update tracking -> optional commit.
+1. Validate the set first: `node "$CLAUDE_PLUGIN_ROOT/scripts/validate-tasks.mjs" --slug <slug>`.
+2. Task files are read from `.rc/tasks/<slug>/` and ordered topologically by their `dependencies` frontmatter. Tasks already `status: completed` are skipped.
+3. On **Claude Code**, `/rc-tasks-workflow <slug>` drives the `Workflow` tool — one subagent per task, sequentially (tasks share the working tree; no parallelism, no worktree isolation). On **any other host**, run each task through the `rc-execute-task` skill in dependency order.
+4. Each task carries its spec plus the PRD, TechSpec, ADRs, and workflow memory as context, and follows the `rc-execute-task` contract: explore -> implement -> validate with `rc-final-verify` -> update tracking -> optional local commit.
+5. A task that fails verification is marked `failed`; tasks depending on it are skipped with the reason recorded. Independent tasks still run.
 6. Workflow memory is maintained across tasks via `rc-workflow-memory`.
 
-**Key flags:**
-- `--auto-commit` -- create a local commit after each task completes cleanly.
-- `--dry-run` -- generate prompts without running the IDE tool.
-- `--include-completed` -- re-process tasks already marked as completed.
+## Phase 5b: Autonomous loop (optional, replaces phases 4-7)
 
-**Interactive mode:** In interactive terminals, `tasks run` attaches to the TUI by default; use `--ui`, `--stream`, `--detach`, or `--attach` to override that behavior.
+For a migration or a large mechanical build-out, `/rc-loop` walks `.rc/ROADMAP.md` (authored by `/rc-roadmap`) one phase at a time: load lessons -> plan the phase's tasks -> execute -> verify -> record lessons -> flip the checkbox on a PASS. It runs only behind the four readiness questions in `skills/rc-loop/references/loop-readiness.md`, and it stops on its own when the roadmap is exhausted, a phase cannot reach green, or a decision the loop cannot assume comes up. Outward-facing actions (PR, push, Linear writes) are never autonomous.
 
 ## Phase 6: Review
 
@@ -108,36 +104,21 @@ Fetches review comments from an external provider (currently CodeRabbit) and wri
 
 **Fix:** `/rc-fix-reviews`
 
-1. RC reads issue files from the latest (or specified) review round.
-2. For each batch of issues, the configured ACP runtime executes the `rc-fix-reviews` skill.
-3. Each issue is triaged (valid/invalid), fixed if valid (in severity order), and verified with `rc-final-verify`.
-4. Issue file frontmatter is updated: `pending` -> `valid`/`invalid` -> `resolved`.
-
-**Key flags:**
-- `--concurrent <N>` -- process N batches in parallel.
-- `--batch-size <N>` -- group N file scopes per batch.
-- `--include-resolved` -- re-process already-resolved issues.
+1. The skill reads issue files from the latest (or specified) review round.
+2. Each issue is triaged (valid/invalid), fixed if valid (in severity order), and verified with `rc-final-verify`.
+3. Issue file frontmatter is updated: `pending` -> `valid`/`invalid` -> `resolved`.
 
 **Iterate:** Repeat phases 6-7 until all reviews are clean, then merge.
 
 ## Phase 8: Archive
 
-**Archive:** move `.rc/tasks/<slug>/` into `.rc/tasks/_archived/`
+**Archive:** move `.rc/tasks/<slug>/` into `.rc/tasks/_archived/<timestamp>-<slug>/`.
 
-Moves fully completed workflows from `.rc/tasks/<slug>/` to `.rc/tasks/_archived/<timestamp>-<slug>/`.
-
-**Eligibility:** Run `rc sync` first. Archive eligibility is computed from synced daemon state: all task items must be completed and all synced review issues must be resolved.
+**Eligibility:** every `task_NN.md` is `status: completed` and every issue under `reviews-NNN/` is `resolved` — read from the task and issue files themselves, which are the source of truth.
 
 ## Ad Hoc Execution
 
-**Exec:** prompt the agent/host directly (there is no `rc exec` wrapper)
-
-Execute a single prompt outside the pipeline workflow.
-
-- **Reusable agents:** invoke a specialist agent directly (e.g. the `rc-oracle` agent) in your host.
-- **Persistence:** `--persist` saves session artifacts. Resume with `--run-id <id>`.
-- **TUI mode:** `--tui` opens an interactive terminal UI.
-- **Output formats:** `--format text` (default), `json` (lean JSONL), `raw-json` (full event stream).
+Prompt the agent/host directly — there is no `rc exec` wrapper. To keep the main context lean, delegate: `rc-explorer` for recon, `rc-librarian` for external docs, `rc-oracle` for hard review/decisions, `rc-fixer` for bounded implementation (see `delegation-contract.md`).
 
 ## Workflow Memory
 

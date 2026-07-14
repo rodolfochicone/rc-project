@@ -44,6 +44,24 @@ Memória e aprendizado: `/rc-project-memory` (fatos duráveis do projeto), `rc-w
 - `/rc-review-workflow <nome>` — loop automatizado review → fix → re-review.
 - `/rc-fix-reviews <nome>` — triagem e correção dos issues do round.
 
+## 4. Loop autônomo (opcional)
+
+O loop é para **migração e build-out grande atrás de um harness verde** — feature normal continua
+em `/rc-pipe`. Autonomia se conquista: o `/rc-loop` só roda depois das quatro perguntas de
+prontidão (harness forte? feedback rápido? condição de parada confiável? backlog grande o
+bastante?). Qualquer "não" → fique no fluxo humano-gated e invista no harness.
+
+| Comando | O que faz |
+| --- | --- |
+| `/rc-roadmap [create\|next\|status]` | Autora/lê o `.rc/ROADMAP.md` — as fases-épico. É o passo de **intenção humana**: o loop executa, não inventa. |
+| `/rc-loop` | Anda o roadmap fase a fase (plan → execute → verify → aprende → fecha) até esgotar ou uma fase não ficar verde. |
+
+Por trás, a skill `rc-lessons` carrega as lições confirmadas no planejamento e registra as novas no
+verify — é o que impede o loop de repetir os próprios bugs a cada fase.
+
+O loop deixa a working tree verde e commitada por fase. **PR, push e escrita no Linear/Jira nunca
+são autônomos** — continuam sendo passo humano confirmado (`/rc-git`).
+
 ---
 
 ## Fluxo típico de ponta a ponta

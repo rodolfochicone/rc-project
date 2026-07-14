@@ -70,6 +70,16 @@ state move (`rc-card` / `rc-linear`). The loop's job is to leave a green, commit
 per phase; shipping is the human's confirmed step. Match the `rc-card` guardrail — never offload a
 confirmation-bearing action into unattended automation.
 
+## Triggering — RC ships no scheduler
+
+The loop's heartbeat belongs to the **host**, not to RC: Claude Code already has `/loop` and
+scheduled agents. RC deliberately adds no cron, no daemon, no watcher of its own.
+
+Only **fixed** loops — no side effects, safe to repeat (`rc-review-workflow`, `rc-qa-execution`,
+benchmarks) — are candidates for unattended scheduling. `rc-loop` is a **creator** loop: each phase
+builds on the last, so a bug in an early phase propagates. Run it with the human within reach, and
+keep the human-gated boundary above intact under any automation.
+
 ## Not this skill
 
 - **Single task** → `rc-execute-task`. **Fixed, already-authored task set (one pass)** → `rc-tasks-workflow`.
