@@ -4,6 +4,39 @@
 
 _Nada ainda — registre aqui as mudanças da próxima versão sob `### Added` / `### Changed` / `### Fixed` / `### Removed`, movendo-as para uma seção versionada no release._
 
+## [2.5.0] - 2026-07-14
+
+Primeira rodada real do `/rc-loop` neste repo. O backlog não foi inventado: saiu do
+sensor novo do `plugin-smoke` (`dangling asset`), que achou 8 links que as skills
+publicavam e que não resolviam. O gate foi o oráculo — o loop só fechou cada fase
+com `node scripts/plugin-smoke.mjs` verde.
+
+### Added
+
+- **`plugin-smoke` — check `dangling asset`.** Todo link markdown ou caminho em crase
+  apontando para `references/`, `assets/` ou `scripts/` a partir de um `SKILL.md`/`AGENTS.md`
+  precisa existir (na própria skill, na raiz do plugin ou numa skill irmã). Âncoras `#secao`
+  são ignoradas; prosa ilustrativa não conta. O gate foi de 107 para **300 componentes**.
+
+### Fixed
+
+- **`rc-autoresearch`** — `eval-guide.md` movido para `references/`. O link estava certo; o
+  arquivo é que estava fora da convenção do repo (conteúdo profundo vive em `references/`).
+- **`rc-bubbletea`** — removida a "Effects Library". A skill anunciava metaballs, waves,
+  rainbow cycling e um `references/effects.md` que **nunca existiram** neste repo (resquício de
+  uma skill upstream que empacotava um template Go que RC não distribui). A promessa saiu
+  também do bullet de trigger e da `description` do frontmatter — que o gate não enxerga e que
+  carrega em toda sessão.
+- **`rc-zod`** — `SKILL.md`, `AGENTS.md` e `README.md` apontavam para `references/_sections.md`,
+  `assets/templates/_template.md` e `metadata.json`: scaffolding de gerador nunca preenchido.
+  Agora apontam só para as regras que existem (`references/{prefix}-{slug}.md`).
+- **`rc-skill-best-practices`** — a prosa mandava usar `assets/skill-template.md`; o arquivo
+  distribuído é `assets/SKILL.template.md`.
+- **`rc-smux-rc-pairing`** — último resquício do fork Compozy: `run-compozy-start.sh` renomeado
+  para `run-rc-start.sh` (o próprio banner do script já imprimia o nome novo — o de-fork
+  reescreveu o corpo e esqueceu o nome do arquivo). Ganhou o bit de execução que faltava: era o
+  único script do diretório em 644, e a skill manda executá-lo direto.
+
 ## [2.4.0] - 2026-07-14
 
 O gate deste repo passava verde enquanto a v2.3.0 corrigia bugs que ele deveria ter
@@ -533,7 +566,8 @@ Sync Claude Code (project scope)
 - Initial RC release
 
 <!-- GitHub releases (apenas versões que têm seção acima e release publicado) -->
-[Unreleased]: https://github.com/rodolfochicone/rc-project/compare/v2.4.0...main
+[Unreleased]: https://github.com/rodolfochicone/rc-project/compare/v2.5.0...main
+[2.5.0]: https://github.com/rodolfochicone/rc-project/releases/tag/v2.5.0
 [2.4.0]: https://github.com/rodolfochicone/rc-project/releases/tag/v2.4.0
 [2.3.0]: https://github.com/rodolfochicone/rc-project/releases/tag/v2.3.0
 [2.2.1]: https://github.com/rodolfochicone/rc-project/releases/tag/v2.2.1
