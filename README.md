@@ -4,6 +4,7 @@
   <p>
     <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
     <a href="https://github.com/rodolfochicone/rc-project/releases"><img src="https://img.shields.io/github/v/release/rodolfochicone/rc-project?include_prereleases" alt="Release"></a>
+    <a href="https://github.com/sponsors/rodolfochicone"><img src="https://img.shields.io/github/sponsors/rodolfochicone?label=Sponsors&color=ea4aaa&logo=githubsponsors&logoColor=white" alt="Sponsors"></a>
   </p>
 </div>
 
