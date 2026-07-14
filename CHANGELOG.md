@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+_Nada ainda — registre aqui as mudanças da próxima versão sob `### Added` / `### Changed` / `### Fixed` / `### Removed`, movendo-as para uma seção versionada no release._
+
+## [2.4.0] - 2026-07-14
+
+O gate deste repo passava verde enquanto a v2.3.0 corrigia bugs que ele deveria ter
+pego — validava frontmatter, não coerência. Esta versão transforma o `plugin-smoke`
+num sensor de conteúdo: o número de componentes checados foi de 107 para 213.
+
 ### Added
 
 - **`plugin-smoke` ganhou dois sensores de conteúdo** — o gate antigo passava com
@@ -525,7 +533,8 @@ Sync Claude Code (project scope)
 - Initial RC release
 
 <!-- GitHub releases (apenas versões que têm seção acima e release publicado) -->
-[Unreleased]: https://github.com/rodolfochicone/rc-project/compare/v2.3.0...main
+[Unreleased]: https://github.com/rodolfochicone/rc-project/compare/v2.4.0...main
+[2.4.0]: https://github.com/rodolfochicone/rc-project/releases/tag/v2.4.0
 [2.3.0]: https://github.com/rodolfochicone/rc-project/releases/tag/v2.3.0
 [2.2.1]: https://github.com/rodolfochicone/rc-project/releases/tag/v2.2.1
 [2.2.0]: https://github.com/rodolfochicone/rc-project/releases/tag/v2.2.0
