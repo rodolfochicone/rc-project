@@ -182,6 +182,25 @@ for (const skillDir of SKILL_DIRS) {
   }
 }
 
+// --- CI toolchain fossils: a workflow must not build a stack this repo does not have ---
+// ci.yml survived the de-fork setting up Go, Bun, Playwright and running `make verify` in a repo
+// that ships plain markdown — so every push touching skills/ or scripts/ failed for months.
+// The invariant is tied to reality (does the manifest exist?), not to a blacklist of names.
+const TOOLCHAIN = [
+  { re: /setup-go|go-version|\bgo (build|test|mod)\b/, needs: 'go.mod', what: 'Go' },
+  { re: /setup-bun|bun install|bunx/, needs: 'bun.lock', what: 'Bun' },
+  { re: /^\s*(run:.*|-\s+)make\s+\w+/m, needs: 'Makefile', what: 'make' },
+];
+for (const f of listFiles(join(ROOT, '.github', 'workflows'), '.yml')) {
+  const file = join('.github', 'workflows', f);
+  checked++;
+  const text = readFileSync(join(ROOT, file), 'utf8');
+  for (const { re, needs, what } of TOOLCHAIN) {
+    if (re.test(text) && !existsSync(join(ROOT, needs)))
+      fail(file, `sets up ${what}, but this repo has no \`${needs}\` — toolchain fossil`);
+  }
+}
+
 // --- report ---
 if (problems.length === 0) {
   console.log(`plugin-smoke: OK (${checked} components checked)`);
