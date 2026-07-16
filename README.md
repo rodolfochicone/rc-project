@@ -214,6 +214,10 @@ Deep, opinionated guides for a specific library/runtime — auto-fire on the mat
 | `rc-vitest` | Vitest: tests, mocking, coverage, filtering, fixtures. |
 | `rc-python` | Idiomatic typed Python 3.12+ — PEP 695 generics, asyncio/TaskGroup, pytest, ruff, uv packaging. |
 | `rc-ai-sdk` | Vercel AI SDK: `generateText`/`streamText`, tools, agents, providers, streaming. |
+| `rc-fullstack-axum-svelte` | Umbrella: routes Axum + SQLx/Postgres + SvelteKit work; **Bun** for the frontend. |
+| `rc-axum` | Axum 0.8+ Rust APIs — routing, State, middleware, errors, WebSockets, security, tests, clippy. |
+| `rc-sqlx` | SQLx 0.8+ + PostgreSQL — pool, binds, transactions, migrations, macros, DB tests. |
+| `rc-sveltekit` | SvelteKit 2 + Svelte 5 — SSR load, form actions, hooks, CSRF/CSP, adapter-node, **Bun**. |
 
 ### Backend, data & operations
 

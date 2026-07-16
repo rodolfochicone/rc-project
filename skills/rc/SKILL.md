@@ -75,6 +75,10 @@ human-gated pipeline above. Outward-facing actions (PR, push, Linear writes) are
 | `rc-loop` | `/rc-loop` | Walking the roadmap unattended, after the readiness gate passes (Claude Code only) | A single task (rc-execute-task), a fixed task set (rc-tasks-workflow), a weak harness |
 | `rc-lessons` | (skill) | Recording/loading grounded lessons so a loop stops repeating its own bugs | Durable project facts (use rc-memory) |
 | `rc` | `/rc` | Learning how to use RC | Executing workflow steps |
+| `rc-fullstack-axum-svelte` | (skill) | Umbrella Axum + SQLx + SvelteKit (Bun) | React/Next, PRD/task pipeline phases |
+| `rc-axum` | (skill) | Axum 0.8+ APIs, WS, middleware, security/tests | SvelteKit-only or SQLx-only work |
+| `rc-sqlx` | (skill) | SQLx 0.8 + Postgres access, migrations, DB tests | HTTP routing alone, non-Rust ORMs |
+| `rc-sveltekit` | (skill) | SvelteKit 2 SSR, forms, hooks, adapter-node, Bun | React/Next, Axum-only APIs |
 
 ## Bundled specialist agents
 

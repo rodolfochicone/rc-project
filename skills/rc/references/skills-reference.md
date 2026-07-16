@@ -126,6 +126,42 @@ Maintains workflow-scoped task memory for RC runs using files under `.rc/tasks/<
 
 ---
 
+## rc-fullstack-axum-svelte
+
+**Trigger:** skill auto-fire / fullstack Rust + SvelteKit work.
+
+Umbrella that **routes** to `rc-axum`, `rc-sqlx`, and `rc-sveltekit`, defines the default VPS architecture, and mandates **Bun ≥ 1.3** for the frontend (install + SSR runtime). Does not replace specialist guides — load their `references/` when implementing.
+
+- **Use when:** Building or reviewing the Axum + Postgres + SvelteKit stack together, or unsure which specialist to open.
+- **Do not use for:** React/Next, pure Python, or PRD/TechSpec/task pipeline phases.
+
+## rc-axum
+
+**Trigger:** skill auto-fire / stack work on Axum.
+
+Implements and reviews **Axum 0.8+** Rust HTTP APIs (routing, `State`, extractors, Tower middleware, typed errors, WebSockets) plus security, tests, and clippy/fmt gates. References under `skills/rc-axum/references/`.
+
+- **Use when:** Building or reviewing Axum backends / WS endpoints.
+- **Do not use for:** SvelteKit alone (`rc-sveltekit`), SQLx-only work (`rc-sqlx`).
+
+## rc-sqlx
+
+**Trigger:** skill auto-fire / SQLx or Postgres-from-Rust.
+
+Implements and reviews **SQLx 0.8+** with PostgreSQL (pool, binds, transactions, migrations, compile-time macros, DB tests). References under `skills/rc-sqlx/references/`.
+
+- **Use when:** Writing or reviewing Rust database access with SQLx.
+- **Do not use for:** HTTP routing alone (`rc-axum`), general SQL design without Rust (`rc-sql`).
+
+## rc-sveltekit
+
+**Trigger:** skill auto-fire / SvelteKit routes or SSR.
+
+Implements and reviews **SvelteKit 2 + Svelte 5** (SSR `load`, form actions, `hooks.server`, cookies, CSRF/CSP, adapter-node + **Bun** VPS deploy, tests). References under `skills/rc-sveltekit/references/`.
+
+- **Use when:** Building or reviewing SvelteKit apps (especially SSR + Bun on VPS).
+- **Do not use for:** React/Next (`rc-react`), Axum-only APIs (`rc-axum`).
+
 ## rc
 
 **Trigger:** `/rc`
@@ -136,4 +172,4 @@ This skill. Explains RC capabilities, CLI commands, core workflow skills, option
 - **Outputs:** Reference information presented to the agent.
 - **Pipeline position:** Standalone reference, not part of the pipeline.
 - **Use when:** The user asks how to use RC, what commands are available, or how the workflow works.
-- **Do not use for:** Executing any workflow step. Use the specific `cy-` skills instead.
+- **Do not use for:** Executing any workflow step. Use the specific `rc-*` skills instead.

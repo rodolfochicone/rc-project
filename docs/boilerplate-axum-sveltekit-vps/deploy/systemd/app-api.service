@@ -1,0 +1,25 @@
+[Unit]
+Description=App API (Axum)
+After=network.target postgresql.service docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=deploy
+Group=deploy
+WorkingDirectory=/opt/app
+EnvironmentFile=/opt/app/.env
+ExecStart=/opt/app/bin/app-api
+Restart=on-failure
+RestartSec=3
+LimitNOFILE=65535
+
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/app
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,29 @@
+[Unit]
+Description=App Web (SvelteKit on Bun)
+After=network.target app-api.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=deploy
+Group=deploy
+WorkingDirectory=/opt/app/web
+EnvironmentFile=/opt/app/.env
+Environment=PORT=3001
+Environment=HOST=127.0.0.1
+Environment=NODE_ENV=production
+# Prefer system path (install-vps.sh symlinks Bun to /usr/local/bin).
+# ProtectHome=true blocks /home/deploy/.bun — do not ExecStart from $HOME.
+ExecStart=/usr/local/bin/bun /opt/app/web/index.js
+Restart=on-failure
+RestartSec=3
+LimitNOFILE=65535
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/app
+
+[Install]
+WantedBy=multi-user.target

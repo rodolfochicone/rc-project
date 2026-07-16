@@ -1,0 +1,25 @@
+# Substitua example.com pelo seu domínio (ou use :80 só com IP).
+# TLS automático com Let's Encrypt quando o domínio aponta para a VPS.
+
+{$DOMAIN:localhost} {
+	encode gzip zstd
+
+	# WebSocket real-time → Axum
+	handle /ws/* {
+		reverse_proxy 127.0.0.1:3000
+	}
+
+	# API REST → Axum
+	handle /api/* {
+		reverse_proxy 127.0.0.1:3000
+	}
+
+	handle /health {
+		reverse_proxy 127.0.0.1:3000
+	}
+
+	# SSR + assets → SvelteKit (adapter-node rodando com Bun)
+	handle {
+		reverse_proxy 127.0.0.1:3001
+	}
+}
