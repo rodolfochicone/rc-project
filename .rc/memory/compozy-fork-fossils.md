@@ -26,3 +26,5 @@ decide quem está stale**.
 tooling), nomes de arquivo/script, e qualquer coisa que cite `make`, `go`, `bun`, `daemon`,
 `ACP` ou `web/`. O gate hoje cobre parte disso (ver [[gate-sensor-over-patch]]), mas só o que é
 markdown/workflow — dotfiles de tooling seguem sem sensor.
+
+**Update 2026-07-15:** os fósseis Go foram removidos no corte pre-slim (commits 743377b + dd4a344): agents/README.md (agente fantasma rc:README), hooks go-fmt/go-mod-guard (+ canal opencode), rc-fix-coderabbit-review, rc-app-renderer-systems, rc-portal-design e o cluster Go/TUI inteiro. Tag `pre-slim` guarda o estado anterior.
