@@ -4,6 +4,54 @@
 
 _Nada ainda — registre aqui as mudanças da próxima versão sob `### Added` / `### Changed` / `### Fixed` / `### Removed`, movendo-as para uma seção versionada no release._
 
+## [3.0.0] - 2026-07-15
+
+O corte "pre-slim": o plugin foi auditado contra o uso real (19 dias de histórico de
+sessões, referências cruzadas internas e git log) e enxugado de **85 para 57 skills**.
+O critério foi evidência, não opinião: o que o fluxo plan→exec→review usa fica; fóssil,
+redundância e nicho sem uso saem. A tag `pre-slim` marca o estado anterior — nada se
+perde, git guarda. Descriptions de skill custam contexto em toda sessão; o corte devolve
+~4.5k tokens por sessão e reduz a chance de ativação de skill errada.
+
+### Added
+
+- **`rc-board`** — fusão de `rc-jira` + `rc-linear` numa skill genérica de board em modo
+  PM: `SKILL.md` provider-neutro (discuss/create/update/finalize/refine/execute) +
+  `references/linear.md` e `references/jira.md` com o contrato de tooling de cada
+  provedor (GMUD incluso no Jira). As chaves `linear_key`/`jira_key` e os sync files
+  `_linear-sync.md`/`_jira-sync.md` foram preservados — task files existentes continuam
+  válidos.
+
+### Removed
+
+- **Fósseis do fork Compozy** — `agents/README.md` (falava de "embedding Go source
+  files" e registrava um agente fantasma `rc:README` em toda sessão), os hooks
+  `go-fmt.sh`/`go-mod-guard.sh` (rodavam a cada Edit em repos sem nenhum Go; removidos
+  do `hooks.json` e do canal OpenCode), `rc-fix-coderabbit-review` (fluxo da era Codex),
+  `rc-app-renderer-systems` e `rc-portal-design` (convenções de codebases alheios).
+- **Cluster Go/TUI** (nenhum projeto dessa stack no histórico) — `rc-golang-pro`,
+  `rc-bubbletea`, `rc-tui-design`, `rc-tui-glamorous`, `rc-smux`, `rc-smux-rc-pairing`.
+- **Redundâncias** — `rc-adversarial-review` e `rc-impl-peer-review` (cobertos por
+  `rc-code-review`/`rc-review-round`), `rc-lesson-learned` (coberto por
+  `rc-memory`/`rc-lessons`), `rc-to-prompt` (coberto por `rc-enrichment-prompt`),
+  `rc-exa-web-search-free` (WebSearch nativo), `rc-minimalist-ui` e
+  `rc-redesign-existing-projects` (o par `rc-frontend-design`/`rc-interface-design`
+  cobre design de UI).
+- **Meta sem uso** — `rc-graphify`, `rc-refactoring-analysis`,
+  `rc-extreme-software-optimization`, `rc-qa-report`, `rc-ubs`, `rc-autoresearch`,
+  `rc-audit`, `rc-drawio`, `rc-tech-logos`, `rc-find-skills`, `rc-compact`.
+- **Extension `rc-idea-factory`** — duplicava os council agents que o plugin já embarca;
+  o `/rc-council` cobre o debate multi-advisor. O workflow-guide foi renumerado (a fase
+  de ideação opcional saiu do pipeline documentado).
+
+### Changed
+
+- **BREAKING:** quem invocava `rc-jira`/`rc-linear` passa a usar `rc-board` (o provedor
+  é detectado pelo MCP conectado). Referências em `rc-card`, `rc-loop` e
+  `rc-tasks-workflow` já apontam para a nova skill.
+- README, COMMANDS, catálogo (`skills/rc/`) e docs de hooks atualizados; varredura de
+  referências penduradas limpa e `plugin-smoke` verde (220 componentes).
+
 ## [2.6.0] - 2026-07-14
 
 Release de infraestrutura: o conteúdo do plugin é idêntico ao da 2.5.0. O que mudou é
@@ -614,7 +662,8 @@ Sync Claude Code (project scope)
 - Initial RC release
 
 <!-- GitHub releases (apenas versões que têm seção acima e release publicado) -->
-[Unreleased]: https://github.com/rodolfochicone/rc-project/compare/v2.6.0...main
+[Unreleased]: https://github.com/rodolfochicone/rc-project/compare/v3.0.0...main
+[3.0.0]: https://github.com/rodolfochicone/rc-project/releases/tag/v3.0.0
 [2.6.0]: https://github.com/rodolfochicone/rc-project/releases/tag/v2.6.0
 [2.5.0]: https://github.com/rodolfochicone/rc-project/releases/tag/v2.5.0
 [2.4.0]: https://github.com/rodolfochicone/rc-project/releases/tag/v2.4.0
