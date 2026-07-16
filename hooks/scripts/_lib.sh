@@ -10,7 +10,7 @@
 #
 # Profiles are cumulative: minimal ⊂ standard ⊂ strict. A hook declares the
 # lowest profile at which it is active; it runs at that profile and every higher
-# one. git/commit guards are "minimal" (always on); formatting and the fact-gate
+# one. git/commit guards are "minimal" (always on); repair-guidance and the fact-gate
 # default off until "standard"/"strict" respectively.
 
 rc_profile_rank() {
