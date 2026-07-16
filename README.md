@@ -63,9 +63,9 @@ cross-tool `~/.agents/skills` path and the OpenCode-specific agents/commands/plu
 ## 🔄 How It Works
 
 ```text
-idea (optional) → PRD → TechSpec → tasks → execution → review → remediation → ship
-      /rc-idea-factory        /rc-create-*        rc-tasks-workflow /       /rc-git
-                                                  rc-execute-task
+PRD → TechSpec → tasks → execution → review → remediation → ship
+   /rc-create-*         rc-tasks-workflow /        /rc-git
+                        rc-execute-task
 ```
 
 Each phase is a skill. Artifacts land under `.rc/tasks/<slug>/` (`_prd.md`, `_techspec.md`, task
@@ -222,11 +222,6 @@ Deep, opinionated guides for a specific library/runtime — auto-fire on the mat
 | `rc-sql` | Relational DB — query optimization (EXPLAIN, indexes, N+1), schema design; read-only by default. | Writing/reviewing queries or modeling schema. Not for repo-specific migrations or NoSQL. |
 | `rc-observability` | Logs, metrics, traces, and incident response — instrumentation, SLOs, postmortems. | Instrumenting a service, defining alerts, or running root-cause analysis. |
 | `rc-resilience` | Event-driven resilience — idempotency, retries/backoff, DLQ, poison messages, timeouts, circuit breaker. | Designing/reviewing message producers/consumers (EventBridge, SQS) or cross-service calls. |
-
-### Bundled extension
-
-Optional, under `extensions/rc-idea-factory`: **`rc-idea-factory`** — raw idea → structured idea spec
-with market research, business analysis, and a council debate. Sits before `rc-create-prd`.
 
 ---
 

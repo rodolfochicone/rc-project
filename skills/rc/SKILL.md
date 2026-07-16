@@ -37,13 +37,12 @@ access is required for the private repo (`gh auth login` or `GH_TOKEN`).
 
 Phases run in order; each produces artifacts consumed by the next.
 
-1. **Ideation** (optional) — `/rc-idea-factory` expands a raw idea into a research-backed spec at `.rc/tasks/<slug>/_idea.md`. Ships bundled under `extensions/rc-idea-factory`.
-2. **Requirements** — `/rc-create-prd` → `.rc/tasks/<slug>/_prd.md` + ADRs.
-3. **Technical Design** — `/rc-create-techspec` → `_techspec.md` + ADRs.
-4. **Task Decomposition** — `/rc-create-tasks` → `task_01.md … task_N.md` + master `_tasks.md`. Validate with `node "$CLAUDE_PLUGIN_ROOT/scripts/validate-tasks.mjs" --slug <slug>`.
-5. **Execution** — `/rc-tasks-workflow <slug>` (Claude Code; drives the `Workflow` tool) or the `rc-execute-task` skill per task in dependency order (any host).
-6. **Review** — `/rc-review-round` (manual multi-lens review) or `/rc-review-workflow` (Claude Code review→fix loop) → issue files under `reviews-NNN/`.
-7. **Remediation** — `/rc-fix-reviews` triages, fixes, and verifies each review issue.
+1. **Requirements** — `/rc-create-prd` → `.rc/tasks/<slug>/_prd.md` + ADRs.
+2. **Technical Design** — `/rc-create-techspec` → `_techspec.md` + ADRs.
+3. **Task Decomposition** — `/rc-create-tasks` → `task_01.md … task_N.md` + master `_tasks.md`. Validate with `node "$CLAUDE_PLUGIN_ROOT/scripts/validate-tasks.mjs" --slug <slug>`.
+4. **Execution** — `/rc-tasks-workflow <slug>` (Claude Code; drives the `Workflow` tool) or the `rc-execute-task` skill per task in dependency order (any host).
+5. **Review** — `/rc-review-round` (manual multi-lens review) or `/rc-review-workflow` (Claude Code review→fix loop) → issue files under `reviews-NNN/`.
+6. **Remediation** — `/rc-fix-reviews` triages, fixes, and verifies each review issue.
 8. **Archive** — move a fully completed `.rc/tasks/<slug>/` into `.rc/tasks/_archived/`.
 
 Repeat review/remediation until clean, then ship with `/rc-git`. For a step-by-step walkthrough,
@@ -105,12 +104,6 @@ Configured in `hooks/hooks.json` (bash scripts under `hooks/scripts/`, gated by
 - **Resilience** — `repair-guidance` injects corrective guidance when an `Edit`/`Task` returns a
   repairable failure, so the agent fixes the root cause instead of retrying the same failing call.
 
-## Optional extension skills
-
-| Skill | Trigger | When To Use |
-| --- | --- | --- |
-| `rc-idea-factory` | `/rc-idea-factory` | A raw feature idea needs structured exploration (research + council debate) before a PRD |
-
 For detailed skill descriptions and inputs/outputs, read `references/skills-reference.md`.
 
 ## Artifact Directory Structure
@@ -119,7 +112,6 @@ For detailed skill descriptions and inputs/outputs, read `references/skills-refe
 .rc/
   tasks/
     <slug>/                            # One directory per workflow
-      _idea.md                         # Idea spec (from rc-idea-factory)
       _prd.md                          # Product Requirements Document
       _techspec.md                     # Technical Specification
       _tasks.md                        # Master task list
@@ -138,8 +130,8 @@ For detailed skill descriptions and inputs/outputs, read `references/skills-refe
 
 ## Reusable agents and the council pattern
 
-Beyond the bundled specialist agents above, the optional `rc-idea-factory` extension ships
-**council advisor** agents used in a multi-perspective debate:
+Beyond the bundled specialist agents above, the plugin ships **council advisor** agents
+used in a multi-perspective debate (see the `rc-council` skill):
 
 | Agent | Perspective |
 | --- | --- |

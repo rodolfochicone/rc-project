@@ -13,7 +13,6 @@ OpenCode e outras ferramentas); os artefatos vivem em `.rc/` dentro do projeto.
 
 | Comando | O que faz |
 | --- | --- |
-| `/rc-idea-factory <nome>` | (opcional) Amadurece uma ideia crua → spec pesquisada |
 | `/rc-create-prd <nome>` | Brainstorm + pesquisa → **PRD** de negócio |
 | `/rc-create-techspec <nome>` | PRD → **TechSpec** (arquitetura, APIs, modelos de dados) |
 | `/rc-create-tasks <nome>` | PRD + Spec → **tasks** executáveis |

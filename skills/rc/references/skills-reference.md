@@ -4,23 +4,6 @@ Detailed catalog of all bundled RC skills, their inputs, outputs, and pipeline p
 
 ---
 
-## rc-idea-factory
-
-**Trigger:** `/rc-idea-factory [feature-idea]`
-
-Bundled under `extensions/rc-idea-factory`; available once the plugin is installed.
-
-Expands a raw feature idea into a structured, research-backed specification through interactive brainstorming, web research, business analysis, and multi-advisor council debate.
-
-- **Inputs:** Feature idea or problem description. Optional existing `_idea.md` for update mode.
-- **Outputs:** `.rc/tasks/<slug>/_idea.md`, ADRs in `adrs/`.
-- **Pipeline position:** Optional first step. Feeds into `rc-create-prd`.
-- **Process:** Clarifying questions -> parallel codebase + web research -> business viability analysis -> council debate -> opportunity scan -> draft -> user approval.
-- **Use when:** The user has a raw idea and wants to explore viability before committing to a PRD.
-- **Do not use for:** PRD creation, technical specifications, task breakdown, or code implementation.
-
----
-
 ## rc-create-prd
 
 **Trigger:** `/rc-create-prd [feature-name-or-idea] [idea-file]`

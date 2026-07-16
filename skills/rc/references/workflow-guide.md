@@ -5,29 +5,9 @@ End-to-end walkthrough of the RC development pipeline from setup through archive
 ## Prerequisites
 
 1. **Install the plugin.** Install RC through your host's plugin/marketplace mechanism (Claude Code: `/plugin marketplace add rodolfochicone/rc-project` then `/plugin install rc@rc-project`). Skills, commands, agents, and hooks are auto-discovered. There is no binary, daemon, or CLI.
-2. **Ideation extension.** `/rc-idea-factory` ships bundled under `extensions/rc-idea-factory`; its skills and council agents are available once the plugin is installed.
-3. **Configure (optional).** Model and reasoning effort live in each skill's/agent's frontmatter; hook behavior is set via `RC_HOOK_PROFILE` / `RC_DISABLED_HOOKS`. Read `config-reference.md`.
+2. **Configure (optional).** Model and reasoning effort live in each skill's/agent's frontmatter; hook behavior is set via `RC_HOOK_PROFILE` / `RC_DISABLED_HOOKS`. Read `config-reference.md`.
 
-## Phase 1: Ideation (Optional)
-
-**Skill:** `/rc-idea-factory [feature-idea]`
-
-Use when a raw idea needs structured exploration before committing to a PRD.
-
-Bundled: `extensions/rc-idea-factory` (skills + council agents), available with the plugin.
-
-1. Invoke `/rc-idea-factory` inside an agent session with the feature idea.
-2. Answer 3-6 clarifying questions (one per message, multiple-choice preferred).
-3. The skill runs parallel codebase exploration and web research.
-4. A business analyst persona evaluates viability with KPIs and scoring.
-5. A council debate (3-5 advisors from the extension-shipped council agents) challenges scope and surfaces risks.
-6. A product strategist scans for higher-leverage alternatives.
-7. Review and approve the draft idea spec.
-8. Output: `.rc/tasks/<slug>/_idea.md` + ADRs.
-
-**Skip when:** The requirements are already well-understood and a PRD can be written directly.
-
-## Phase 2: Requirements
+## Phase 1: Requirements
 
 **Skill:** `/rc-create-prd [feature-name-or-idea] [idea-file]`
 
@@ -40,7 +20,7 @@ Bundled: `extensions/rc-idea-factory` (skills + council agents), available with 
 
 **Key rule:** The PRD describes user capabilities and business outcomes only. No databases, APIs, frameworks, or architecture.
 
-## Phase 3: Technical Design
+## Phase 2: Technical Design
 
 **Skill:** `/rc-create-techspec [feature-name]`
 
@@ -53,7 +33,7 @@ Bundled: `extensions/rc-idea-factory` (skills + council agents), available with 
 
 **Contains:** System architecture, data models, core interfaces, API design, development sequencing.
 
-## Phase 4: Task Decomposition
+## Phase 3: Task Decomposition
 
 **Skill:** `/rc-create-tasks [feature-name]`
 
@@ -67,7 +47,7 @@ Bundled: `extensions/rc-idea-factory` (skills + council agents), available with 
 
 **Task types:** `frontend`, `backend`, `docs`, `test`, `infra`, `refactor`, `chore`, `bugfix` — the conventional set `rc-create-tasks` writes. The validator requires the `type` field to be present but does not constrain its value, so a project-specific type is allowed.
 
-## Phase 5: Execution
+## Phase 4: Execution
 
 **Run:** `/rc-tasks-workflow <slug>` (Claude Code) or the `rc-execute-task` skill per task in dependency order (any host)
 
@@ -78,11 +58,11 @@ Bundled: `extensions/rc-idea-factory` (skills + council agents), available with 
 5. A task that fails verification is marked `failed`; tasks depending on it are skipped with the reason recorded. Independent tasks still run.
 6. Workflow memory is maintained across tasks via `rc-workflow-memory`.
 
-## Phase 5b: Autonomous loop (optional, replaces phases 4-7)
+## Phase 4b: Autonomous loop (optional, replaces phases 3-6)
 
 For a migration or a large mechanical build-out, `/rc-loop` walks `.rc/ROADMAP.md` (authored by `/rc-roadmap`) one phase at a time: load lessons -> plan the phase's tasks -> execute -> verify -> record lessons -> flip the checkbox on a PASS. It runs only behind the four readiness questions in `skills/rc-loop/references/loop-readiness.md`, and it stops on its own when the roadmap is exhausted, a phase cannot reach green, or a decision the loop cannot assume comes up. Outward-facing actions (PR, push, Linear writes) are never autonomous.
 
-## Phase 6: Review
+## Phase 5: Review
 
 Two paths are available:
 
@@ -100,7 +80,7 @@ Fetches review comments from an external provider (currently CodeRabbit) and wri
 
 **Both paths produce:** `issue_*.md` files with YAML frontmatter containing round metadata (`provider`, `pr`, `round`, `round_created_at`) plus issue metadata (`status`, `severity`, `file`, `line`).
 
-## Phase 7: Remediation
+## Phase 6: Remediation
 
 **Fix:** `/rc-fix-reviews`
 
@@ -110,7 +90,7 @@ Fetches review comments from an external provider (currently CodeRabbit) and wri
 
 **Iterate:** Repeat phases 6-7 until all reviews are clean, then merge.
 
-## Phase 8: Archive
+## Phase 7: Archive
 
 **Archive:** move `.rc/tasks/<slug>/` into `.rc/tasks/_archived/<timestamp>-<slug>/`.
 
