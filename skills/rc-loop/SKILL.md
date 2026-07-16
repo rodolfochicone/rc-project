@@ -66,7 +66,7 @@ Persist enough in shared workflow memory (`## Handoff`) that a re-invocation res
 
 The loop implements, verifies, and commits **locally**. Outward-facing actions stay human-gated
 and are **not** performed by the loop: opening a PR (`rc-git`), pushing, and any Linear write or
-state move (`rc-card` / `rc-linear`). The loop's job is to leave a green, committed working tree
+state move (`rc-card` / `rc-board`). The loop's job is to leave a green, committed working tree
 per phase; shipping is the human's confirmed step. Match the `rc-card` guardrail — never offload a
 confirmation-bearing action into unattended automation.
 

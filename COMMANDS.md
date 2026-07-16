@@ -24,7 +24,7 @@ OpenCode e outras ferramentas); os artefatos vivem em `.rc/` dentro do projeto.
 | `/rc-analyze <pergunta>` | Análise profunda, baseada em evidência, de código existente |
 | `/rc-final-verify` | Exige evidência de verificação antes de declarar "concluído" |
 | `/rc-git [ticket]` | Cria branch, push e abre PR com confirmação em cada passo |
-| `/rc-linear` | Cria, lê, comenta e move issues do Linear via MCP oficial |
+| `/rc-board` | Cria, lê, comenta e move issues em qualquer board (Linear, Jira) via MCP oficial |
 
 Memória e aprendizado: `/rc-project-memory` (fatos duráveis do projeto), `rc-workflow-memory`
 (contexto entre tasks de um workflow), `/rc-instincts` (padrões recorrentes).

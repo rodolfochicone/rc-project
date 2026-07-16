@@ -20,7 +20,7 @@ This is **Claude Code only** — the `Workflow` tool does not exist in other age
 ## Phase 1 — Resolve the slug
 
 1. If the argument is a **slug**, use `.rc/tasks/<slug>/` directly.
-2. If it is a **Linear key** (the rc-linear gancho), grep `linear_key:` across `.rc/tasks/**/task_*.md`; the matching files share one directory — that directory name is the slug. No local match → stop and say so (local task files are the source of truth; never reconstruct tasks from Linear text).
+2. If it is a **Linear key** (the rc-board gancho), grep `linear_key:` across `.rc/tasks/**/task_*.md`; the matching files share one directory — that directory name is the slug. No local match → stop and say so (local task files are the source of truth; never reconstruct tasks from Linear text).
 3. Confirm `.rc/tasks/<slug>/` holds `_tasks.md` and `task_01.md … task_NN.md`.
 
 ## Phase 2 — Validate & order
@@ -89,7 +89,7 @@ return { results }
 
 The `Workflow` tool runs in the background and notifies on completion; read its result and relay what matters. Summarize per task — status, gate result, a trimmed evidence excerpt, files touched — and the overall outcome (N passed / M failed / K skipped).
 
-When this skill was reached from the **rc-linear *Execute an issue*** flow, hand the per-task evidence back to rc-linear so it can post it to Linear (comment per sub-issue + parent summary). This skill itself does **not** write to Linear.
+When this skill was reached from the **rc-board *Execute an issue*** flow, hand the per-task evidence back to rc-board so it can post it to Linear (comment per sub-issue + parent summary). This skill itself does **not** write to Linear.
 
 ## Guardrails
 
