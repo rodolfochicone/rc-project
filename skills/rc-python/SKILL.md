@@ -1,6 +1,6 @@
 ---
 name: rc-python
-description: Implements idiomatic, fully type-hinted Python 3.12+ — precise typing and generics (PEP 695), asyncio structured concurrency, dataclasses, and robust error handling — with pytest testing, ruff linting/formatting, and pyproject.toml/uv packaging. Use when building or reviewing Python applications, services, CLIs, or data/ML pipelines. Invoke for type hints, Protocols, asyncio/TaskGroup, pytest fixtures/parametrize, packaging, or performance profiling. Do not use for JS/TS (use rc-typescript-advanced) or Go (use rc-golang-pro).
+description: Implements idiomatic, fully type-hinted Python 3.12+ — precise typing and generics (PEP 695), asyncio structured concurrency, dataclasses, and robust error handling — with pytest testing, ruff linting/formatting, and pyproject.toml/uv packaging. Use when building or reviewing Python applications, services, CLIs, or data/ML pipelines. Invoke for type hints, Protocols, asyncio/TaskGroup, pytest fixtures/parametrize, packaging, or performance profiling. Do not use for JS/TS (use rc-typescript-advanced) or Go.
 license: MIT
 metadata:
   version: "1.0.0"
@@ -9,7 +9,7 @@ metadata:
   role: specialist
   scope: implementation
   output-format: code
-  related-skills: rc-tdd, rc-refactoring-analysis, rc-systematic-debugging
+  related-skills: rc-tdd, rc-systematic-debugging
 ---
 
 # Python Pro

@@ -1,6 +1,6 @@
 ---
 name: rc-lessons
-description: Deterministic loop-lessons machine — records grounded engineering lessons from verification signals (AC gaps, surviving mutants, spec deviations, gate failures) and loads the corroborated ones at plan/design time, so autonomous or repeated loops stop re-making the same mistake. All bookkeeping (IDs, distinct-feature recurrence, candidate→confirmed promotion, quarantine, prune) is owned by scripts/lessons.mjs, not prose. Use to record a lesson after a verify/review failure, or to load confirmed lessons before planning a task or roadmap phase. Do not use for user-correction trigger→action learnings (rc-memory), per-task working notes (rc-workflow-memory), or on-demand reflection on a diff (rc-lesson-learned).
+description: Deterministic loop-lessons machine — records grounded engineering lessons from verification signals (AC gaps, surviving mutants, spec deviations, gate failures) and loads the corroborated ones at plan/design time, so autonomous or repeated loops stop re-making the same mistake. All bookkeeping (IDs, distinct-feature recurrence, candidate→confirmed promotion, quarantine, prune) is owned by scripts/lessons.mjs, not prose. Use to record a lesson after a verify/review failure, or to load confirmed lessons before planning a task or roadmap phase. Do not use for user-correction trigger→action learnings (rc-memory), per-task working notes (rc-workflow-memory), or on-demand reflection on a diff.
 user-invocable: false
 model: sonnet
 effort: low
@@ -93,4 +93,3 @@ node "$CLAUDE_PLUGIN_ROOT/scripts/lessons.mjs" penalize --root <project-root> --
 
 - **User corrections / workflow trigger→action learnings, cross-session** → `rc-memory` (`.rc/memory/LEARNINGS.md`).
 - **Per-task working notes, decisions, handoff within one run** → `rc-workflow-memory` (`.rc/tasks/<slug>/memory/`).
-- **On-demand "what did I learn from this diff?" reflection** (no store) → `rc-lesson-learned`.

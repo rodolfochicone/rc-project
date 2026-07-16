@@ -18,8 +18,6 @@ gates for the pipeline belong in the Go executor.
 | `SessionStart`| —                        | `memory-load.sh`  | Warm-starts the session: injects a bounded summary of `.rc/memory/` (facts, learnings, pending-observation nudge) into context. Never blocks; silent when there is no memory. |
 | `PreToolUse`  | `Bash`                   | `git-guard.sh`    | Blocks destructive/history-rewriting git: `reset --hard`, `restore`, `clean`, change-discarding `checkout`, `rebase`, `filter-branch`, force-push. |
 | `PreToolUse`  | `Bash`                   | `commit-guard.sh` | Blocks AI attribution in commit messages (`Co-Authored-By`, "Generated with Claude", 🤖).                                                          |
-| `PreToolUse`  | `Edit\|Write\|MultiEdit` | `go-mod-guard.sh` | Blocks hand-editing `go.mod` / `go.sum`; directs to `go get`.                                                                                      |
-| `PostToolUse` | `Edit\|Write\|MultiEdit` | `go-fmt.sh`       | Runs `gofmt -w` on the edited `.go` file (never blocks).                                                                                           |
 
 Blocking hooks exit `2` and return the message on stderr to the agent. Allowed
 calls exit `0`.
@@ -28,7 +26,6 @@ calls exit `0`.
 
 - `jq` on `PATH` (used to parse the hook payload). If `jq` is missing the hooks
   fail open (exit 0) so they never break a session.
-- `gofmt` on `PATH` for `go-fmt.sh` (no-op if absent).
 
 ## Notes & limits
 

@@ -5,7 +5,7 @@
 #
 # Env knobs (read at hook invocation time):
 #   RC_HOOK_PROFILE    minimal | standard | strict   (default: standard)
-#   RC_DISABLED_HOOKS  comma-separated hook names to force-skip (e.g. "go-fmt,gateguard")
+#   RC_DISABLED_HOOKS  comma-separated hook names to force-skip (e.g. "db-guard,gateguard")
 #   RC_DRY_RUN         1 to log a would-block decision and allow instead of blocking
 #
 # Profiles are cumulative: minimal ⊂ standard ⊂ strict. A hook declares the

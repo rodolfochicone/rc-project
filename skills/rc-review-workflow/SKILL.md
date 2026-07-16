@@ -51,7 +51,7 @@ const LENSES = [
   { key: 'defects',      skill: 'rc-code-review',         focus: 'correctness, security, performance, project conventions' },
   { key: 'simplify',     skill: 'rc-simplify-review',     focus: 'over-engineering, needless complexity, dead abstractions' },
   { key: 'architecture', skill: 'architectural-analysis', focus: 'dead code, duplication, architectural anti-patterns, type confusion' },
-  { key: 'adversarial',  skill: 'rc-adversarial-review',     focus: 'refute the other lenses — what did they miss or get wrong; default skeptical' },
+  { key: 'adversarial',  skill: 'adversarial-analysis',     focus: 'refute the other lenses — what did they miss or get wrong; default skeptical' },
 ]
 
 const FINDINGS = { type: 'object', required: ['lens', 'findings'], properties: {
@@ -115,4 +115,4 @@ The `Workflow` tool runs in the background and notifies on completion; read its 
 - **Lenses read-only, fix sequential.** Run the review lenses in parallel (they only analyze); run synthesis and fix one round at a time so nothing fights over the working tree.
 - **No new high/critical is the exit signal.** A round whose new issues are all medium/low (or none at all) means converged — fix them, then stop. Otherwise keep looping until the round cap or a red `make verify`, and report what remains.
 - **Verify gates every fix round.** A round's fixes count only after a clean `make verify` via `rc-final-verify`. Never mark issues resolved on a red gate.
-- **Adversarial lens is in-Workflow, not cross-LLM.** Here the `adversarial` lens is a skeptical Claude subagent, not the real cross-model `rc-adversarial-review` (which spawns the opposite LLM). For a true cross-LLM pass, run `/rc-adversarial-review` separately.
+- **Adversarial lens is in-Workflow, not cross-LLM.** Here the `adversarial` lens is a skeptical Claude subagent; it does not spawn another model.

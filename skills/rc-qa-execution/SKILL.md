@@ -1,6 +1,6 @@
 ---
 name: rc-qa-execution
-description: Executes full-project QA like a real user by discovering the repository verification and E2E contracts, running build, lint, test, and startup commands, exercising core workflows end-to-end through CLI, HTTP, and browser interfaces, requiring automated regression coverage for supported critical flows, fixing root-cause regressions, and rerunning the full gate. Uses the agent-browser companion skill for Web UI validation when a web surface exists. Use when validating a branch, release candidate, migration, refactor, or risky commit. Do not use for static code review only, one-off unit test edits, planning test cases, or architecture brainstorming without execution — use rc-qa-report for planning and documentation.
+description: Executes full-project QA like a real user by discovering the repository verification and E2E contracts, running build, lint, test, and startup commands, exercising core workflows end-to-end through CLI, HTTP, and browser interfaces, requiring automated regression coverage for supported critical flows, fixing root-cause regressions, and rerunning the full gate. Uses the agent-browser companion skill for Web UI validation when a web surface exists. Use when validating a branch, release candidate, migration, refactor, or risky commit. Do not use for static code review only, one-off unit test edits, planning test cases, or architecture brainstorming without execution.
 argument-hint: "[qa-output-path]"
 model: sonnet
 effort: high
@@ -28,7 +28,7 @@ effort: high
 
 **Step 2: Define the QA Scope**
 
-1. Check whether `<qa-output-path>/qa/test-cases/` and `<qa-output-path>/qa/test-plans/` contain artifacts from a prior `rc-qa-report` run. If they exist, read the test plans, test case IDs, and automation annotations to seed the execution matrix and prioritize P0/P1 test cases.
+1. Check whether `<qa-output-path>/qa/test-cases/` and `<qa-output-path>/qa/test-plans/` contain artifacts from a prior QA planning run. If they exist, read the test plans, test case IDs, and automation annotations to seed the execution matrix and prioritize P0/P1 test cases.
 2. Build a short execution matrix covering baseline verification, changed workflows, unchanged business-critical workflows, and automation follow-up.
 3. Read `references/checklist.md` and ensure every required category has a planned validation.
 4. Prefer public entry points such as CLI commands, HTTP endpoints, browser flows, worker jobs, and documented setup commands over internal test helpers.
@@ -86,7 +86,7 @@ Skip this step if the project has no Web UI surface.
 6. Fix production code or real configuration at the source of the failure. Do not weaken tests to match broken behavior.
 7. Re-run the narrow reproduction, updated automated coverage, impacted scenario, and baseline gate after each fix.
 8. For Web UI regressions, reproduce the visual failure with `agent-browser`, capture before/after screenshots under `<qa-output-path>/qa/screenshots/`, and verify the fix through the same browser flow.
-9. Use `assets/issue-template.md` to write issue files under `<qa-output-path>/qa/issues/`. Create the subdirectory if it does not exist. Name each file using the `BUG-<num>.md` convention (e.g., `BUG-001.md`). Assign Severity (Critical/High/Medium/Low) and Priority (P0-P3) to every issue. When an issue was discovered while executing a test case from `rc-qa-report`, include the TC-ID in the Related section and fill in the automation follow-up fields.
+9. Use `assets/issue-template.md` to write issue files under `<qa-output-path>/qa/issues/`. Create the subdirectory if it does not exist. Name each file using the `BUG-<num>.md` convention (e.g., `BUG-001.md`). Assign Severity (Critical/High/Medium/Low) and Priority (P0-P3) to every issue. When an issue was discovered while executing a test case from a prior QA test plan, include the TC-ID in the Related section and fill in the automation follow-up fields.
 
 **Step 7: Verify the Final State**
 

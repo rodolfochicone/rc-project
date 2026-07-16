@@ -99,9 +99,7 @@ Configured in `hooks/hooks.json` (bash scripts under `hooks/scripts/`, gated by
 `RC_HOOK_PROFILE=minimal|standard|strict`):
 
 - **Guardrails** — `git-guard`/`commit-guard` (never auto-commit/push), `gateguard` (force
-  grounding before the first edit of a file), `go-mod-guard` (protect `go.mod` in Go target
-  projects).
-- **Formatting** — `go-fmt` on edited Go files (in Go target projects).
+  grounding before the first edit of a file), `db-guard` (read-only database access by default).
 - **Observability** — `observe` appends tool observations to `.rc/memory/observations.jsonl`
   for the `rc-memory` loop; `notify` on stop/notification.
 - **Resilience** — `repair-guidance` injects corrective guidance when an `Edit`/`Task` returns a

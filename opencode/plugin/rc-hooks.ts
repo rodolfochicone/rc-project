@@ -4,7 +4,7 @@ import { join } from "node:path";
 // rc hook parity for OpenCode. OpenCode has no settings.json hooks like Claude
 // Code; it exposes a plugin API instead. Rather than reimplement the guard logic
 // in TypeScript, this plugin shells out to the SAME bundled shell scripts the
-// Claude channel uses (git-guard, commit-guard, go-mod-guard, gateguard, go-fmt),
+// Claude channel uses (git-guard, commit-guard, gateguard, observe),
 // so there is one source of truth. The plugin ships those scripts next to this
 // file under <opencode-root>/rc/hooks/scripts/.
 //
@@ -66,16 +66,11 @@ export const RCHooks: Plugin = async ({ $ }) => {
       }
       if (input.tool === "edit" || input.tool === "write" || input.tool === "patch") {
         const payload = fileArgs(input, output);
-        await runGuard("go-mod-guard.sh", payload);
         await runGuard("gateguard.sh", payload);
       }
     },
     "tool.execute.after": async (input: any, output: any) => {
       const isEdit = input.tool === "edit" || input.tool === "write" || input.tool === "patch";
-      if (isEdit) {
-        // go-fmt never blocks (exit 0); it normalizes the edited Go file.
-        await runGuard("go-fmt.sh", fileArgs(input, output));
-      }
       // Instincts capture — opt-in, only when RC_INSTINCTS=1 (observe.sh self-gates
       // too, but skip spawning bash entirely when disabled).
       if (process.env.RC_INSTINCTS === "1" && (isEdit || input.tool === "bash")) {

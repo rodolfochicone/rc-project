@@ -86,9 +86,7 @@ agent (and you) exactly when each one fires.
 | Skill | Purpose | Use when |
 | --- | --- | --- |
 | `rc` | Explains RC itself — pipeline, artifacts, agents, hooks, config. | You want to know what exists or how the workflow fits together (not to run a step). |
-| `rc-find-skills` | Discovers and installs agent skills. | "Is there a skill for X?", "find a skill that…", extending capabilities. |
 | `rc-enrichment-prompt` | Rewrites a rough request into a structured, execution-ready prompt (Objective / Context / Requirements / Acceptance criteria). | A request is vague/underspecified, or you ask to "enhance/enrich this prompt" before work starts. |
-| `rc-to-prompt` | Packages code + context into a detailed prompt for **another** LLM to solve (the *what*, not the *how*). | Handing a problem off to an external model or teammate. |
 | `rc-brainstorming` | Explores intent, requirements, and design before implementation. | Before any creative/greenfield work — features, components, new behavior. |
 | `rc-council` | Multi-advisor debate (3–5 archetypes) with opening statements, tensions, and synthesis. | High-impact architecture/tech/product trade-offs; stress-testing a PRD or spec. Not for yes/no lookups. |
 
@@ -125,9 +123,6 @@ and only behind a green harness. Normal feature work stays in `/rc-pipe`.
 | --- | --- | --- |
 | `rc-analyze` | Deep, evidence-based read-only analysis → thorough report ending in an actionable plan. | Diagnose a bug, trace a flow, assess impact/feasibility. Not to review a diff for defects. |
 | `rc-codemap` | Builds/refreshes a per-directory `codemap.md`; only re-maps changed dirs. | Read first in exploration-heavy tasks to cut token cost. |
-| `rc-refactoring-analysis` | Fowler-catalog refactoring audit **plus** architectural audit (dead code, duplication, anti-patterns, type confusion) → prioritized report in `docs/_refacs/`. | Auditing code quality/codebase health, finding dead code, or preparing a refactoring sprint. |
-| `rc-graphify` | Turns a codebase (or any input) into a persistent knowledge graph with query/path/explain tools. | Questions about architecture, file relationships, or when `graphify-out/` exists. |
-| `rc-ubs` | Runs the Ultimate Bug Scanner over code. | Pre-commit quality checks or validating AI-generated code for bugs/security. |
 
 ### Review & remediation
 
@@ -138,9 +133,6 @@ and only behind a green harness. Normal feature work stays in `/rc-pipe`.
 | `rc-review-workflow` | Automated review→fix→re-review loop via the `Workflow` tool until clean or a round cap. | Hands-off multi-lens review-and-remediate on a slug (Claude Code only). |
 | `rc-simplify-review` | Single lens — over-engineering only → ranked delete-list with net lines/deps removable. | Opt-in pre-PR bloat pass, or auditing legacy code. |
 | `rc-fix-reviews` | Triage, fix, verify, and resolve batched review issues under `reviews-NNN/`. | Remediating an existing review round. |
-| `rc-fix-coderabbit-review` | End-to-end CodeRabbit remediation by PR number (export → fix → resolve threads). | Clearing CodeRabbit feedback on a specific PR. |
-| `rc-adversarial-review` | Spawns reviewers on the **opposite** model (Claude↔Codex) to challenge the work. | You want a true cross-model critical pass. |
-| `rc-impl-peer-review` | Optional cross-model Opus peer review of a diff, packaged for user-directed fixes. | You explicitly ask for an independent Opus review before commit/PR. |
 
 ### Quality, testing & discipline
 
@@ -152,9 +144,7 @@ and only behind a green harness. Normal feature work stays in `/rc-pipe`.
 | `rc-testing-anti-patterns` | Prevents testing mock behavior, test-only production methods, and blind mocking. | Writing/changing tests or adding mocks. |
 | `rc-systematic-debugging` | Structured root-cause process before proposing fixes. | Any bug, test failure, or unexpected behavior. |
 | `rc-no-workarounds` | Gate that rejects hacks/symptom patches (type assertions, lint suppressions, error swallowing…). | Debugging, fixing, or reviewing — to force root-cause fixes. |
-| `rc-extreme-software-optimization` | Profile-driven perf optimization with behavior proofs. | "slow / bottleneck / p95 / latency / throughput" or algorithmic wins. |
-| `rc-qa-execution` | Full-project QA as a real user: discover contract, run build/lint/test/startup, exercise flows E2E, fix regressions, re-gate. | Validating a branch/release/migration/refactor. Pairs with `rc-qa-report`. |
-| `rc-qa-report` | Test plans, test cases, regression suites, and bug reports (Figma MCP validation). | Planning/documenting QA before execution. |
+| `rc-qa-execution` | Full-project QA as a real user: discover contract, run build/lint/test/startup, exercise flows E2E, fix regressions, re-gate. | Validating a branch/release/migration/refactor. |
 
 ### Docs
 
@@ -176,24 +166,19 @@ and only behind a green harness. Normal feature work stays in `/rc-pipe`.
 | --- | --- | --- |
 | `rc-memory` | The single durable, cross-session memory: curated project facts **and** distilled instincts, as markdown under `.rc/memory/`. | Consult before working; record durable facts/learnings after. |
 | `rc-workflow-memory` | Task-scoped memory across a slug's task executions under `.rc/tasks/{name}/memory/`. | A task prompt provides workflow-memory paths to read/update/promote. |
-| `rc-compact` | Deliberate conversation compaction at logical boundaries, driven by real token usage. | Long multi-phase runs, to control what context survives. |
 | `rc-context-budget` | Audits what fills the context window (agents, skills, rules, MCP schemas) and recommends cuts. | Sessions compact too early, or before adding more tooling. |
-| `rc-lesson-learned` | Extracts engineering lessons from recent git history. | "What's the lesson here / takeaway?" reflection on a diff. |
 
 ### Config, security, integrations & scaffolding
 
 | Skill | Purpose | Use when |
 | --- | --- | --- |
-| `rc-audit` | Security-audits the agent config surface (`.claude`, `.mcp.json`, hooks, installed skills) for secrets, over-broad perms, injection vectors. | Reviewing an agent setup before sharing, or a periodic config audit. |
-| `rc-linear` | PM-mode Linear via the official Linear MCP: shape ideas, create/refine issues into PRD/TechSpec/sub-issues, execute child issues. | Any Linear work through the official MCP, with confirmation on writes. |
-| `rc-jira` | Company-agnostic Jira/Atlassian via the Atlassian MCP: discuss, create/update/finalize a card, refine into native sub-tasks, execute with test evidence, plus GMUD (change management with mandatory rollback). | Any Jira work through the Atlassian MCP, with confirmation on writes. |
+| `rc-board` | PM-mode board driver via the official MCP (Linear and Jira/Atlassian): shape ideas, create/refine issues into PRD/TechSpec/child issues, execute children with test evidence; GMUD on Jira. | Any board work through its official MCP, with confirmation on writes. |
 
 ### Skill authoring & self-improvement
 
 | Skill | Purpose | Use when |
 | --- | --- | --- |
 | `rc-skill-best-practices` | Authors professional-grade skills to the agentskills.io spec (validation script + template + checklist). | Creating a new skill directory or optimizing metadata for discovery. |
-| `rc-autoresearch` | Autonomously optimizes a skill: run → score against evals → mutate prompt → keep wins. | "Improve/optimize/benchmark this skill." |
 | `rc-hookify` | Authors a new fail-open RC hook from a plain-language rule: writes the script, wires `hooks.json`, documents + verifies it. | Turning an every-time guardrail/formatter/observer into a hook. |
 
 ### Frontend & design
@@ -202,13 +187,9 @@ and only behind a green harness. Normal feature work stays in `/rc-pipe`.
 | --- | --- | --- |
 | `rc-frontend-design` | Distinctive, production-grade interfaces that avoid generic AI aesthetics. | Building web components/pages/apps, or when a design skill needs project context. |
 | `rc-interface-design` | Dashboards, admin panels, tools, interactive products (not marketing pages). | App/tool UI with craft and consistency. |
-| `rc-minimalist-ui` | Editorial minimalism: warm monochrome, typographic contrast, flat bento grids. | You want that specific clean, document-style aesthetic. |
-| `rc-redesign-existing-projects` | Audits and upgrades an existing site/app to premium quality without breaking it. | Modernizing existing UI in any CSS framework. |
 | `rc-a11y` | Accessibility (WCAG 2.2 AA): semantic HTML, ARIA, keyboard nav, focus management, contrast, screen readers. | Building or reviewing UI that must be accessible. |
 | `rc-shadcn-ui` | Complete shadcn/ui patterns: install, config, forms (RHF + Zod), theming, components. | Building UI with shadcn/ui + Radix + Tailwind. |
 | `rc-storybook-stories` | Create/update/refactor Storybook stories to project patterns. | Adding stories for new components or fixing Storybook issues. |
-| `rc-tech-logos` | Installs official tech/brand logos from the Elements registry. | Needing brand logos for landing pages, auth UIs, integrations. |
-| `rc-drawio` | Diagrams: flowcharts, architecture, ER, sequence, class, wireframes → PNG/SVG/PDF. | Any request to draw/generate a diagram or `.drawio` file. |
 
 ### Content & media
 
@@ -226,13 +207,11 @@ Deep, opinionated guides for a specific library/runtime — auto-fire on the mat
 | `rc-react` | React 19+ components, hooks, state, `useEffect` patterns, TS integration. |
 | `rc-vercel-react-best-practices` | React/Next.js **performance** patterns + composition patterns (compound components, render props, context) — Vercel Engineering. |
 | `rc-tanstack` | TanStack ecosystem — Query/DB, Form, Router overview **plus** per-rule best practices for Query, Router and Start (server functions, middleware, SSR, auth). |
-| `rc-app-renderer-systems` | Domain feature systems under a `systems/` directory (service layer + Query hooks + XState). |
 | `rc-tailwindcss` | Tailwind CSS v4 patterns, responsive layouts, `tailwind-variants`. |
 | `rc-zustand` | Zustand store organization and client-state patterns. |
 | `rc-typescript-advanced` | Generics, conditional/mapped types, template literals, utility types. |
 | `rc-zod` | Zod schemas, parsing, `safeParse`, `z.infer`, error handling. |
 | `rc-vitest` | Vitest: tests, mocking, coverage, filtering, fixtures. |
-| `rc-golang-pro` | Idiomatic concurrent Go, gRPC/REST microservices, pprof, generics. |
 | `rc-python` | Idiomatic typed Python 3.12+ — PEP 695 generics, asyncio/TaskGroup, pytest, ruff, uv packaging. |
 | `rc-ai-sdk` | Vercel AI SDK: `generateText`/`streamText`, tools, agents, providers, streaming. |
 
@@ -243,28 +222,6 @@ Deep, opinionated guides for a specific library/runtime — auto-fire on the mat
 | `rc-sql` | Relational DB — query optimization (EXPLAIN, indexes, N+1), schema design; read-only by default. | Writing/reviewing queries or modeling schema. Not for repo-specific migrations or NoSQL. |
 | `rc-observability` | Logs, metrics, traces, and incident response — instrumentation, SLOs, postmortems. | Instrumenting a service, defining alerts, or running root-cause analysis. |
 | `rc-resilience` | Event-driven resilience — idempotency, retries/backoff, DLQ, poison messages, timeouts, circuit breaker. | Designing/reviewing message producers/consumers (EventBridge, SQS) or cross-service calls. |
-
-### TUI, CLI & multi-agent
-
-| Skill | Use when |
-| --- | --- |
-| `rc-tui-design` | Framework-agnostic TUI design — layouts, color, keybindings, dashboards. |
-| `rc-tui-glamorous` | Charmbracelet ecosystem router — Gum (shell), Lip Gloss, Bubble Tea, Wish/SSH. |
-| `rc-bubbletea` | Deep Go Bubble Tea app patterns — Elm architecture, dual-pane, weight-based layout. |
-| `rc-smux` | Control tmux panes and message between AI agents (tmux-bridge CLI). |
-| `rc-smux-rc-pairing` | Interactive tmux pairing: orchestrator + Codex author + Claude challenger driving a RC run. |
-
-### Research
-
-| Skill | Use when |
-| --- | --- |
-| `rc-exa-web-search-free` | Free web/code/company search via the Exa MCP (no API key). |
-
-### Project-specific (Escale)
-
-| Skill | Use when |
-| --- | --- |
-| `rc-portal-design` | Any UI work in `rc-portal` — design system, tokens, Tailwind, Storybook, a11y gates. |
 
 ### Bundled extension
 
@@ -324,8 +281,8 @@ Harness-only guardrails (no model-context cost), wired in `hooks/hooks.json`:
 - **`git-guard`** — blocks destructive/history-rewriting git commands.
 - **`commit-guard`** — gates commits behind verification.
 - **`db-guard`** — enforces read-only database access by default (blocks write/DDL SQL without approval).
-- **`go-mod-guard`** / **`gateguard`** — protect `go.mod` and force investigation before risky edits.
-- **`go-fmt`** — formats Go on write. **`observe`** — feeds the instincts loop. **`repair-guidance`** —
+- **`gateguard`** — forces investigation before risky edits.
+- **`observe`** — feeds the instincts loop. **`repair-guidance`** —
   helps the agent recover from a failed edit/delegation. **`notify`** — Stop/Notification signals.
 - **`memory-load`** — `SessionStart` warm-start: surfaces a bounded summary of `.rc/memory/` (facts +
   learnings) and nudges distillation when observations pile up. Silent outside RC projects.

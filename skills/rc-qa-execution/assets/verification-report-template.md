@@ -40,7 +40,7 @@ Viewports tested: <list of viewports or "default only">
 Authentication: <method used or "not required">
 Blocked flows: <none or list with reason>
 
-TEST CASE COVERAGE (when rc-qa-report artifacts exist)
+TEST CASE COVERAGE (when QA test-plan artifacts exist)
 ----------------------------------------------------------
 Test cases found: <number of TC-*.md files in qa-output-path/test-cases/>
 Executed: <number exercised during this QA run>

@@ -30,7 +30,7 @@ stdout reaches the model only on some events, and only `PreToolUse` can block).
 
 ## Step 2 — write the script (house style)
 
-`hooks/scripts/<verb-noun>.sh`, `chmod +x`. Name it by what it does (`go-fmt`, `commit-guard`,
+`hooks/scripts/<verb-noun>.sh`, `chmod +x`. Name it by what it does (`db-guard`, `commit-guard`,
 `memory-load`). Skeleton — every real hook in `hooks/scripts/` follows it:
 
 ```bash
