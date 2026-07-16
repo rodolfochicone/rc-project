@@ -4,6 +4,33 @@
 
 _Nada ainda — registre aqui as mudanças da próxima versão sob `### Added` / `### Changed` / `### Fixed` / `### Removed`, movendo-as para uma seção versionada no release._
 
+## [3.1.0] - 2026-07-16
+
+Stack **Axum + SQLx/Postgres + SvelteKit (Bun)** no hub: skills especializadas, skill
+guarda-chuva e boilerplate de deploy VPS (Caddy + systemd + Postgres).
+
+### Added
+
+- **`rc-fullstack-axum-svelte`** — umbrella que roteia para as specialists, fixa
+  arquitetura VPS (Caddy → Axum + SvelteKit) e manda usar **Bun ≥ 1.3** no front
+  (`bun install` / `bun run` / SSR).
+- **`rc-axum`** — Axum 0.8+ (routing, State, middleware, erros tipados, WebSockets,
+  security, tests, clippy/fmt).
+- **`rc-sqlx`** — SQLx 0.8+ + PostgreSQL (pool, binds, transactions, migrations,
+  macros, security, tests).
+- **`rc-sveltekit`** — SvelteKit 2 + Svelte 5 (SSR load, form actions, hooks,
+  CSRF/CSP, adapter-node rodando com Bun, tests).
+- **`docs/stack-vps-fullstack-rust-typescript.md`** — análise de stack (Rust vs TS,
+  ranking, VPS KVM 4).
+- **`docs/boilerplate-axum-sveltekit-vps/`** — template deployável: Axum API +
+  SvelteKit + Postgres (Docker) + Caddy + systemd + scripts (`install-vps`,
+  `deploy`, `dev`) com Bun.
+
+### Changed
+
+- Catálogo no `README.md`, `skills/rc/SKILL.md` e `skills-reference.md` lista as
+  quatro skills novas e o uso de Bun no front da stack.
+
 ## [3.0.0] - 2026-07-15
 
 O corte "pre-slim": o plugin foi auditado contra o uso real (19 dias de histórico de
@@ -662,7 +689,8 @@ Sync Claude Code (project scope)
 - Initial RC release
 
 <!-- GitHub releases (apenas versões que têm seção acima e release publicado) -->
-[Unreleased]: https://github.com/rodolfochicone/rc-project/compare/v3.0.0...main
+[Unreleased]: https://github.com/rodolfochicone/rc-project/compare/v3.1.0...main
+[3.1.0]: https://github.com/rodolfochicone/rc-project/releases/tag/v3.1.0
 [3.0.0]: https://github.com/rodolfochicone/rc-project/releases/tag/v3.0.0
 [2.6.0]: https://github.com/rodolfochicone/rc-project/releases/tag/v2.6.0
 [2.5.0]: https://github.com/rodolfochicone/rc-project/releases/tag/v2.5.0
