@@ -4,6 +4,63 @@
 
 _Nada ainda — registre aqui as mudanças da próxima versão sob `### Added` / `### Changed` / `### Fixed` / `### Removed`, movendo-as para uma seção versionada no release._
 
+## [3.2.0] - 2026-07-17
+
+Primeira medição do hub contra uma régua de doutrina — e a régua chegou junto. A
+`rc-skill-best-practices` tinha 402 palavras de mecânica de spec e nenhum vocabulário
+para *single source of truth*, *no-op* ou *sediment*; auditadas as 64 skills contra a
+versão nova, 47 falhavam em "uma regra, um dono" (73%). Não eram 47 descuidos: era uma
+seção de recap que o template da casa punha no fim de toda skill.
+
+### Added
+
+- **`rc-rust`** — Rust como linguagem: ownership e lifetimes, hierarquia de erros com
+  thiserror/anyhow, async com Tokio, design de traits, testes, perf, clippy e rustdoc.
+  Era o único gap de stack real — `rc-axum` e `rc-sqlx` se declaram fora de escopo para
+  Rust idiomático. Roteada pelo `rc-fullstack-axum-svelte`.
+- **`rc-agents-md`** — autoria de AGENTS.md/CLAUDE.md: o teste de aluguel
+  (delta/frequência/economia), a escada de escopo e as branches Write/Trim/Gate.
+- **`rc-deslop`** — varredura barata que remove slop de IA do diff antes do commit
+  (comentário não merecido, try/catch defensivo, cast pra `any`, aninhamento).
+- **`plugin-smoke`** ganha 3 checks de doutrina, como **aviso** (não falha): description
+  sem anti-trigger, arquivo em `references/` sem ponteiro, arquivo solto na raiz da skill.
+  `--warn` lista. FP de cada check medido antes de escrever; um quarto candidato
+  (`user-invocable: true` redundante) foi descartado por não ser defeito.
+- **`git-guard --selftest`** — 11 casos, offline.
+
+### Changed
+
+- **`rc-skill-best-practices`** reescrita a partir da doutrina upstream: invocação
+  (model vs. user-invoked), hierarquia de informação, *completion criterion* contra
+  *premature completion*, leading words e failure modes. De 1 para 4 references.
+- **Uma regra, um dono** em 37 skills: a seção de recap (`Critical Rules` / `Guardrails`
+  / `Must not do` / `Constraints`) foi colapsada quando cada bullet tinha dono — num
+  hook, noutra skill, num `references/`, ou num step acima. O ganho não é linha
+  economizada: `rc-no-workarounds`, `rc-final-verify` e `rc-testing-anti-patterns`
+  passaram a ser **usadas** por ponteiro em vez de parafraseadas por quem não é dona.
+- **`rc-git`** de 496 → 152 linhas: citava `references/` zero vezes e duplicava inline o
+  conteúdo dos 5 arquivos (587 linhas inalcançáveis). Agora aponta de verdade.
+- **`git-guard`** decide em dois níveis via JSON: **ask** para reescrita de histórico e
+  push com lease (legítimos, recuperáveis, mas nunca em silêncio) e **deny** para perda
+  sem desfazer barato. A mensagem do force-push cru ensina a alternativa com lease.
+
+### Fixed
+
+- **O plugin bloqueava a própria feature**: o `git-guard` negava reescrita de histórico
+  incondicionalmente enquanto o `rc-git` ensina exatamente esse fluxo. Todo consumidor
+  recebia uma skill que ensinava rebase e um hook que o tornava impossível.
+- **Escapes que não alcançavam ninguém**: `RC_DRY_RUN` e `RC_DISABLED_HOOKS` eram
+  anunciados pelo `_lib.sh`, e os três guards que bloqueiam (git, db, commit) eram
+  justamente os três que não o importavam. Os três agora passam por `rc_hook_active` +
+  `rc_block`/`rc_deny`/`rc_ask`.
+- **Fóssil do Go**: `rc-create-techspec` exigia "at least one Go interface or struct
+  definition" na seção Core Interfaces — numa skill stack-agnostic, num repo
+  Rust/SvelteKit. Toda TechSpec gerada recebia essa ordem. Agora pede um tipo no idioma
+  do próprio projeto.
+- **Referências penduradas**: `find-docs` (citada pelo CLAUDE.md e pelo `rc-video`) e
+  `superpowers:*` (citada 3× pelo `rc-systematic-debugging`) apontavam para skills que
+  não existem. Trocadas pelo MCP Context7 e por `rc-tdd`/`rc-final-verify`.
+
 ## [3.1.0] - 2026-07-16
 
 Stack **Axum + SQLx/Postgres + SvelteKit (Bun)** no hub: skills especializadas, skill
@@ -689,7 +746,8 @@ Sync Claude Code (project scope)
 - Initial RC release
 
 <!-- GitHub releases (apenas versões que têm seção acima e release publicado) -->
-[Unreleased]: https://github.com/rodolfochicone/rc-project/compare/v3.1.0...main
+[Unreleased]: https://github.com/rodolfochicone/rc-project/compare/v3.2.0...main
+[3.2.0]: https://github.com/rodolfochicone/rc-project/releases/tag/v3.2.0
 [3.1.0]: https://github.com/rodolfochicone/rc-project/releases/tag/v3.1.0
 [3.0.0]: https://github.com/rodolfochicone/rc-project/releases/tag/v3.0.0
 [2.6.0]: https://github.com/rodolfochicone/rc-project/releases/tag/v2.6.0
