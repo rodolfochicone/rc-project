@@ -52,7 +52,7 @@ print(video.generate_stream())
 ```
 
 A API evolui rápido. **Não confie de memória** — antes de escrever código real, confirme a
-assinatura atual via a skill `find-docs`/Context7 ou a doc oficial (docs.videodb.io).
+assinatura atual via o MCP Context7 ou a doc oficial (docs.videodb.io).
 
 ## Checklist antes de adotar
 

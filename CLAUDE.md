@@ -67,7 +67,7 @@ assets live under `opencode/`.
 
 ## Code Search and Discovery
 
-- **TOOL HIERARCHY**: Grep/Glob for repository content; the `find-docs` skill for external
+- **TOOL HIERARCHY**: Grep/Glob for repository content; the Context7 MCP for external
   library documentation; web search only for web research — **never** for local project code.
 
 ## Anti-Patterns for Agents
