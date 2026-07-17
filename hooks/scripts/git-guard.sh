@@ -41,9 +41,24 @@ decide() {
 
     # Force-push: --force-with-lease refuses when the remote moved, so it is the
     # form to reach for; bare --force / -f clobbers whatever landed since fetch.
+    #
+    # O flag tem que ser argumento DO push, não de qualquer coisa depois dele. Casar
+    # o comando inteiro dava FP: `git push origin main && [ -f arquivo ]` acusava
+    # force-push, porque o teste de arquivo do bash também contém " -f". Então
+    # recorta-se o trecho a partir do `git push` até o próximo separador (`;`, `&&`,
+    # `||`, `|`) e só ele é inspecionado.
     case "$norm" in
-    *"git push"*"--force-with-lease"*) printf 'ask\t%s' "force-push with lease rewrites the remote branch. Confirm this is your own branch and that no one else builds on it." ; return ;;
-    *"git push"*"--force"* | *"git push"*" -f"*) printf 'deny\t%s' "bare force-push overwrites whatever landed on the remote since your last fetch. Use 'git push --force-with-lease', which refuses when the remote moved." ; return ;;
+    *"git push"*)
+        push_seg=${norm#*git push}
+        push_seg=${push_seg%%;*}
+        push_seg=${push_seg%%&&*}
+        push_seg=${push_seg%%||*}
+        push_seg=${push_seg%%|*}
+        case "$push_seg" in
+        *"--force-with-lease"*) printf 'ask\t%s' "force-push with lease rewrites the remote branch. Confirm this is your own branch and that no one else builds on it." ; return ;;
+        *"--force"* | *" -f"*) printf 'deny\t%s' "bare force-push overwrites whatever landed on the remote since your last fetch. Use 'git push --force-with-lease', which refuses when the remote moved." ; return ;;
+        esac
+        ;;
     esac
 
     case "$norm" in
@@ -70,6 +85,13 @@ if [ "${1:-}" = "--selftest" ]; then
     check "git status" allow
     check "git push origin feat" allow
     check "git commit -m 'x'" allow
+    # regressão: o flag tem que ser argumento DO push. Estes casavam o antigo
+    # `*"git push"*" -f"*` e eram negados por engano — o segundo bloqueou o commit
+    # que consertava este arquivo.
+    check 'git push origin main && find . -type f' allow
+    check 'git push origin main && [ -f arquivo ]' allow
+    check 'git push origin main; [ -f x ] && echo ok' allow
+    check 'git push -f origin main && [ -f x ]' deny
     exit $fail
 fi
 
