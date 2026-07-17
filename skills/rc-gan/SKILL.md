@@ -45,11 +45,7 @@ Report: the rubric, the score progression (e.g. `iter1 4.2 → iter2 5.8 → ite
 
 ## Critical Rules
 
-- The evaluator scores the **running artifact**, not the diff. A score given without exercising it is invalid.
-- Generator and evaluator are **separate** — never let the same context both build and grade a round; spawn a fresh evaluator each iteration.
 - The rubric and weights are fixed at Phase 0; do not move the goalposts mid-loop to manufacture a passing score.
-- Every iteration must leave a runnable artifact with the correctness gate green; quality iteration never trades away correctness.
-- Stop on plateau — burning iterations past diminishing returns wastes tokens; hand back to the user.
 
 ## Boundaries
 

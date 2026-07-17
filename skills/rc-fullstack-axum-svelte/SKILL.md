@@ -1,6 +1,6 @@
 ---
 name: rc-fullstack-axum-svelte
-description: Routes fullstack Axum + SQLx/Postgres + SvelteKit work to the right specialist skills (rc-axum, rc-sqlx, rc-sveltekit), covering API, data layer, SSR front, security, tests, and VPS deploy with Bun. Use when building or reviewing the Rust/SvelteKit stack together, scaffolding fullstack features, or unsure which skill to load. Do not use for React/Next stacks, pure Python, or workflow PRD/task pipeline phases.
+description: Routes fullstack Axum + SQLx/Postgres + SvelteKit work to the right specialist skills (rc-rust, rc-axum, rc-sqlx, rc-sveltekit), covering Rust idioms, API, data layer, SSR front, security, tests, and VPS deploy with Bun. Use when building or reviewing the Rust/SvelteKit stack together, scaffolding fullstack features, or unsure which skill to load. Do not use for React/Next stacks, pure Python, or workflow PRD/task pipeline phases.
 user-invocable: true
 model: sonnet
 effort: medium
@@ -14,6 +14,7 @@ Single entry point for the **Rust API + Postgres + SvelteKit SSR** stack used on
 
 | Layer | Tech | Skill |
 | ----- | ---- | ----- |
+| Language (backend) | Rust — ownership, errors, async, traits, clippy | `rc-rust` |
 | HTTP API / WS | Axum **0.8+**, Tokio, Tower | `rc-axum` |
 | Data | SQLx **0.8+**, PostgreSQL | `rc-sqlx` |
 | Front SSR/SEO | SvelteKit **2**, Svelte **5**, adapter-node | `rc-sveltekit` |
@@ -52,7 +53,8 @@ Read the matching skill’s `SKILL.md` and the referenced files under that skill
 | Handlers, Router, middleware, WS, CORS, clippy | **`rc-axum`** (all of `references/`) |
 | Queries, pool, migrations, binds, DB tests | **`rc-sqlx`** |
 | Routes, SSR load, forms, hooks, CSP, adapter-node | **`rc-sveltekit`** |
-| End-to-end feature (API + DB + page) | **all three** specialists, in order below |
+| Borrow vs clone, error type design, trait/generic shape, Tokio task & channel choice | + **`rc-rust`** |
+| End-to-end feature (API + DB + page) | **`rc-axum`, `rc-sqlx`, `rc-sveltekit`**, in order below |
 | A11y on UI | + `rc-a11y` |
 | SEO meta / technical SEO | + `rc-seo` |
 | SQL indexes / EXPLAIN depth | + `rc-sql` |
@@ -100,20 +102,6 @@ SSR load ──► API_INTERNAL_URL=http://127.0.0.1:3000
 - API and web bind **loopback**; only Caddy is public.
 - Prefer same-origin `/api` and `/ws` so the browser needs no loose CORS.
 - Secrets: env / `.env` never `PUBLIC_*`.
-
-## Must do
-
-- Activate specialist skills by domain; do not invent Axum/SQLx/Kit patterns that contradict their guides.
-- Use **Bun** for JS install, scripts, and the production SSR process in this stack.
-- Keep handlers thin; SQL in a db/repo module; server-only code out of client bundles.
-- Run security checklists when touching auth, cookies, WS, or raw SQL.
-
-## Must not do
-
-- Use Node/npm/yarn/pnpm for this stack’s frontend by default.
-- Skip migrations for schema changes.
-- Put `DATABASE_URL` or private keys in SvelteKit public env.
-- Claim done without cargo + bun verify evidence (`rc-final-verify`).
 
 ## Output template (fullstack change)
 

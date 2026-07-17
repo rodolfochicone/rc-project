@@ -8,7 +8,7 @@ effort: medium
 
 # Execute RC tasks as a Claude Workflow
 
-Run every `task_NN.md` of a feature slug through the Claude Code **`Workflow`** tool — each task implemented, verified, and tracked, orchestrated by Claude one task at a time. **Invoking this skill is the explicit opt-in to call the `Workflow` tool.**
+Run every `task_NN.md` of a feature slug through the Claude Code **`Workflow`** tool — each task implemented, verified, and tracked, orchestrated by Claude one task at a time. **Invoking this skill is the explicit opt-in to call the `Workflow` tool.** Never call it for unrelated work.
 
 This is **Claude Code only** — the `Workflow` tool does not exist in other agents (Codex, Droid, Cursor). On those hosts, run each task through the `rc-execute-task` skill in dependency order instead.
 
@@ -31,7 +31,7 @@ This is **Claude Code only** — the `Workflow` tool does not exist in other age
 
 ## Phase 3 — Build and launch the Workflow
 
-Call the `Workflow` tool with a script that runs the tasks **sequentially in dependency order** — one `await agent()` at a time, no parallelism, so tasks never fight over the working tree. Each `agent()`:
+Call the `Workflow` tool with a script that runs the tasks **sequentially in dependency order** — one `await agent()` at a time, no parallelism, so tasks never fight over the working tree. Worktree-isolated parallelism is explicitly out of scope. Each `agent()`:
 
 - Receives the `task_NN.md` content, the PRD directory `.rc/tasks/<slug>/`, the tracking paths (`_tasks.md` + its own task file), and the auto-commit mode.
 - Follows the **`rc-execute-task` contract**: explore → implement the task → run `make verify` (via `rc-final-verify`) → update tracking (task checkboxes → task status → `_tasks.md` → commit if auto-commit is on).
@@ -90,11 +90,3 @@ return { results }
 The `Workflow` tool runs in the background and notifies on completion; read its result and relay what matters. Summarize per task — status, gate result, a trimmed evidence excerpt, files touched — and the overall outcome (N passed / M failed / K skipped).
 
 When this skill was reached from the **rc-board *Execute an issue*** flow, hand the per-task evidence back to rc-board so it can post it to Linear (comment per sub-issue + parent summary). This skill itself does **not** write to Linear.
-
-## Guardrails
-
-- **Claude-only, opt-in via this skill.** Calling `Workflow` is justified only because the user invoked this skill. Never call it for unrelated work.
-- **Sequential, no parallelism.** Tasks edit the shared working tree; run one at a time in dependency order. Worktree-isolated parallelism is explicitly out of scope.
-- **Local task files are the source of truth.** Resolve the slug from local files; never reconstruct tasks from Linear text.
-- **Verify gates completion.** A task is `passed` only after a clean `make verify`. Never mark a failing task done.
-- **Claude Code only.** On other hosts, run each task through the `rc-execute-task` skill in dependency order; this Workflow path is the Claude-native runner.

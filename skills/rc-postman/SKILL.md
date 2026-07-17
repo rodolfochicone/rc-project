@@ -48,11 +48,6 @@ Keep a Postman collection synchronized with the API's real routes and request co
 
 ## Critical Rules
 
-- Build requests only from real endpoints and real schemas — never invent endpoints, fields, or routes.
-- Stay on Postman Collection Format v2.1.0; keep the `schema` URL intact.
-- Never hardcode hostnames or secrets in the collection; parameterize via `{{baseUrl}}` and environment variables.
-- Preserve existing collection variables, folder structure, and user-maintained helper folders; do a surgical sync, not a blind overwrite — except sections the skill explicitly regenerates.
-- Example values must be coherent with each field's real type and constraints.
 - Do not modify any source code. This skill only writes the collection and environment files.
 
 ## Error Handling

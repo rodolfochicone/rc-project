@@ -59,11 +59,7 @@ Produce a `README.md` that reflects what the code actually does — never invent
 
 ## Critical Rules
 
-- Never invent information. Every fact comes from a file you read; when unknown, omit it or mark `[TODO]`.
 - Match the language and tone of the existing README. If the repo writes docs in another language, follow it.
-- Preserve still-valid content and existing badges — this is a surgical refresh, not a from-scratch rewrite unless none exists.
-- Use real dependency versions from the manifest; never hardcode versions.
-- Code examples must match the project's actual usage and conventions.
 - Do not modify any source code. This skill only writes the README (and only the target file).
 
 ## Error Handling

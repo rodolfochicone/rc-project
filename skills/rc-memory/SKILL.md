@@ -8,8 +8,10 @@ effort: medium
 
 # Memory
 
-The one place for what RC should remember about *this project* across turns and sessions. It holds
-two kinds of durable knowledge, both as plain markdown under `.rc/memory/` — no database, no binary:
+The one place for what RC should remember about *this project* across turns and sessions. It is
+project-scoped only — never copy memory or learnings to another project or a global location. It
+holds two kinds of durable knowledge, both as plain markdown under `.rc/memory/` — no database, no
+binary, and this skill never edits source code:
 
 1. **Facts** — curated decisions, conventions, gotchas, glossary, and context.
 2. **Learnings** — recurring corrections/workflows distilled into confidence-scored `trigger → action`
@@ -57,7 +59,7 @@ task's terms, open only the matching `<slug>.md`. For a large store, `grep -ri "
 **Record** a fact only when all three hold: (1) a future run would need it to avoid a mistake or
 rediscovery; (2) it is durable for this project, not one task's execution; (3) it is NOT already
 obvious from the repo, git history, PRD, or techspec. Reuse the same slug/`key` to update instead of
-duplicating. Keep each fact short; never store secrets, large code blocks, or logs.
+duplicating. Keep each fact short; never store secrets, tokens, credentials, large code blocks, stack traces, or raw session logs.
 
 ## B — Learnings (the continuous-learning loop)
 
@@ -88,9 +90,5 @@ next pass starts clean. (5) Report what was added/reinforced/weakened/dropped.
 
 ## Critical rules
 
-- Project-scoped only. Never copy memory or learnings to another project or a global location.
-- Facts and learnings are **curated, not a log** — deliberately chosen, pruned aggressively.
-- Never store secrets, tokens, credentials, large code blocks, stack traces, or raw session logs.
 - When a fact or learning is contradicted by the repo or the user, correct or delete it — trust the
   repo over stale memory.
-- This skill writes only under `.rc/memory/`; it does not edit source code.

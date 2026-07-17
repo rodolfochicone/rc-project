@@ -55,8 +55,8 @@ RC supports monorepos, where more than one `.rc` directory can exist. Before rea
    - Spawn an Agent tool call to explore the codebase for files to create or modify, test patterns, and coding conventions.
 
 3. Break down into tasks.
-   - **Challenge scope before decomposing (YAGNI).** The TechSpec already applied YAGNI to the architecture; here the guard is task *scope*. Before turning a requirement into a task, ask: does this need to exist in this delivery, or is it speculative work beyond what the PRD asks? Can the codebase exploration from step 2 already cover it (an existing helper, pattern, or endpoint)? Drop speculative tasks and merge tasks that only scaffold "for later". Never silently remove work the PRD explicitly requests — when something looks like YAGNI but sits in PRD scope, keep it and flag it for the user in the step 4 approval instead.
-   - Decompose implementation sections from the TechSpec into granular, independently implementable tasks.
+   - **Challenge scope before decomposing (YAGNI).** The TechSpec already applied YAGNI to the architecture; here the guard is task *scope*. Before turning a requirement into a task, ask: does this need to exist in this delivery, or is it speculative work beyond what the PRD asks? Can the codebase exploration from step 2 already cover it (an existing helper, pattern, or endpoint)? Drop speculative tasks and merge tasks that only scaffold "for later" — config nobody sets, an abstraction with a single caller. If the TechSpec deliberately cut a component, do not reintroduce it as a task. Never silently remove work the PRD explicitly requests — when something looks like YAGNI but sits in PRD scope, keep it and flag it for the user in the step 4 approval instead.
+   - Decompose implementation sections from the TechSpec into granular, independently implementable tasks. A task must not touch more than 7 files or carry more than 7 subtasks — split it into smaller tasks with explicit dependencies between them instead.
    - **Each task must be independently implementable once all of its declared dependencies are met**, because the executor runs tasks in isolation and any undeclared coupling is what makes one fail mid-run. No task may require undeclared work from another task. If two tasks share a tight coupling, either merge them or extract the shared piece into a dependency task.
    - **No circular dependencies**: if task A depends on task B, task B must not depend on task A (directly or transitively), or neither can ever start.
    - Each task must have: title, type, complexity, and dependencies.
@@ -109,7 +109,7 @@ RC supports monorepos, where more than one `.rc` directory can exist. Before rea
      - `### Patterns to Mirror`: 1-3 short snippets of **real code already in this repo** that the implementation should imitate — the existing error-wrap style, the table-test shape, the handler/constructor pattern. Copy the actual lines (≤10 each) and tag each with `// SOURCE: <path>:<start>-<end>` so the executor mirrors what exists instead of inventing a parallel style. Capture this now (you already explored the codebase) — if the executor would have to grep the repo to find "how we do X here", that knowledge belongs in the task. Omit only when the task genuinely introduces a pattern with no precedent.
      - `### Related ADRs`: links to relevant ADRs if any exist, or omit subsection if no ADRs apply.
      - `## Deliverables`: concrete outputs with mandatory test items and at least 80% coverage target.
-     - `## Tests`: specific test cases as checklists, split into unit tests and integration tests categories.
+     - `## Tests`: specific test cases as checklists, split into unit tests and integration tests categories. Name the specific input, condition, or behavior verified (e.g., "POST /job/done with unknown job ID returns 404") — not vague labels like "test the happy path".
      - `## Success Criteria`: measurable outcomes including "All tests passing" and "Test coverage >=80%".
    - Reassess complexity based on exploration findings and update if changed.
    - **No Prior Knowledge Test.** Before finalizing each task file, apply this check: *could a competent developer (or executor agent) with no prior context implement this task correctly using only the task file plus the referenced TechSpec sections, without having to grep the repo to discover how things are done here?* If not, the gap is missing context — add the concrete file paths, the Patterns to Mirror snippet, or the specific TechSpec/ADR reference that closes it. A task that only an author-who-already-knows could implement is under-enriched.
@@ -126,15 +126,6 @@ RC supports monorepos, where more than one `.rc` directory can exist. Before rea
 Before decomposing, consult project memory via the `rc-memory` skill (scan
 `.rc/memory/INDEX.md`) for the feature and package terms to recover conventions and gotchas
 that should shape task boundaries and implementation notes.
-
-## Anti-Patterns
-
-Do NOT produce tasks with these defects:
-
-- **Mega-tasks.** If a task touches more than 7 files or has more than 7 subtasks, it is too broad. Split it into smaller tasks with explicit dependencies between them.
-- **TechSpec duplication.** Do NOT copy interface definitions, code snippets, or architectural diagrams from the TechSpec into task files. Reference the TechSpec section by name (e.g., "See TechSpec 'Core Interfaces' section") instead of reproducing its content.
-- **Vague test cases.** Do NOT write test descriptions like "test the happy path" or "verify error handling." Each test case must name the specific input, condition, or behavior being verified (e.g., "POST /job/done with unknown job ID returns 404").
-- **Speculative tasks.** Do NOT create tasks for work the PRD does not ask for — config nobody sets, an abstraction with a single caller, scaffolding "for later". If the TechSpec deliberately cut something, do not reintroduce it as a task.
 
 ## Error Handling
 

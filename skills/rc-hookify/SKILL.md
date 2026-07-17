@@ -10,12 +10,16 @@ effort: medium
 
 Turn "I want the agent to always/never do X" into a RC hook. A rule that must hold *every time*
 belongs in a hook, not in prose (CLAUDE.md). This skill writes one in the repo's house style —
-never blocks the session on its own errors, guards by pattern, and is registered + documented.
+never blocks the session on its own errors, guards by pattern, and is registered + documented. It
+writes only under `hooks/`; it never touches application source.
 
 Read `hooks/scripts/_lib.sh` and one existing hook (`hooks/scripts/observe.sh` for an observer,
 `hooks/scripts/git-guard.sh` for a blocker) before writing — mirror them exactly.
 
 ## Step 1 — pick the event
+
+First confirm the rule truly must hold *every time* — if it's advisory (nice-to-have, not
+every-time), it belongs in `CLAUDE.md` or a skill, not a hook; say so instead of writing one.
 
 Match the intent to an event; the full I/O contract is in `references/hook-events.md` (read it —
 stdout reaches the model only on some events, and only `PreToolUse` can block).
@@ -86,11 +90,3 @@ representative one-liner in the existing column style.
   `echo '{"tool_name":"Bash","tool_input":{"command":"git reset --hard"}}' | bash hooks/scripts/<name>.sh; echo "exit $?"`
   — verify it blocks (exit 2) / stays silent (exit 0) / emits the expected text, plus the opt-out
   (`RC_DISABLED_HOOKS=<name>`) and the not-applicable case both exit 0 silently.
-
-## Critical rules
-
-- Hooks ship to **every plugin consumer** — a hook that wrongly blocks or errors breaks their
-  sessions. Fail-open and precise guards are the whole safety model.
-- This skill writes only under `hooks/`; it does not touch application source.
-- If the rule is advisory (nice-to-have, not every-time), it belongs in `CLAUDE.md` or a skill —
-  not a hook. Say so instead of writing one.

@@ -15,7 +15,6 @@ The design clarification must precede the artifact, because a TechSpec written b
 - Do not write the TechSpec file until all phases are complete and the user has approved the final draft — an unapproved file is a design decision the user never signed off on.
 - Do not skip the codebase exploration: each TechSpec is informed by the existing architecture so the design fits what is already there instead of fighting it.
 - Do not skip user interactions: the user shapes the TechSpec at every decision point, because architectural intent and constraints often live with them, not in the code.
-- Do not require section-by-section approval: generate the complete draft, then let the user review it — piecemeal sign-off adds delay without adding rigor.
 </HARD-GATE>
 
 ## Code navigation (Serena)
@@ -32,14 +31,6 @@ Fall back to Grep/Glob + Read when Serena is unavailable or for plain-text (non-
 When this skill instructs you to ask the user a question, you MUST use your runtime's dedicated interactive question tool — the tool or function that presents a question to the user and **pauses execution until the user responds**. Do not output questions as plain assistant text and continue generating; always use the mechanism that blocks until the user has answered.
 
 If your runtime does not provide such a tool, present the question as your complete message and stop generating. Do not answer your own question or proceed without user input.
-
-## Anti-Pattern: "This Is Too Simple To Need Technical Design Review"
-
-Every TechSpec goes through the full design review process. A single endpoint, a minor refactor, a configuration change — all of them. "Simple" technical changes are where unexamined assumptions about existing architecture cause the most integration failures. The design review can be brief for genuinely simple changes, but you MUST ask technical clarification questions and get approval on the technical approach before writing the artifact.
-
-## Anti-Pattern: End-Of-Flow Bureaucracy
-
-Once the user has answered the technical clarification questions and approved an approach, do not force them through a second approval loop for System Architecture, Data Models, API Design, or other final document sections. Synthesize the approved direction into the TechSpec directly. The user can review and request edits in the generated file afterward.
 
 ## Required Inputs
 
@@ -97,13 +88,14 @@ You MUST create a task for each phase and complete them in order:
      - Write each ADR to `.rc/tasks/<name>/adrs/adr-NNN.md` (zero-padded 3-digit sequential number).
 
 4. Draft the TechSpec.
+   - Synthesize the approved direction into the document. Do not present each section for separate approval — the user reviews the complete draft in step 5.
    - Read `references/techspec-template.md` and fill every applicable section.
    - **MANDATORY — Architecture Decision Records section:** The generated TechSpec MUST end with an "Architecture Decision Records" section listing every ADR created during this process. Each entry must include the ADR number (e.g., ADR-001), title, and a one-line summary formatted as a link to the `adrs/` directory. Even simple features require at least one ADR documenting the primary technical approach chosen and alternatives rejected. If no ADRs were created in step 3, go back and create at least one before generating the document.
    - Apply YAGNI ruthlessly: remove any component, interface, or abstraction that is not strictly necessary. Do NOT propose new packages or directories when the feature can be implemented by adding a single file to an existing package.
    - **Trade-offs are mandatory:** the Executive Summary MUST state the primary technical trade-off of the chosen approach.
    - Every PRD goal and user story should map to a technical component.
    - Reference PRD sections by name but do not duplicate business context.
-   - Include code examples only for core interfaces, limited to 20 lines each. The Core Interfaces section must contain at least one Go interface or struct definition as a code block, even for simple features — show the primary type that other components will depend on.
+   - Include code examples only for core interfaces, limited to 20 lines each. The Core Interfaces section must contain at least one type definition as a code block, written in the project's own language and idiom (a Rust trait or struct, a TypeScript interface or type, a Python protocol or dataclass — whatever the codebase already uses), even for simple features — show the primary type that other components will depend on.
    - The Development Sequencing section MUST include a numbered Build Order where every step after the first explicitly states which previous steps it depends on.
    - **MANDATORY — Behavioral Contract section:** end the technical body (before the ADR section) with a "Behavioral Contract" of machine-parseable assertions, so requirements are verifiable and grep-able rather than buried in prose. Use the format in "Behavioral contract format" below. Derive the assertions from the PRD's acceptance criteria and the design decisions; each gets a stable `id` that later artifacts (tasks, reviews) reference. This is the durable, checkable core of the spec — write it for every TechSpec, even simple ones.
    - Prefer active voice, omit needless words, use definite and specific language over vague generalities. Every sentence should earn its place.

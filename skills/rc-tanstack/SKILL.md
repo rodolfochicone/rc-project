@@ -157,7 +157,6 @@ TanStack Router provides type-safe file-based routing with first-class TypeScrip
 
 ### Core Principles
 
-- **Type-Safe Routing**: Embrace type-safe routing as the primary benefit.
 - **File-Based Routes**: Use file-based routing for scalability.
 - **Generated Route Tree**: Leverage the generated route tree for type safety.
 

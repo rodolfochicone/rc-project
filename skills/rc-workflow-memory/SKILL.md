@@ -22,18 +22,15 @@ Maintain the workflow memory files provided by the caller.
 1. Load the memory state before editing code.
    - Read the shared workflow memory file and the current task memory file before making any code change.
    - Treat these files as mandatory context for the run, not optional notes.
-   - If the caller marks either file for compaction, read `references/memory-guidelines.md` and compact that file before proceeding with implementation.
+   - If the caller marks either file for compaction, compact that file per the Compaction Rules before proceeding with implementation.
 
 2. Keep memory current while the task runs.
    - Update the current task memory whenever the objective changes, a non-obvious decision is made, an important learning appears, or an error changes the plan.
-   - Promote only durable cross-task context into the shared workflow memory.
-   - Keep task-local execution details in the current task memory file.
    - If the `rc-memory` skill has promoted high-confidence instincts (recurring trigger→action patterns for this project), treat them as a source of durable cross-task context worth carrying in shared memory.
 
 3. Close out the run cleanly.
    - Update memory before any completion claim, handoff, or commit.
    - Record only facts that help the next run start faster and with fewer mistakes.
-   - Re-read `references/memory-guidelines.md` before compacting if the file has grown noisy or repetitive.
 
 ## Critical Rules
 
@@ -73,7 +70,7 @@ it in the per-project memory via the `rc-memory` skill so other workflows and sk
 
 ## Compaction Rules
 
-When the caller flags a memory file for compaction, apply these rules inline. Read `references/memory-guidelines.md` for full detail, but these rules are sufficient for most compaction passes:
+When the caller flags a memory file for compaction, apply these rules inline — sufficient for most compaction passes. See "When To Read the Reference" below for when the full file is needed:
 
 1. If both files need compaction, compact the shared workflow memory first, then compact the task memory. The shared file sets the cross-task context that the task file should not duplicate.
 2. **Preserve:** current state, durable decisions, reusable learnings, open risks, and handoff notes.

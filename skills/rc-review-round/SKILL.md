@@ -144,10 +144,7 @@ it via the `rc-memory` skill (scope: gotcha).
 ## Critical Rules
 
 - Do not fix the issues found. This skill only identifies and documents issues. The `rc-fix-reviews` workflow handles remediation.
-- Do not create issue files for problems that linters or formatters already catch.
-- Every issue file must have valid YAML frontmatter parseable by `prompt.ParseReviewContext()`.
 - Do not create or maintain review `_meta.md`; round metadata lives in each issue file frontmatter.
-- Do not create empty review rounds. If no issues are found, report a clean review and do not create the round directory.
 - Do not modify any source code files. This is a review-only skill.
 - Do not call provider-specific scripts or `gh` mutations.
 

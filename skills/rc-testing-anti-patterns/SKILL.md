@@ -271,10 +271,8 @@ Tests are part of implementation:
 
 **Warning signs:**
 
-- Mock setup longer than test logic
 - Mocking everything to make test pass
 - Mocks missing methods real components have
-- Test breaks when mock changes
 
 **your human partner's question:** "Do we need to be using a mock here?"
 
@@ -299,11 +297,3 @@ Tests are part of implementation:
 - Test fails when you remove mock
 - Can't explain why mock is needed
 - Mocking "just to be safe"
-
-## The Bottom Line
-
-**Mocks are tools to isolate, not things to test.**
-
-If you're testing mock behavior, you've gone wrong.
-
-Fix: Test real behavior or question why you're mocking at all.

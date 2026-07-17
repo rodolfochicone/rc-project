@@ -111,8 +111,4 @@ The `Workflow` tool runs in the background and notifies on completion; read its 
 
 ## Guardrails
 
-- **Claude-only, opt-in via this skill.** Calling `Workflow` is justified only because the user invoked this skill. Never call it for unrelated work.
-- **Lenses read-only, fix sequential.** Run the review lenses in parallel (they only analyze); run synthesis and fix one round at a time so nothing fights over the working tree.
-- **No new high/critical is the exit signal.** A round whose new issues are all medium/low (or none at all) means converged — fix them, then stop. Otherwise keep looping until the round cap or a red `make verify`, and report what remains.
-- **Verify gates every fix round.** A round's fixes count only after a clean `make verify` via `rc-final-verify`. Never mark issues resolved on a red gate.
 - **Adversarial lens is in-Workflow, not cross-LLM.** Here the `adversarial` lens is a skeptical Claude subagent; it does not spawn another model.

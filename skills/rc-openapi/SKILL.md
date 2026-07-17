@@ -7,7 +7,7 @@ effort: high
 
 # OpenAPI Specification
 
-Generate or maintain an OpenAPI document that mirrors the API's real routes, request contracts, and response models. Document only what exists in source. This skill is standalone and stack-agnostic; it detects how the project defines HTTP endpoints.
+Generate or maintain an OpenAPI document that mirrors the API's real routes, request contracts, and response models. Document only what exists in source. This skill is standalone and stack-agnostic; it detects how the project defines HTTP endpoints. It only writes the spec file — it never modifies source code.
 
 ## Required Inputs
 
@@ -26,7 +26,7 @@ Generate or maintain an OpenAPI document that mirrors the API's real routes, req
 
 4. Extract response models. For each endpoint determine the success and error responses from the handler's return shape and the domain entities it serializes — including field renames the handler applies — and the HTTP status codes it can emit (2xx success, 4xx validation/not-found/conflict, etc.).
 
-5. Map types to OpenAPI Schema Objects, honoring the chosen version:
+5. Map types to OpenAPI Schema Objects, honoring the chosen version — stay on that one version throughout the document, never mixing 3.0 and 3.1 constructs:
    - `string` → `type: string`; uuid → `format: uuid`; datetime → `format: date-time`; `number`/`integer`, `boolean`, arrays, objects accordingly; open maps → `type: object, additionalProperties: true`.
    - **Nullability**: in 3.1.0 use union types (`type: [string, "null"]`); in 3.0.3 use `nullable: true`.
    - **Examples**: in 3.1.0 prefer `examples`; in 3.0.3 use `example`.
@@ -34,22 +34,13 @@ Generate or maintain an OpenAPI document that mirrors the API's real routes, req
 6. Assemble the document:
    - `info` (title, version from the manifest, description), `servers` (real environment URLs), `security` + `components.securitySchemes` for the project's auth scheme, and `tags` grouping operations by domain.
    - `paths`: per operation set `summary`, `description`, a unique `operationId` (the handler/function name), `tags`, `parameters`, `requestBody` when applicable, and all possible `responses` with schemas.
-   - `components.schemas`: define reusable entity, request-body, and error schemas. Reference everything with `$ref` — never duplicate a definition inline (DRY). Put required fields in `required`, defaults in `default`, and a realistic `example`/`examples` on each field.
+   - `components.schemas`: define reusable entity, request-body, and error schemas. Reference everything with `$ref` — never duplicate a definition inline (DRY). Put required fields in `required`, defaults in `default`, and a realistic, type-correct `example`/`examples` on each field (valid UUIDs, E.164 phones, ISO 8601 dates).
 
 7. Reconcile when updating an existing spec: add new endpoints/schemas, remove ones no longer in source, update changed parameters/bodies/responses, and preserve non-conflicting manual additions (extra descriptions, examples).
 
 8. Validate: the document parses as valid YAML/JSON, every `$ref` resolves, every `required` entry names a real property, and the document conforms to the chosen OpenAPI version. Save to the output path.
 
 9. Report: creation vs update mode, endpoints documented/added/removed/updated, schemas generated, and a pointer to validate the spec (e.g. an OpenAPI linter or editor.swagger.io).
-
-## Critical Rules
-
-- Document only endpoints and fields that exist in source — never invent paths, parameters, or schema fields.
-- Stay on one OpenAPI version throughout the document; do not mix 3.0 and 3.1 constructs.
-- Reuse via `$ref` for every shared schema — no duplicated inline definitions.
-- Examples must be realistic and type-correct (valid UUIDs, E.164 phones, ISO 8601 dates).
-- Pull `info.version` from the manifest; do not hardcode it.
-- Do not modify any source code. This skill only writes the spec file.
 
 ## Error Handling
 

@@ -8,7 +8,7 @@ argument-hint: "[config-root]"
 
 # Context Budget
 
-The context window is a budget, not free space. Every always-loaded agent description, skill, rule, MCP tool schema, and `CLAUDE.md` line is spent on *every* turn — a 200k window can effectively start at 70k once enough tooling is enabled, forcing early compaction and degrading reasoning. This skill inventories that fixed overhead, estimates its token cost, and tells you what to trim. Read-only.
+The context window is a budget, not free space. Every always-loaded agent description, skill, rule, MCP tool schema, and `CLAUDE.md` line is spent on *every* turn — a 200k window can effectively start at 70k once enough tooling is enabled, forcing early compaction and degrading reasoning. This skill inventories that fixed overhead, estimates its token cost, and tells you what to trim. Read-only: recommend, do not disable servers, edit configs, or delete skills yourself.
 
 ## What to inventory
 
@@ -34,18 +34,12 @@ Tag each contributor:
 - **sometimes** — needed for a class of task (a stack's skill, a provider MCP). Candidate for on-demand enabling.
 - **rarely** — niche; loaded by default but seldom used. Prime candidate to disable.
 
-Then give the **top 3 reductions ranked by tokens saved**, each with the concrete action and estimated saving. The usual biggest levers, in order:
+Then give the **top 3 reductions ranked by tokens saved × likelihood-unused** — do not just list everything — each with the concrete action and estimated saving. Never recommend trimming a security control (permission `deny`, a guardrail hook) to save tokens. The usual biggest levers, in order:
 
 1. **Disable rarely-used MCP servers** (biggest single lever — hundreds to thousands of tokens each). Replace a heavy always-on MCP with a thin CLI-wrapping command/skill where possible (e.g. a `gh pr` command instead of the GitHub MCP).
 2. **Trim long agent descriptions** — they load on every Task consideration. Move detail into the agent body; keep the description a tight routing trigger.
-3. **Shorten always-loaded prose** — fold repeated guidance into a skill/rule that loads on demand instead of living in `CLAUDE.md`.
+3. **Shorten always-loaded prose** — fold repeated guidance into a skill/rule that loads on demand instead of living in `CLAUDE.md`. When this is the recommendation, hand the file to `rc-agents-md`: it owns the rent test (delta / frequency / economy), the scope ladder that says where a rule relocates instead of dying, and the Trim branch that executes the verdict. Note for the estimate: in Claude Code an `@path` import expands at load time — full rent — while a path mentioned in prose is read on demand.
 
 ## Output
 
 Print a table (`contributor | type | est. tokens | class`), the total fixed overhead, and the ranked top-3 reductions with estimated savings and the exact action for each. Note that estimates are approximate (±20%); the goal is relative ranking, not exact accounting.
-
-## Critical Rules
-
-- Read-only. Recommend; do not disable servers, edit configs, or delete skills yourself.
-- Never recommend trimming a security control (permission `deny`, a guardrail hook) to save tokens.
-- Rank by tokens saved × likelihood-unused; do not just list everything.

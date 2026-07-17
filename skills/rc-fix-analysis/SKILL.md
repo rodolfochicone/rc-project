@@ -47,13 +47,14 @@ RC supports monorepos, where more than one `.rc` directory can exist. Before rea
 2. Re-ground every step against the current code. The report may be stale. For each step, open the cited `file:line` and confirm the code still matches what the plan assumes. If a step no longer applies (already fixed, code moved, assumption wrong), note the divergence, adapt the step to current reality, and surface it to the user rather than forcing a change that no longer fits.
 
 3. Implement step by step, fixing the root cause. For each plan step:
-   - Make the smallest change that correctly resolves the underlying problem the analysis identified — not a symptom patch. No workarounds: do not silence type errors with assertions, suppress linter rules, swallow errors, add timing hacks, or special-case the failing input to make a check pass.
+   - Make the smallest change that correctly resolves the underlying problem the analysis identified — not a symptom patch. Apply `rc-no-workarounds` to every fix before writing it; it owns the catalog of what counts as a workaround.
    - Match the surrounding code's conventions, naming, and structure. Touch only what the step requires; do not refactor adjacent code.
    - Keep edits traceable to the plan step that motivated them.
+   - A step that can only be satisfied by a workaround, or that would introduce a pattern harmful to this codebase, is a defect in the plan. Surface it to the user instead of implementing it.
 
-4. Cover the change with tests that encode intent. Add or adjust tests so they assert *why* the behavior matters, not merely that the current code runs. A test that cannot fail when the business logic regresses is not adequate. Do not test mocks against mocks, and do not add test-only methods to production code to make something assertable.
+4. Cover the change with tests that encode intent. Add or adjust tests so they assert *why* the behavior matters, not merely that the current code runs. A test that cannot fail when the business logic regresses is not adequate. When the change pulls in mocks or a test-only seam, apply `rc-testing-anti-patterns` — it owns that trap.
 
-5. Verify with the project's gate. Detect and run the stack's real verification: a declared command (e.g. `make verify`, `npm test`, `pytest`, `go test ./... -race`, `cargo test`) or the closest equivalent the project provides. Run it for real and read the full output. If it fails, fix the root cause and re-run until it passes — do not declare success on stale or partial evidence. If no gate exists, run the most authoritative checks available (build + tests) and say which.
+5. Verify with the project's gate. Detect and run the stack's real verification: a declared command (e.g. `make verify`, `npm test`, `pytest`, `go test ./... -race`, `cargo test`) or the closest equivalent the project provides. Run it for real and read the full output. If it fails, fix the root cause and re-run until it passes. If no gate exists, run the most authoritative checks available (build + tests) and say which. Apply `rc-final-verify` before reporting any step done — it owns the evidence bar.
 
 6. Write the resolution log and report it.
    - Write to `.rc/tasks/<slug>/resolution-NNN.md` when a feature slug applies, otherwise `.rc/analysis/<topic-slug>-resolution-NNN.md`. `NNN` is zero-padded and increments past any existing matching file. Never overwrite the `analysis-NNN.md` it executed.
@@ -68,18 +69,8 @@ Before applying the plan, consult project memory (the `rc-memory` skill, scannin
 decisions and gotchas (see the `rc-memory` skill). When the change establishes a
 durable decision or reveals a non-obvious gotcha, record it via the `rc-memory` skill.
 
-## Critical Rules
-
-- Execute the plan; do not re-analyze. If there is no plan, stop and route the user to `rc-analyze`.
-- Root cause over symptom. Reject workarounds — type assertions to silence checks, lint suppressions, error swallowing, timing hacks, and input special-casing are not fixes.
-- Surgical changes. Implement only what the plan's steps require; do not improve adjacent code or restyle untouched files.
-- Tests must encode why the change matters and be able to fail when the logic regresses.
-- Never declare done without fresh verification evidence. Run the gate, read the output, report it honestly — if it fails or a step was skipped, say so.
-- Reason in the target stack's idioms. If a plan step would introduce a harmful pattern, surface it instead of silently implementing it.
-
 ## Error Handling
 
-- **No report / no plan** — stop and instruct the user to run `rc-analyze` to produce a plan; do not fabricate one.
 - **Stale plan** — when a step's cited code has changed, adapt the step to the current code and flag the divergence; do not force an obsolete edit.
 - **Verification fails** — keep the change in progress (not "done"), fix the root cause, and re-run the gate. Report the failing output if you cannot resolve it.
 - **Ambiguous or conflicting steps** — ask one focused clarifying question before changing code, rather than guessing.

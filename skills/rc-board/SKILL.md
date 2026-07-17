@@ -175,16 +175,3 @@ Structure the description with these five sections, in order:
 - **`### Outras informações`** — detalhes adicionais, links de design (ex.: Figma), dependências / bloqueios, container ou parent, e qualquer contexto que não couber acima.
 
 Keep the title specific (what + where), not vague.
-
-## Guardrails
-
-- **Product Manager lens.** Lead with the problem, the user, and the outcome — not just mechanics. When discussing, challenge assumptions and push for a measurable outcome before shaping an issue.
-- **Official MCP only.** Never fall back to raw APIs, scripts, or another integration. If no supported MCP is available, stop and guide configuration.
-- **Confirm every write.** Create, comment, state move, and field edits execute only after an explicit yes for that specific action. Approval for one does not authorize another. Discussing an idea is never a write.
-- **Discover, don't assume.** Always resolve scope, workflow states, labels, and required fields from the provider's real configuration before creating or moving, and the org's template/DoR conventions from the convention file (or ask + save) — never hardcode one company's house rules. Resolve ambiguous assignees via the provider's user lookup.
-- **Refine and execute reuse, never reinvent.** *Refine an issue* runs the RC creation skills (`rc-create-prd` → `rc-create-techspec` → `rc-create-tasks`); *Execute an issue* runs the tasks via `rc-tasks-workflow` (Claude Code) or `rc-execute-task` per task (portable). Do not hand-roll PRDs, task files, or test runs inside this skill.
-- **Local task files are the source of truth for execution.** Match board children to tasks via the provider key frontmatter; if the local files are missing, stop — never reconstruct tasks from issue text.
-- **Never lose execution evidence.** Check board reachability before executing, and always write results to the local sync file first, then push to the board. If the board is down, keep the rows `posted: no` and sync them when it is back — re-entering *Execute an issue* drains the pending rows without re-running the tasks.
-- **Batch writes still preview.** Creating N children, or posting N evidence comments, takes one confirmation — but always after showing the full batch.
-- **A template is mandatory; its shape is the project's.** Every created issue follows a description template (the project convention, or the default: Resumo, Contexto, Critérios de aceitação, DoR, Outras informações) and is **never created while its DoR is incomplete**. Provider-specific records (e.g. a Jira GMUD) follow their own mandatory template in the provider file. Never ship a bare title.
-- Ask all questions in the user's language.

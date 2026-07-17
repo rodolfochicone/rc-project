@@ -82,13 +82,7 @@ decisions, conventions, and gotchas that may already answer or inform it (see th
 
 ## Critical Rules
 
-- Do not modify source code — this skill is the read-only half of the pair, so its only writes are the report under `.rc/...`; code changes belong to `rc-fix-analysis`, which executes the plan.
-- Lead with the answer, because the reader needs the verdict to act and should not have to reconstruct it from the trace.
-- Every factual claim cites a `file:line`, and distinguish what the code does from what you infer it does — a named function may not do what its name says, so grounding is what separates analysis from a confident guess.
 - Depth over breadth padding: answer the question fully but do not inflate the report with tangential surveys, since padding buries the load-bearing findings and wastes the reader's attention.
-- Do not settle for the first explanation that fits — confirmation bias produces confident, wrong diagnoses; weigh competing hypotheses and seek the evidence that would disconfirm yours.
-- Reason in the target stack's idioms, and surface a harmful convention rather than silently endorsing it, so the report does not normalize a latent problem.
-- When the code is genuinely ambiguous or you ran out of evidence, say so — guessing to appear complete is worse than a named gap the reader can follow up on.
 
 ## Error Handling
 

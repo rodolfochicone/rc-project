@@ -20,19 +20,6 @@ For detailed patterns, examples, and checklists, see:
 - **Tailwind Variants**: Use `tailwind-variants` (tv) for component styling instead of CVA.
 - **Mobile-First**: Build responsive layouts with mobile-first approach.
 
-## Critical: Design Token Usage
-
-To ensure theme switching works correctly:
-
-**Always use:**
-- Backgrounds: `bg-background`, `bg-card`, `bg-muted`, `bg-popover`
-- Text: `text-foreground`, `text-muted-foreground`, `text-card-foreground`
-- Borders: `border-border`, `border-input`, `border-ring`
-- Actions: `bg-primary text-primary-foreground`, `bg-secondary text-secondary-foreground`
-- States: `bg-destructive text-destructive-foreground`, `bg-accent text-accent-foreground`
-
-**Never use:** `bg-white`, `text-black`, `border-gray-200`, `bg-blue-500`
-
 ## Common Tasks
 
 ### Component Styling with Tailwind Variants

@@ -1,6 +1,6 @@
 ---
 name: rc-sqlx
-description: Implements and reviews SQLx 0.8+ with PostgreSQL in Rust — PgPool, query/query_as, bind parameters, transactions, migrations, compile-time query macros, and database tests. Use when writing or changing database access with SQLx or Postgres from Rust. Do not use for Axum HTTP routing alone (rc-axum), SvelteKit (rc-sveltekit), or non-Rust ORMs.
+description: Implements and reviews SQLx 0.8+ with PostgreSQL in Rust — PgPool, query/query_as, bind parameters, transactions, migrations, compile-time query macros, and database tests. Use when writing or changing database access with SQLx or Postgres from Rust. Do not use for Axum HTTP routing alone (rc-axum), SvelteKit (rc-sveltekit), Rust language idioms — ownership, error types, async patterns (rc-rust) — or non-Rust ORMs.
 user-invocable: true
 model: sonnet
 effort: medium
@@ -39,7 +39,6 @@ Async SQL for Rust without a heavy ORM. Target: **sqlx 0.8.x**, **PostgreSQL 16*
 
 ## Must not do
 
-- Concatenate SQL with user strings.
 - Share one long-lived transaction across HTTP requests.
 - Use the superuser role for the app in production.
 - Commit migrations that are not reversible or documented when data loss is possible.

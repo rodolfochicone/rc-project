@@ -26,10 +26,9 @@ qualquer banco relacional.
 
 - **Meça com EXPLAIN antes de otimizar — não adivinhe.** Nenhum ajuste de índice ou query se justifica sem o plano de execução real na frente.
 - **O índice certo bate a query esperta.** Antes de reescrever uma query complexa, verifique se falta um índice.
-- **Read-only por padrão (Rule 9).** Só execute `SELECT`/`EXPLAIN` para análise. `INSERT`/`UPDATE`/`DELETE`/DDL são recomendados no relatório — nunca executados sem autorização explícita do usuário.
+- **Read-only por padrão (Rule 9).** Para análise, só `SELECT`/`EXPLAIN`; escrita e DDL vão no relatório como recomendação, para o usuário executar ou autorizar. O hook `db-guard` bloqueia escrita via `psql`/`mysql`/`sqlite3` no Bash — é rede de segurança, não a regra: acesso via MCP passa por fora dele.
 - **O schema é o alicerce.** Corrija o schema antes de contornar sua falha em código (validação duplicada, joins gambiarra, etc.).
 
 ## Error Handling
 
 - Sem acesso ao banco: analise o schema/DDL e as queries do repositório estaticamente e diga explicitamente que o `EXPLAIN` real e a verificação de índices ficaram pendentes.
-- Nunca rode `INSERT`/`UPDATE`/`DELETE`/DDL nem qualquer comando além de `SELECT`/`EXPLAIN` sem autorização explícita — mesmo que a mudança pareça trivial ou reversível.

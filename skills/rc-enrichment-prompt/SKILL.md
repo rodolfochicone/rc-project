@@ -57,6 +57,4 @@ Turn a raw request into an optimized, execution-ready prompt. The output is a **
 ## Rules
 
 - **Preserve intent.** Sharpen and structure the user's request; never substitute a different task.
-- **Evidence over invention.** Every "Context" claim must be grounded in the repo/conversation. Unknowns go to Open questions, not into assumptions.
-- **No implementation.** This skill ends at the rewritten prompt. Executing it is a separate step.
 - **Language.** Match the language of the original prompt.

@@ -80,4 +80,3 @@ gotcha, record it via the `rc-memory` skill (scope: gotcha).
 - Do not fetch or export reviews inside this workflow. The review round files already exist (produced by the `rc-review-round` or `rc-review-workflow` skill).
 - Do not call provider-specific scripts or `gh` mutations. RC resolves provider threads after the batch succeeds.
 - Do not modify issue files outside the scoped batch.
-- Do not mark an issue `resolved` before the underlying work and verification are actually complete.

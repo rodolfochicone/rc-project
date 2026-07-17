@@ -78,23 +78,11 @@ split with `except*`.
 ## Constraints
 
 ### MUST DO
-- Type every public function signature; run `pyright` or `mypy --strict` and fix all errors.
-- Prefer `Protocol` (structural typing) and composition over deep inheritance.
-- Use context managers (`with`) for files, locks, connections, and any resource with cleanup.
 - Raise specific exceptions; chain with `raise ... from err` to preserve the cause.
-- Use `asyncio.TaskGroup` / `asyncio.timeout` for concurrent I/O; re-raise `CancelledError`.
-- Use `dataclasses` (or `attrs`) for data holders; `frozen=True, slots=True` when immutable.
-- Format and lint with `ruff`; pin dependencies via `pyproject.toml` + a lockfile.
-- Write `pytest` tests that encode why the behavior matters (see rc-tdd).
 
 ### MUST NOT DO
-- Use `Any` (or leave functions untyped) without a written justification.
 - Swallow exceptions with bare `except:` or `except Exception: pass`.
-- Do CPU-bound work on the asyncio event loop, or block the loop with sync I/O (use `asyncio.to_thread`).
 - Use mutable default arguments (`def f(x=[])`) — use `None` + assign inside.
-- Reach for threads/multiprocessing before confirming the workload is actually I/O- vs CPU-bound.
-- Hardcode configuration or secrets — read from env/config.
-- Ship `print` debugging — use the `logging` module.
 
 ## Output Templates
 

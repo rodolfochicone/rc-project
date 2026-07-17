@@ -1,6 +1,6 @@
 ---
 name: rc-axum
-description: Implements and reviews Axum 0.8+ APIs in Rust — routing, State, extractors, Tower middleware, typed errors, WebSockets, CORS, timeouts, and production hardening. Use when building or changing Axum backends, handlers, middleware, or real-time WS endpoints. Do not use for SvelteKit/frontends (rc-sveltekit), SQLx/Postgres data layer alone (rc-sqlx), or general React/Next work.
+description: Implements and reviews Axum 0.8+ APIs in Rust — routing, State, extractors, Tower middleware, typed errors, WebSockets, CORS, timeouts, and production hardening. Use when building or changing Axum backends, handlers, middleware, or real-time WS endpoints. Do not use for SvelteKit/frontends (rc-sveltekit), SQLx/Postgres data layer alone (rc-sqlx), Rust language idioms — ownership, error types, trait design (rc-rust) — or general React/Next work.
 user-invocable: true
 model: sonnet
 effort: medium
@@ -40,10 +40,7 @@ Opinionated guide for production Axum services (Tokio + Tower + Hyper). Target c
 
 ## Must not do
 
-- Put non-`Clone` heavy resources directly in state without `Arc`.
 - Use stringly `format!` SQL (use `rc-sqlx` + binds).
-- Expose the app on `0.0.0.0` without proxy/TLS plan on a public VPS.
-- Swallow extractor failures as 500 when they should be 400/401/422.
 - Block the async runtime with sync CPU-heavy work (use `spawn_blocking` or dedicated workers).
 
 ## Output template

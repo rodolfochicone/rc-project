@@ -79,9 +79,7 @@ This is the load-bearing guard — a complexity review that cuts a necessary saf
 
 - Do not modify source code. This skill writes its report under `.rc/...` and reports findings only.
 - Complexity only. Correctness, security, and performance defects are out of scope — route them to `rc-code-review` instead of reporting them here.
-- Prove every cut before proposing it; never flag from a name alone. Distinguish a confirmed cut from a hypothesis.
 - The `net:` figure is counted from the real findings in this report — it is the lines those cuts would remove. Never invent a savings number or a per-change "you saved X" claim: code that was never written has no baseline to subtract from.
-- Express every replacement in the target stack's idioms, with a concrete, actionable form.
 
 ## Error Handling
 

@@ -146,13 +146,7 @@ it via the `rc-memory` skill (scope: gotcha) so future work avoids it.
 
 ## Critical Rules
 
-- Do not modify source code. This skill writes its report under `.rc/tasks/<slug>/` and reports findings; it may additionally publish the review to the PR (summary and/or inline comments) only after the user explicitly approves each post.
 - Even when no findings are found, write the report recording the clean verdict so the review is traceable.
-- Do not report issues a linter or formatter already catches.
-- Express every finding in the target stack's idioms, with a concrete, actionable fix.
-- Enforce the project's documented conventions over personal taste; flag a harmful convention rather than ignoring it.
-- Assign severity by actual impact; do not inflate findings to pad the report.
-- Verify a pattern is genuinely problematic before flagging it.
 
 ## Error Handling
 

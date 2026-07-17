@@ -13,7 +13,7 @@ Ask every confirmation question in the user's language. An optional Linear issue
 
 **Always write the PR title and description in Brazilian Portuguese (pt-BR)**, regardless of the conversation language. Keep the conventional-commit type prefix (`feat:`, `fix:`, etc.) in the title; everything else is in pt-BR.
 
-Use a TodoWrite list to track the phases. Run them **in order** and **never** push or open a PR without an explicit yes for that specific step.
+Use a TodoWrite list to track the phases. Run them **in order**; commit, push, and opening the PR each need their own explicit yes — approval for one step never carries over to the next.
 
 ## Phase 0 — Gather git state
 
@@ -45,7 +45,7 @@ Build a concise, human-readable summary of what was done, from the actual diff �
 - Working changes: `git status --short`, `git diff --stat`, `git diff --cached --stat`; read the diffs as needed.
 - Any local commits ahead: `git log --oneline <base>..HEAD`.
 
-Group by area/file and describe the intent (what changed and why), in a few bullets. Reuse this summary for the branch name, commit message, and PR body.
+Group by area/file and describe the intent (what changed and why), in a few bullets. If the diff is large, summarize honestly rather than omitting anything material. Reuse this summary for the branch name, commit message, and PR body.
 
 ## Phase 3 — Create the feature branch (only if on the default branch)
 
@@ -116,381 +116,37 @@ Render the PR body in **Brazilian Portuguese (pt-BR)** using the structure below
 
 ## Guardrails
 
-- Outward-facing actions (commit, push, PR) happen **only** after an explicit yes for that specific step — approval for one step does not authorize the next.
-- Never force-push, never rewrite shared history, never touch unrelated branches.
-- Don't invent a summary — base it on the real diff. If the diff is large, summarize honestly rather than omitting.
+- Never touch unrelated branches.
 
 ## Rebase e resolução de conflitos
 
-Handle git rebase operations and resolve merge conflicts intelligently while preserving features and maintaining code quality. Use this section when rebasing feature branches, resolving conflicts across commits, and ensuring clean linear history without losing changes.
+Handle git rebase operations and resolve merge conflicts intelligently while preserving features and maintaining code quality. Use this section when rebasing feature branches or resolving conflicts across commits. The full strategy decision matrix, conflict decision framework, diagnostic commands, troubleshooting, and automated/CI resolution live in `references/` — read the matching file **in full** when you reach that need in the workflow below, don't rely on memory of it.
 
 ### Quick start
 
-For most rebases with multiple commits, use the squash-first strategy to resolve conflicts only once:
+For most rebases with 3+ commits, squash first to resolve conflicts once instead of per-commit:
 
 ```bash
-# Step 1: Backup current state
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-git branch backup-rebase-$TIMESTAMP
-
-# Step 2: Squash commits (interactive rebase on current branch)
-git rebase -i $(git merge-base HEAD origin/main)
-
-# Step 3: Rebase onto target
-git rebase origin/main
-
-# Step 4: If conflicts, resolve them once (see workflow below)
-# Then continue: git rebase --continue
-
-# Step 5: Force push safely
+git branch backup-rebase-$TIMESTAMP           # Step 1: safety backup
+git rebase -i $(git merge-base HEAD origin/main)  # Step 2: squash commits
+git rebase origin/main                        # Step 3: rebase onto target
+# If conflicts: resolve, then git rebase --continue
 git push origin $(git rev-parse --abbrev-ref HEAD) --force-with-lease
 ```
 
-This approach resolves conflicts once instead of per-commit, saving time and mental overhead.
-
-### Core workflow: conflict analysis & resolution
-
-Copy this checklist and mark progress:
-
-```
-Rebase Workflow:
-- [ ] Step 1: Create safety backup
-- [ ] Step 2: Fetch latest from target branch
-- [ ] Step 3: Analyze conflict scope
-- [ ] Step 4: Choose resolution strategy
-- [ ] Step 5: Apply conflict resolutions
-- [ ] Step 6: Validate merged code
-- [ ] Step 7: Run tests
-- [ ] Step 8: Force push safely
-```
-
-#### Step 1: Create safety backup
-
-ALWAYS do this first. If rebase goes wrong, you can recover:
-
-```bash
-# Timestamped backup branch
-TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-git branch backup-rebase-$TIMESTAMP
-
-# Alternative: note your current HEAD SHA for manual recovery
-git reflog
-```
-
-This costs nothing and saves hours of work if something goes wrong.
-
-#### Step 2: Fetch latest changes
-
-Ensure you have the most recent remote state:
-
-```bash
-# Fetch without modifying local branches
-git fetch origin
-
-# View the divergence
-git log --oneline origin/main..HEAD  # Your commits
-git log --oneline HEAD..origin/main  # New commits on main
-```
-
-Understand how many commits you're rebasing and how much main has changed.
-
-#### Step 3: Analyze conflict scope
-
-Before starting the rebase, predict conflicts:
-
-```bash
-# See which files you changed
-git diff --name-only origin/main...HEAD
-
-# See which files main changed
-git diff --name-only origin/main HEAD
-
-# Likely conflict areas: files changed in both
-```
-
-**Key insight**: If you changed `auth.ts` and so did main, you WILL get conflicts in `auth.ts`.
-
-Anticipating conflicts helps you understand how to resolve them.
-
-#### Step 4: Choose resolution strategy
-
-**Strategy A: Squash first (recommended for 3+ commits)**
-
-*When to use*: Multiple feature commits with many conflicts expected.
-
-*Why*: Reduces conflicts to one resolution phase instead of per-commit.
-
-```bash
-# Interactive rebase on current branch first
-git rebase -i $(git merge-base HEAD origin/main)
-
-# In editor, change all "pick" to "squash" (or 's') except first commit
-# Save and exit - commits are squashed into one
-# Edit commit message to describe the entire feature
-
-# Now rebase the squashed commit
-git rebase origin/main
-
-# Resolve conflicts once, then git rebase --continue
-```
-
-*Tradeoffs*: Lose individual commit history, but simpler conflict resolution.
-
-**Strategy B: Interactive rebase with conflict awareness**
-
-*When to use*: 1-2 commits, clean history, or complex per-commit logic.
-
-```bash
-git rebase -i origin/main
-
-# In editor, you can:
-# - Reorder commits to isolate conflict-prone ones
-# - Drop commits that are already in main (git detects this)
-# - Combine related commits before rebasing
-
-# Save and exit - rebase proceeds, stopping at conflicts
-```
-
-*Tradeoffs*: More control, but more conflict-resolution iterations.
-
-**Strategy C: Simple linear rebase (fastest, auto-resolution)**
-
-*When to use*: Simple cases, no critical decisions, or in automated pipelines.
-
-```bash
-# Rebase all commits at once
-git rebase origin/main
-
-# If no conflicts, done
-# If conflicts, you resolve each one
-```
-
-**Warning**: Not recommended for complex scenarios. Use Strategies A or B instead.
-
-#### Step 5: Apply conflict resolutions
-
-When `git rebase` pauses with conflicts:
-
-```bash
-# See which files conflict
-git status
-
-# For each conflicted file:
-# - RECOMMENDED: Use merge tool for visual clarity
-git mergetool --no-prompt
-
-# - ALTERNATIVE: Manual edit in your editor
-# Search for conflict markers: <<<<<<, ======, >>>>>>
-```
-
-**Conflict marker anatomy**
-
-```javascript
-<<<<<<< HEAD
-// Your current feature code
-function authenticate(token) {
-  validateToken(token);
-  return true;
-}
-=======
-// Main branch code (incoming)
-function authenticate(token) {
-  if (!token) throw new Error("No token");
-  validateToken(token);
-  setSession(token);
-  return true;
-}
->>>>>>> origin/main
-```
-
-**Decision framework** (before deleting markers):
-
-1. **Can you keep both?** YES → Merge them intelligently
-
-   ```javascript
-   function authenticate(token) {
-     if (!token) throw new Error("No token"); // Keep main's validation
-     validateToken(token);
-     setSession(token); // Keep main's session setup
-     return true; // Keep feature's return
-   }
-   ```
-
-2. **Conflicting logic?** Understand WHY they differ, then decide
-   - Did main add critical security checks? → Keep main's version
-   - Did your feature add essential functionality? → Keep feature's version
-   - Are they trying to do different things? → Combine intentionally
-
-3. **Lost features?** NEVER let a feature silently disappear
-   - If you added authentication logic, ensure it's in final version
-   - If main improved database access, ensure that's preserved
-
-**Key resolution principles**
-
-DO:
-- Keep both versions' important functionality when possible
-- Use the merge tool for visual representation
-- Add comments explaining merged conflicts: `// Merged from both versions: main's validation + feature's session setup`
-- Test each file after resolution
-
-DON'T:
-- Mindlessly pick one version without understanding both
-- Delete conflict markers without understanding the conflict
-- Keep duplicate code - merge intelligently
-- Skip testing before continuing
-
-#### Step 6: Validate merged code
-
-After resolving conflicts, validate the merged code:
-
-```bash
-# 1. Check syntax
-npm run lint  # or eslint, pylint, etc.
-
-# 2. Check types (if TypeScript)
-npm run type-check  # or tsc --noEmit
-
-# 3. Spot-check key files
-git diff HEAD origin/main -- <conflicted-file>
-
-# If validation fails:
-# 1. Fix the issue in the file
-# 2. git add <file>
-# 3. git rebase --continue
-```
-
-**Important**: Validation catches mistakes BEFORE you commit them.
-
-#### Step 7: Run tests
-
-This is your safety net:
-
-```bash
-# Run full test suite
-npm test
-
-# Or specific tests for changed areas
-npm test -- --testPathPattern=auth  # If auth.ts was changed
-
-# If tests fail:
-# 1. Understand what broke
-# 2. Fix in the files
-# 3. git add <files>
-# 4. git rebase --continue
-```
-
-**Rule**: Never force-push code that fails tests.
-
-#### Step 8: Force push safely
-
-Use `--force-with-lease` instead of `--force`. It protects against accidentally overwriting others' work:
-
-```bash
-# SAFE: Protects others' commits
-git push origin $(git rev-parse --abbrev-ref HEAD) --force-with-lease
-
-# UNSAFE: Can overwrite others' work
-git push origin your-branch -f  # Don't do this
-
-# If force-with-lease fails:
-# Someone else pushed to your branch
-# Coordinate with them before forcing
-```
-
-### Common scenarios & strategies
-
-**Scenario 1: Many small conflicts across 5+ commits** — use the squash-first strategy:
-
-```bash
-git rebase -i $(git merge-base HEAD origin/main)
-# Mark all but first commit as 's' (squash)
-# Save - commits squash into one
-
-git rebase origin/main
-# Resolve conflicts once
-git rebase --continue
-
-# Only one conflict-resolution phase!
-```
-
-*Why*: Each commit might have conflicts. Squashing before rebasing means one pass.
-
-**Scenario 2: One specific commit has conflicts** — target that commit with interactive rebase:
-
-```bash
-git rebase -i origin/main
-
-# In editor, move the problematic commit to the end
-# Save - rebase proceeds, stopping at that commit
-
-# When it stops, you know exactly which commit conflicts
-git status  # See what changed in this commit
-
-# Resolve, then continue
-git rebase --continue
-```
-
-*Why*: Isolating the commit helps you understand what it's trying to do.
-
-**Scenario 3: Conflicts keep repeating (same file, different commits)** — use git rerere (reuse recorded resolution):
-
-```bash
-# Enable rerere globally (one-time setup)
-git config --global rerere.enabled true
-
-# Now when you hit the same conflict in a second commit,
-# Git automatically applies the first commit's resolution
-
-git rebase origin/main
-
-# Git remembers your first conflict resolution
-# and replays it automatically for similar conflicts
-```
-
-*Why*: When rebasing and hitting the same file repeatedly, rerere saves manual work.
-
-**Scenario 4: Rebase conflicts are too complex** — emergency escape plan:
-
-```bash
-# Abort the rebase - return to original state
-git rebase --abort
-
-# Fall back to merge (safer for complex scenarios)
-git merge origin/main
-
-# Or try a different approach:
-# - Squash your entire feature branch first
-# - Cherry-pick main's critical changes selectively
-```
-
-*Important*: It's okay to abort and rethink. Better than a broken rebase.
-
-### Checklist: before you commit to rebasing
-
-- [ ] Understand why you're rebasing (cleaner history, syncing with main, etc.)
-- [ ] Backup your current branch
-- [ ] Run tests on current branch - they should pass
-- [ ] Fetch latest: `git fetch origin`
-- [ ] Understand what you'll be rebasing (5 commits? 50?)
-- [ ] Understand main's recent changes (1 commit? Major refactor?)
-- [ ] Choose your strategy (squash-first, interactive, or simple linear — see above)
-- [ ] Have your merge tool ready (if using GUI)
-- [ ] Block 30 mins - don't rush conflict resolution
-- [ ] Have tests ready to run after rebase
+### Workflow
+
+1. **Backup** — create the timestamped backup branch above (or note the current HEAD SHA via `git reflog`) before touching anything.
+2. **Fetch & compare** — `git fetch origin`; `git log --oneline origin/main..HEAD` (your commits) vs `HEAD..origin/main` (new commits on main).
+3. **Predict conflict scope** — `git diff --name-only origin/main...HEAD` vs `origin/main HEAD`; files changed on both sides will conflict.
+4. **Choose a strategy** — read `references/strategies.md` **in full** for the decision matrix (squash-first, interactive, simple linear, rerere, or merge-instead) and each strategy's tradeoffs.
+5. **Resolve conflicts** — read `references/resolution-patterns.md` **in full** for the conflict-marker anatomy and decision framework. Never delete a marker without understanding both sides; a feature must never silently disappear.
+6. **Validate** — lint/type-check the resolved files, then run the test suite. Never continue a rebase (or force-push) on top of a failing validation.
+7. **Force-push safely** — only `--force-with-lease` (never bare `--force`), and only after tests pass.
+
+Diagnostic one-liners and the bundled helper scripts (`scripts/pre-rebase-backup.sh`, `scripts/analyze-conflicts.sh`, `scripts/validate-merge.sh`) are in `references/scripts-tools.md` (in full). Common failure modes — stuck rebase, lock errors, lost commits after a force-push — are in `references/troubleshooting.md` (in full). CI/automated conflict resolution (`-X theirs`/`ours`/`recursive`) is in `references/automation.md` (in full) — only for non-critical, well-tested changes, never as the default.
 
 ### When NOT to rebase
 
-- Shared branches (use merge instead: `git merge origin/main`)
-- Critical production code without comprehensive tests
-- When multiple people are pushing to the same branch
-- If you don't understand the conflicts you're seeing
-
-**Default to merge if uncertain.** Merge is safer for collaborative work.
-
-**Use rebase when**: Solo feature branch, clean history matters, no shared dependencies.
-
-### Summary: the rebase philosophy
-
-Rebasing is a tool for creating clean, linear commit history. **Used well**, it makes debugging and code review easier. **Used poorly**, it loses work.
-
-**The key principle**: Understand every conflict before resolving it. Don't automate away the thinking.
+Shared branches, critical production code without comprehensive tests, or when multiple people push to the same branch — use `git merge origin/main` instead. Default to merge if uncertain.
