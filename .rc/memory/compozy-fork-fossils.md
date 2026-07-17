@@ -2,7 +2,7 @@
 title: Fósseis do fork Compozy (era Go/CLI)
 scope: context
 key: compozy-fork-fossils
-tags: [fork, ci, legado, de-fork, go]
+tags: [fork, ci, legado, de-fork, go, install, hooks]
 source: rc-memory (distilled 2026-07-14)
 created: 2026-07-14
 updated: 2026-07-17
@@ -49,3 +49,34 @@ com o upstream, **71% falham** o gate contra **15%** das nativas. As 5 vendoriza
 exatamente as que alguém adaptou. Sintomas: identity prose na `description` ("Comprehensive
 guide for…", "Expert guide", "Essential for…"), ausência de anti-trigger, e `references/` que o
 `SKILL.md` nunca cita. O gate hoje vê os três (ver [[gate-sensor-over-patch]]).
+
+## O fóssil também mora FORA do repo — e ali nenhum gate alcança
+
+Descoberto em 2026-07-17 ao atualizar o plugin instalado. Existia um install **manual e
+pré-plugin** em `~/.claude/rc/hooks/scripts/`, wired por **caminho absoluto** no
+`~/.claude/settings.json` — nunca documentado no repo (`grep` em `docs/` e `README.md` volta
+vazio). Consequências, todas ativas havia ~1 mês:
+
+- **Rodava em paralelo com o plugin.** O `rc@rc-project` está habilitado e seu `hooks.json` já
+  wira os 9 via `${CLAUDE_PLUGIN_ROOT}`; o `settings.json` wirava mais 8 por cima. Cinco hooks
+  disparavam **duas vezes**, e a cópia manual era a **velha**.
+- **Ressuscitava hook deletado.** `go-fmt.sh` e `go-mod-guard.sh` saíram do repo no corte
+  pre-slim (`dd4a344`) e seguiam disparando na máquina, a cada Edit e a cada Bash. **Deletar do
+  repo não desinstala.**
+- **Tinha conteúdo que nunca foi commitado.** O `observe.sh` instalado não bate com *nenhuma*
+  versão do histórico: era da era `rc-instincts` (opt-in, `.rc/instincts/`), enquanto o repo já
+  tinha `rc-memory` (opt-out, `.rc/memory/`). Install mantido à mão deriva.
+
+**O tell:** a mensagem de erro do hook nomeia o caminho. `[~/.claude/rc/hooks/scripts/git-guard.sh]`
+= install manual; `[${CLAUDE_PLUGIN_ROOT}/hooks/scripts/git-guard.sh]` = plugin. Foi assim que a
+duplicação apareceu — e assim que se prova a remoção.
+
+**Resolvido em 2026-07-17:** os 8 hooks do rc saíram do `settings.json` (sobrou só o
+`ship_gate.py`, que não é do rc) e `~/.claude/rc/` foi apagado. Backups:
+`~/.claude/settings.json.bak-2026-07-17` e `~/.claude/rc-hooks-backup-2026-07-17.tgz`.
+
+**A lição que generaliza:** o gate só vê o repositório. Config de máquina (`~/.claude/`,
+dotfiles, `settings.json`) é ponto cego permanente — quando o repo remove um hook, uma skill ou
+um script, **verifique também o install**, senão o defeito continua vivo em quem já instalou. O
+canal do plugin (marketplace + `hooks.json`) é a única forma que se atualiza sozinha; qualquer
+wiring manual vira fóssil no dia seguinte.
