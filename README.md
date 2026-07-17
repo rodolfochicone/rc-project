@@ -132,6 +132,7 @@ and only behind a green harness. Normal feature work stays in `/rc-pipe`.
 | `rc-review-round` | Multi-lens review → structured issue files compatible with `rc-fix-reviews`. | Creating a manual review round (no external provider). |
 | `rc-review-workflow` | Automated review→fix→re-review loop via the `Workflow` tool until clean or a round cap. | Hands-off multi-lens review-and-remediate on a slug (Claude Code only). |
 | `rc-simplify-review` | Single lens — over-engineering only → ranked delete-list with net lines/deps removable. | Opt-in pre-PR bloat pass, or auditing legacy code. |
+| `rc-deslop` | Edits out AI slop in the branch diff — unearned comments, defensive try/catch, `any` casts, deep nesting. | Cheap sweep before any commit or PR. |
 | `rc-fix-reviews` | Triage, fix, verify, and resolve batched review issues under `reviews-NNN/`. | Remediating an existing review round. |
 
 ### Quality, testing & discipline
@@ -178,7 +179,8 @@ and only behind a green harness. Normal feature work stays in `/rc-pipe`.
 
 | Skill | Purpose | Use when |
 | --- | --- | --- |
-| `rc-skill-best-practices` | Authors professional-grade skills to the agentskills.io spec (validation script + template + checklist). | Creating a new skill directory or optimizing metadata for discovery. |
+| `rc-skill-best-practices` | Authors, refactors, and debugs skills — doctrine (invocation, info hierarchy, leading words, failure modes) + spec mechanics, glossary, checklist. | Creating a skill, pruning a bloated one, or diagnosing refs the agent ignores. |
+| `rc-agents-md` | Authors lean AGENTS.md/CLAUDE.md — the rent test, the scope ladder, and the Write/Trim/Gate branches. | Writing an instruction file, trimming a bloated one, or gating a new rule. |
 | `rc-hookify` | Authors a new fail-open RC hook from a plain-language rule: writes the script, wires `hooks.json`, documents + verifies it. | Turning an every-time guardrail/formatter/observer into a hook. |
 
 ### Frontend & design
@@ -215,6 +217,7 @@ Deep, opinionated guides for a specific library/runtime — auto-fire on the mat
 | `rc-python` | Idiomatic typed Python 3.12+ — PEP 695 generics, asyncio/TaskGroup, pytest, ruff, uv packaging. |
 | `rc-ai-sdk` | Vercel AI SDK: `generateText`/`streamText`, tools, agents, providers, streaming. |
 | `rc-fullstack-axum-svelte` | Umbrella: routes Axum + SQLx/Postgres + SvelteKit work; **Bun** for the frontend. |
+| `rc-rust` | Rust the language — ownership, thiserror/anyhow, Tokio, traits, testing, perf, clippy, rustdoc. |
 | `rc-axum` | Axum 0.8+ Rust APIs — routing, State, middleware, errors, WebSockets, security, tests, clippy. |
 | `rc-sqlx` | SQLx 0.8+ + PostgreSQL — pool, binds, transactions, migrations, macros, DB tests. |
 | `rc-sveltekit` | SvelteKit 2 + Svelte 5 — SSR load, form actions, hooks, CSRF/CSP, adapter-node, **Bun**. |
