@@ -45,3 +45,51 @@ rc_block() {
     printf 'rc %s: %s\n' "$1" "$2" >&2
     exit 2
 }
+
+# --- PreToolUse structured decisions (JSON on stdout, exit 0) -----------------
+# Claude Code parses hook JSON only on exit 0; on exit 2 it ignores stdout and
+# reads stderr instead. The two signalling styles must not be mixed inside one
+# hook, so a hook that needs "ask" uses rc_deny/rc_ask for *every* decision it
+# makes and never calls rc_block. Deny-only hooks (db-guard, commit-guard) stay
+# on rc_block. Source: code.claude.com/docs/en/hooks.md — "PreToolUse decision
+# control" + "Exit code output".
+
+# rc__json_escape <string> — minimal escaping for a JSON string body.
+rc__json_escape() {
+    printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' | tr -d '\n'
+}
+
+# rc__decision <hook-name> <ask|deny> <reason>
+rc__decision() {
+    rc__reason=$(rc__json_escape "rc $1: $3")
+    printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"%s","permissionDecisionReason":"%s"}}\n' "$2" "$rc__reason"
+    exit 0
+}
+
+# rc_deny <hook-name> <message>
+# Refuse the tool call outright; <message> reaches the agent. Deterministic in
+# every mode, interactive or headless. RC_DRY_RUN=1 downgrades it to a log.
+rc_deny() {
+    if [ "${RC_DRY_RUN:-0}" = "1" ]; then
+        printf 'rc %s (dry-run, would deny): %s\n' "$1" "$2" >&2
+        exit 0
+    fi
+    rc__decision "$1" "deny" "$2"
+}
+
+# rc_ask <hook-name> <message>
+# Force a permission prompt the user must answer — it fires even when the command
+# is allowlisted or the session is in auto mode. Use for operations that are
+# legitimate but must not happen silently.
+#
+# CAVEAT: what "ask" does under `claude -p` (headless, nobody to answer) is not
+# documented. Do not rely on it as a hard stop in CI — reach for rc_deny when a
+# call must never proceed without a human, and prefer rc_ask only where the
+# operation is recoverable if it slips through.
+rc_ask() {
+    if [ "${RC_DRY_RUN:-0}" = "1" ]; then
+        printf 'rc %s (dry-run, would ask): %s\n' "$1" "$2" >&2
+        exit 0
+    fi
+    rc__decision "$1" "ask" "$2"
+}
