@@ -16,8 +16,13 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const VALID_MODELS = new Set(['sonnet', 'opus', 'haiku', 'fable', 'inherit']);
 
 const problems = [];
+const warnings = [];
 let checked = 0;
 const fail = (file, msg) => problems.push(`${file}: ${msg}`);
+// Doctrine checks land as warnings, not failures: they report a real backlog (64 findings from the
+// 2026-07-17 audit) that predates them, and a gate that is red on arrival is a gate people learn to
+// skip. Promote to `fail` once the backlog is cleared — the count only goes down from here.
+const warn = (file, msg) => warnings.push(`${file}: ${msg}`);
 
 /** Parse the leading `---` frontmatter block into a flat {key: value} map (or null). */
 function frontmatter(text) {
@@ -182,6 +187,73 @@ for (const skillDir of SKILL_DIRS) {
   }
 }
 
+// --- anti-trigger: a description without one over-fires and burns context on every session ---
+// The skill spec wants both a positive trigger ("Use when…") and a negative one ("Do not use
+// for…"); the 2026-07-17 doctrine audit found 15 skills carrying only the positive half — all of
+// them vendored front-end skills copied in and never adapted (rc-react, rc-tailwindcss, rc-zod…).
+// Phrasing is deliberately broad: `rc-zod` says "does NOT cover", not "do not use for", and a
+// narrower regex flagged it as a false positive. Portuguese variants count — some skills ship pt-BR.
+const ANTI_TRIGGER =
+  /do not use|don't use|dont use|not for|never use|does not cover|doesn't cover|does not handle|not intended for|excludes|não use|nao use|não cobre|nao cobre/i;
+for (const name of listDirs(join(ROOT, 'skills'))) {
+  const abs = join(ROOT, 'skills', name, 'SKILL.md');
+  if (!existsSync(abs)) continue;
+  checked++;
+  const fm = frontmatter(readFileSync(abs, 'utf8'));
+  if (!fm?.description) continue; // already reported above
+  if (!ANTI_TRIGGER.test(fm.description))
+    warn(join('skills', name, 'SKILL.md'), 'description has no anti-trigger ("Do not use for…")');
+}
+
+// --- orphan bundled files: shipped weight the agent can never reach ---
+// A file under a skill that SKILL.md never points at is dead weight every consumer downloads.
+// `rc-shadcn-ui` ships 4,370 lines of `references/` with zero pointers; `rc-git` ships 587 and
+// duplicates them inline instead. Reachability is generous on purpose — the naive version of this
+// check (exact path only) reported 102 files at ~85% false positives, because skills legitimately
+// point at a *directory* (`references/query/`) or name a file without its extension. Counting all
+// four forms took it to 29 real orphans. If it ever gets noisy again, widen the forms, not the gate.
+const walkFiles = (dir) =>
+  readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
+    e.isDirectory() ? walkFiles(join(dir, e.name)) : [join(dir, e.name)]
+  );
+for (const name of listDirs(join(ROOT, 'skills'))) {
+  const skillDir = join(ROOT, 'skills', name);
+  const sp = join(skillDir, 'SKILL.md');
+  if (!existsSync(sp)) continue;
+  checked++;
+  const text = readFileSync(sp, 'utf8');
+  for (const abs of walkFiles(skillDir)) {
+    if (abs === sp) continue;
+    const rel = abs.slice(skillDir.length + 1);
+    const base = rel.split('/').pop();
+    const stem = base.replace(/\.[^.]+$/, '');
+    const parent = rel.includes('/') ? rel.slice(0, rel.lastIndexOf('/')) : null;
+    const reachable =
+      text.includes(rel) || text.includes(base) || text.includes(stem) ||
+      (parent && text.includes(parent + '/'));
+    if (!reachable)
+      warn(join('skills', name, 'SKILL.md'), `orphan file: \`${rel}\` is never pointed at`);
+  }
+}
+
+// --- stray files at a skill root: the spec allows scripts/, references/, assets/ and nothing else ---
+// Loose root files escape the dangling-asset check above (it only follows those three prefixes), so
+// `rc-tdd`'s `[tests.md](tests.md)` links are unguarded — delete the file and nothing notices.
+// They are also where vendoring debris lands: `rc-vitest/GENERATION.md` (a source SHA),
+// `rc-systematic-debugging/test-pressure-*.md` (the upstream author's own test transcripts).
+// Allowlist: AGENTS.md is a first-class entry point in this repo (see the dangling-asset check
+// above, which reads it); LICENSE/NOTICE are legal requirements — Apache 2.0 §4(d) mandates NOTICE.
+const ROOT_ALLOWED = /^(SKILL\.md|AGENTS\.md|LICENSE.*|NOTICE.*)$/i;
+for (const name of listDirs(join(ROOT, 'skills'))) {
+  const skillDir = join(ROOT, 'skills', name);
+  if (!existsSync(join(skillDir, 'SKILL.md'))) continue;
+  checked++;
+  for (const e of readdirSync(skillDir, { withFileTypes: true })) {
+    if (e.isDirectory() || ROOT_ALLOWED.test(e.name)) continue;
+    warn(join('skills', name), `stray file at skill root: \`${e.name}\` — move under references/, assets/ or scripts/`);
+  }
+}
+
 // --- CI toolchain fossils: a workflow must not build a stack this repo does not have ---
 // ci.yml survived the de-fork setting up Go, Bun, Playwright and running `make verify` in a repo
 // that ships plain markdown — so every push touching skills/ or scripts/ failed for months.
@@ -202,6 +274,17 @@ for (const f of listFiles(join(ROOT, '.github', 'workflows'), '.yml')) {
 }
 
 // --- report ---
+// Warnings print with `--warn` (or in CI via PLUGIN_SMOKE_WARN=1) so the default run stays a
+// signal, not a wall of pre-existing backlog. They never affect the exit code.
+const showWarnings = process.argv.includes('--warn') || process.env.PLUGIN_SMOKE_WARN === '1';
+if (warnings.length) {
+  if (showWarnings) {
+    console.error(`plugin-smoke: ${warnings.length} doctrine warning(s):`);
+    for (const w of warnings) console.error(`  ~ ${w}`);
+  } else {
+    console.error(`plugin-smoke: ${warnings.length} doctrine warning(s) — rerun with --warn to list.`);
+  }
+}
 if (problems.length === 0) {
   console.log(`plugin-smoke: OK (${checked} components checked)`);
   process.exit(0);
