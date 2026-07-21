@@ -4,6 +4,21 @@
 
 _Nada ainda — registre aqui as mudanças da próxima versão sob `### Added` / `### Changed` / `### Fixed` / `### Removed`, movendo-as para uma seção versionada no release._
 
+## [3.3.0] - 2026-07-21
+
+### Changed
+
+- **`rc-enrichment-prompt`** deixa de ser um one-shot que imprime e encerra. Depois do
+  output vêm dois passos: resolver as questões em aberto numa rodada de perguntas
+  (reimprimindo o prompt já corrigido) e oferecer salvar em `.rc/prompts/NN-<slug>.md`,
+  numerado a partir do maior `NN` existente — nunca da contagem de arquivos, senão um
+  prompt apagado recicla o número e sobrescreve o vizinho. A oferta de salvar é
+  incondicional; as questões em aberto são só um passo intermediário.
+  Ao passar a escrever em `.rc/`, a skill ganha a seção "Resolving the `.rc` base
+  directory" e o boilerplate do tool interativo que bloqueia — os dois contratos que
+  toda skill que grava e pergunta já carrega. Modelo sobe para `opus`/`high`: a skill
+  agora investiga o repo e conduz um diálogo, não só reescreve texto.
+
 ## [3.2.0] - 2026-07-17
 
 Primeira medição do hub contra uma régua de doutrina — e a régua chegou junto. A

@@ -130,6 +130,7 @@ For detailed skill descriptions and inputs/outputs, read `references/skills-refe
     LEARNINGS.md                       # Distilled trigger→action learnings
     observations.jsonl                 # Raw tool observations (observe hook)
   analysis/                            # rc-analyze reports
+  prompts/                             # Enriched prompts (rc-enrichment-prompt)
 ```
 
 ## Reusable agents and the council pattern

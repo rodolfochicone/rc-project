@@ -86,7 +86,7 @@ agent (and you) exactly when each one fires.
 | Skill | Purpose | Use when |
 | --- | --- | --- |
 | `rc` | Explains RC itself — pipeline, artifacts, agents, hooks, config. | You want to know what exists or how the workflow fits together (not to run a step). |
-| `rc-enrichment-prompt` | Rewrites a rough request into a structured, execution-ready prompt (Objective / Context / Requirements / Acceptance criteria). | A request is vague/underspecified, or you ask to "enhance/enrich this prompt" before work starts. |
+| `rc-enrichment-prompt` | Rewrites a rough request into a structured, execution-ready prompt (Objective / Context / Requirements / Acceptance criteria), resolves its open questions, and optionally saves it to `.rc/prompts/`. | A request is vague/underspecified, or you ask to "enhance/enrich this prompt" before work starts. |
 | `rc-brainstorming` | Explores intent, requirements, and design before implementation. | Before any creative/greenfield work — features, components, new behavior. |
 | `rc-council` | Multi-advisor debate (3–5 archetypes) with opening statements, tensions, and synthesis. | High-impact architecture/tech/product trade-offs; stress-testing a PRD or spec. Not for yes/no lookups. |
 
