@@ -100,21 +100,21 @@ You MUST create a task for each phase and complete them in order:
    - **MANDATORY — Behavioral Contract section:** end the technical body (before the ADR section) with a "Behavioral Contract" of machine-parseable assertions, so requirements are verifiable and grep-able rather than buried in prose. Use the format in "Behavioral contract format" below. Derive the assertions from the PRD's acceptance criteria and the design decisions; each gets a stable `id` that later artifacts (tasks, reviews) reference. This is the durable, checkable core of the spec — write it for every TechSpec, even simple ones.
    - Prefer active voice, omit needless words, use definite and specific language over vague generalities. Every sentence should earn its place.
    - Language: **English**. Tone: clear, technical, consistent with existing project artifacts.
-   - Present the complete draft to the user for review.
+   - Write the draft to `.rc/tasks/<name>/_techspec.md`. **Do not print the document** — it is long, and printing it duplicates what the file already holds.
 
 5. Review with the user.
-   - Present the draft and ask using the interactive question tool:
-     - "Here is the TechSpec draft. Please review and let me know:"
-     - A) Approved — save as is
+   - Summarize in **at most 8 lines**: one line on the approach, the primary trade-off it buys (the same one the Executive Summary states), and any risk or decision the user must weigh in on. Nothing else — no section-by-section walkthrough, no restating the design. If nothing is risky, say so in one line instead of inventing concerns.
+   - Then ask using the interactive question tool:
+     - "TechSpec written to `.rc/tasks/<name>/_techspec.md`. Please review and let me know:"
+     - A) Approved — keep as is
      - B) Adjust specific sections (tell me which ones)
      - C) Rewrite section X (tell me what to change)
      - D) Discard and start over
-   - If B or C: make the changes and present again.
+   - If B or C: edit the file in place and report **only what changed**, in a line or two. Do not re-summarize the whole document.
    - If D: go back to step 2.
 
-6. Save the TechSpec file.
-   - Write the completed document to `.rc/tasks/<name>/_techspec.md`.
-   - Confirm the file path to the user.
+6. Confirm.
+   - The document is already at `.rc/tasks/<name>/_techspec.md` — on approval, just confirm the path.
    - Remind the user that the next step is to create tasks using `rc-create-tasks` from this TechSpec.
 
 ## Behavioral contract format

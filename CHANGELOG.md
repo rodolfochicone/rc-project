@@ -4,6 +4,20 @@
 
 _Nada ainda — registre aqui as mudanças da próxima versão sob `### Added` / `### Changed` / `### Fixed` / `### Removed`, movendo-as para uma seção versionada no release._
 
+## [3.4.0] - 2026-07-21
+
+### Changed
+
+- **`rc-create-prd` e `rc-create-techspec`** paravam de escrever o documento para despejá-lo
+  inteiro no chat — e só depois salvavam o mesmo conteúdo em disco. O draft agora vai direto
+  para `_prd.md`/`_techspec.md` e o usuário recebe **no máximo 8 linhas**: o que o documento
+  cobre, as decisões que o moldaram e o que exige decisão dele (no TechSpec, o trade-off
+  principal que o Executive Summary já declara). Se não há risco, a skill diz isso em uma
+  linha em vez de encher a seção de preocupação genérica. O ciclo de ajuste ficou barato
+  junto: B/C edita o arquivo no lugar e relata só o que mudou, em vez de reapresentar o
+  documento a cada rodada. O `rc-board` já fazia assim ("Keep the full documents local");
+  as duas skills de criação eram a exceção.
+
 ## [3.3.1] - 2026-07-21
 
 ### Changed

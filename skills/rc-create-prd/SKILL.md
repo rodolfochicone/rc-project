@@ -132,21 +132,21 @@ Create a task (TodoWrite or the host's equivalent) for each of the seven steps b
    - Optional sections (include when relevant): High-Level Technical Constraints.
    - Prefer active voice, omit needless words, use definite and specific language over vague generalities. Every sentence should earn its place.
    - Language: **English**. Tone: clear, technical, consistent with existing project artifacts.
-   - Present the complete draft to the user for review.
+   - Write the draft to `.rc/tasks/<slug>/_prd.md`. **Do not print the document** — it is long, and printing it duplicates what the file already holds.
 
 6. Review with the user.
-   - Present the draft and ask using the interactive question tool:
-     - "Here is the PRD draft. Please review and let me know:"
-     - A) Approved — save as is
+   - Summarize in **at most 8 lines**: one line on what the PRD covers, the 2–4 decisions that shaped it, and any risk or open question the user must weigh in on. Nothing else — no section-by-section walkthrough, no restating the document. If nothing is risky, say so in one line instead of inventing concerns.
+   - Then ask using the interactive question tool:
+     - "PRD written to `.rc/tasks/<slug>/_prd.md`. Please review and let me know:"
+     - A) Approved — keep as is
      - B) Adjust specific sections (tell me which ones)
      - C) Rewrite section X (tell me what to change)
      - D) Discard and start over
-   - If B or C: make the changes and present again.
+   - If B or C: edit the file in place and report **only what changed**, in a line or two. Do not re-summarize the whole document.
    - If D: go back to step 3.
 
-7. Save the PRD file.
-   - Write the completed document to `.rc/tasks/<slug>/_prd.md`.
-   - Confirm the file path to the user.
+7. Confirm.
+   - The document is already at `.rc/tasks/<slug>/_prd.md` — on approval, just confirm the path.
    - Remind the user that the next step is to create a TechSpec using `rc-create-techspec` from this PRD.
 
 ## Project memory
