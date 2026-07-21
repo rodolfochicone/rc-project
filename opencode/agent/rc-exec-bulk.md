@@ -1,7 +1,7 @@
 ---
 description: rc bulk / parallel execution — implement many independent tasks token-efficiently
 mode: subagent
-model: opencode-go/kimi-rc.7-code
+model: opencode-go/kimi-k2.7-code
 reasoningEffort: high
 temperature: 0.2
 ---
