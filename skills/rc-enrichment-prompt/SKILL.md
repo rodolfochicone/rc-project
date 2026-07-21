@@ -62,13 +62,15 @@ When this skill instructs you to ask the user a question, you MUST use your runt
 - [Only genuine blockers that need the user; omit the section if none.]
 ```
 
+The draft is internal until step 6 — do not print it here. `## Open questions` in particular never reaches the screen: step 5 consumes it and the answers land in the sections above.
+
 **Step 4 — Right-size.** Match the enriched prompt's weight to the task. A one-line change gets a short Objective + Acceptance criteria, not a full template. A large feature gets the full structure. Enrichment adds signal, never ceremony.
 
-**Step 5 — Output.** Print only the enriched prompt (inside a fenced block so it is copy-pasteable) plus, if any, the Open questions. If invoked inside a RC flow, the enriched prompt is the input the next skill/command consumes.
+**Step 5 — Resolve the open questions, before printing anything.** Skip this step entirely if step 3 produced no `## Open questions` section. Otherwise **do not print the draft yet** — printing it now only to reprint it after the answers costs the user two full copies of the same prompt. Ask all the questions in one round via the interactive question tool that pauses execution. Fold each answer into the section it belongs to (Requirements, Constraints, Out of scope) and drop the `## Open questions` block. One round only: whatever is still undecided becomes a line under `## Assumptions`, not a second round of questions.
 
-**Step 6 — Resolve the open questions.** Skip this step entirely if step 3 produced no `## Open questions` section. Otherwise ask all of them in one round via the interactive question tool that pauses execution. Fold each answer into the section it belongs to (Requirements, Constraints, Out of scope), drop the `## Open questions` block, and **reprint the full updated prompt**. One round only: whatever is still undecided becomes a line under `## Assumptions` in the prompt, not a second round of questions.
+**Step 6 — Output.** Print the enriched prompt **once**, inside a fenced block so it is copy-pasteable, with the step-5 answers already folded in. If invoked inside a RC flow, this is the input the next skill/command consumes.
 
-**Step 7 — Offer to save.** Always, whether or not step 6 ran. Ask the user — via the interactive question tool that pauses execution — whether to save the enriched prompt. If they decline, say the prompt was not saved and stop. If they accept, write it to `.rc/prompts/NN-<slug>.md` under the resolved base:
+**Step 7 — Offer to save.** Always, whether or not step 5 ran. Ask the user — via the interactive question tool that pauses execution — whether to save the enriched prompt. If they decline, say the prompt was not saved and stop. If they accept, write it to `.rc/prompts/NN-<slug>.md` under the resolved base:
 
 - `NN` is zero-padded to 2 digits and **increments past the highest `NN` already present** in `.rc/prompts/` — never the file count, since a deleted prompt must not recycle its number. With no files, start at `01`.
 - `<slug>` is kebab-case derived from `## Objective`, 3–5 words, **in the language of the original prompt** (see Rules).
