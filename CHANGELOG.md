@@ -4,7 +4,7 @@
 
 _Nada ainda — registre aqui as mudanças da próxima versão sob `### Added` / `### Changed` / `### Fixed` / `### Removed`, movendo-as para uma seção versionada no release._
 
-## [3.3.0] - 2026-07-21
+## [3.3.1] - 2026-07-21
 
 ### Changed
 
