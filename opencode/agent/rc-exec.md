@@ -1,7 +1,7 @@
 ---
 description: rc execution phase — implement one hard task end to end
 mode: subagent
-model: opencode-go/glm-5.2
+model: opencode-go/kimi-k3
 reasoningEffort: high
 temperature: 0.2
 ---

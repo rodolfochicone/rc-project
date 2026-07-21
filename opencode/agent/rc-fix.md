@@ -1,7 +1,7 @@
 ---
 description: rc fix phase — resolve review/QA issues at the root cause
 mode: subagent
-model: opencode-go/glm-5.2
+model: opencode-go/kimi-k3
 reasoningEffort: high
 temperature: 0.2
 ---

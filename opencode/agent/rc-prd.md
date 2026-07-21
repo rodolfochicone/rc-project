@@ -1,7 +1,7 @@
 ---
 description: rc PRD / ideation phase — brainstorm and write the Product Requirements Document
 mode: subagent
-model: opencode-go/kimi-k2.6
+model: opencode-go/kimi-k3
 reasoningEffort: high
 temperature: 0.4
 ---

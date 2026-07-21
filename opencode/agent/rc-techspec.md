@@ -1,7 +1,7 @@
 ---
 description: rc Tech spec / architecture phase — translate the PRD into a technical design
 mode: subagent
-model: opencode-go/glm-5.2
+model: opencode-go/kimi-k3
 reasoningEffort: high
 temperature: 0.3
 ---

@@ -1,7 +1,7 @@
 ---
 description: rc task breakdown phase — decompose the PRD + TechSpec into executable tasks
 mode: subagent
-model: opencode-go/qwen3.7-max
+model: opencode-go/kimi-k3
 reasoningEffort: high
 temperature: 0.3
 ---

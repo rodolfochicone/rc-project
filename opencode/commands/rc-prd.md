@@ -1,5 +1,5 @@
 ---
-description: rc — PRD / ideation (Kimi K2.6, high)
+description: rc — PRD / ideation (Kimi K3, high)
 agent: rc-prd
 ---
 

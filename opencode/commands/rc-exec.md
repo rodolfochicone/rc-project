@@ -1,5 +1,5 @@
 ---
-description: rc — implement one hard task (GLM-5.2, high)
+description: rc — implement one hard task (Kimi K3, high)
 agent: rc-exec
 ---
 

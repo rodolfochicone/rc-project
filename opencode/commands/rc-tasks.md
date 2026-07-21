@@ -1,5 +1,5 @@
 ---
-description: rc — break PRD+TechSpec into tasks (Qwen3.7 Max, high)
+description: rc — break PRD+TechSpec into tasks (Kimi K3, high)
 agent: rc-tasks
 ---
 

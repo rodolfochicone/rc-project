@@ -1,5 +1,5 @@
 ---
-description: rc — resolve review/QA issues at root cause (GLM-5.2, high)
+description: rc — resolve review/QA issues at root cause (Kimi K3, high)
 agent: rc-fix
 ---
 

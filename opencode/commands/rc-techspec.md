@@ -1,5 +1,5 @@
 ---
-description: rc — Tech spec / architecture (GLM-5.2, high)
+description: rc — Tech spec / architecture (Kimi K3, high)
 agent: rc-techspec
 ---
 
